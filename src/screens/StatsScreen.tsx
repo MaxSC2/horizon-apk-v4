@@ -176,7 +176,7 @@ export default function StatsScreen() {
         </View>
       </ScrollView>
 
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 100 }}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 40 }}>
 
         {sub === 'stats' && (
           <>
@@ -618,8 +618,6 @@ export default function StatsScreen() {
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 2 }}>Тело · Разум · Дисциплина · Горизонт</Text>
               </View>
             </Card>
-            
-            <View style={{ height: 100 }} />
           </>
         )}
       </ScrollView>

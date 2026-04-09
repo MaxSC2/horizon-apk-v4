@@ -186,7 +186,7 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
 
         {/* Quote */}
         <View style={{ padding: 12, backgroundColor: T.primary + '18', borderWidth: 1, borderColor: T.primary + '33', borderRadius: 12, marginBottom: 12 }}>

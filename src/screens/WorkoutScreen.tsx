@@ -192,7 +192,7 @@ export default function WorkoutScreen() {
     const filtered = histSearch ? entries.filter(([d,l])=>d.includes(histSearch)||PLAN.find(p=>p.id===(l as any).dayId)?.name.toLowerCase().includes(histSearch.toLowerCase())) : entries.slice(0,20);
     return (
       <SafeAreaView style={{ flex:1, backgroundColor:T.bg }}>
-        <ScrollView contentContainerStyle={{ padding:14, paddingBottom:100 }}>
+        <ScrollView contentContainerStyle={{ padding:14, paddingBottom:40 }}>
           <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
             <Text style={{ fontFamily:'BarlowCondensed_900Black', fontSize:24, color:T.txt }}>Тренировка</Text>
             <TouchableOpacity onPress={()=>setShowHist(!showHist)} style={{ flexDirection:'row', alignItems:'center', gap:5, paddingHorizontal:12, paddingVertical:6, borderRadius:9, borderWidth:1, borderColor:T.bord, backgroundColor:showHist?T.primary+'22':T.lo }}>
@@ -260,7 +260,7 @@ export default function WorkoutScreen() {
   return (
     <SafeAreaView style={{ flex:1, backgroundColor:T.bg }}>
       {session.showRest && <RestTimerModal T={T} onDone={()=>upd({showRest:false})}/>}
-      <ScrollView contentContainerStyle={{ padding:14, paddingBottom:100 }}>
+      <ScrollView contentContainerStyle={{ padding:14, paddingBottom:40 }}>
 
         {session.phase==='warmup' && (<>
           <View style={{ flexDirection:'row', justifyContent:'space-between', marginBottom:4 }}>

@@ -134,7 +134,7 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }} stickyHeaderIndices={[0]}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }} stickyHeaderIndices={[0]}>
 
         {/* Sticky Calendar Header */}
         <View style={{ backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord }}>

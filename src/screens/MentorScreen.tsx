@@ -254,7 +254,7 @@ export default function MentorScreen() {
         </View>
 
         {/* Messages */}
-        <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 14, gap: 12 }} onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}>
+        <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 14, gap: 12, paddingBottom: 40 }} onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}>
 
           {/* Welcome */}
           {isWelcome && (
