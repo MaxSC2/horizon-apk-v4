@@ -78,7 +78,7 @@ export default function StylePickerModal({ T, currentStyleId, currentThemeId, on
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'flex-end' }} onPress={onClose}>
         <Pressable onPress={() => {}}>
-          <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%', paddingBottom: 34 }}>
+          <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: 34 }}>
             {/* Header */}
             <View style={{ padding: 18, paddingBottom: 10 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
