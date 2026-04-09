@@ -314,12 +314,20 @@ export default function DashboardScreen() {
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: sleepColor }}>{sleepHours > 0 ? `${sleepHours}ч` : 'Не записан'}</Text>
               </View>
             </View>
-            <View style={{ flexDirection: 'row', gap: 4 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               {[5, 6, 7, 8].map(h => (
-                <TouchableOpacity key={h} onPress={() => setSleep(h)} style={{ width: 30, height: 30, borderRadius: 7, borderWidth: 1.5, borderColor: sleepHours === h ? sleepColor : T.bord, backgroundColor: sleepHours === h ? sleepColor + '22' : T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 11, color: sleepHours === h ? sleepColor : T.muted }}>{h}</Text>
+                <TouchableOpacity key={h} onPress={() => setSleep(h)} style={{ width: 28, height: 28, borderRadius: 6, borderWidth: 1.5, borderColor: sleepHours === h ? sleepColor : T.bord, backgroundColor: sleepHours === h ? sleepColor + '22' : T.lo, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: sleepHours === h ? sleepColor : T.muted }}>{h}</Text>
                 </TouchableOpacity>
               ))}
+              <TextInput
+                value={sleepHours > 0 && ![5,6,7,8].includes(sleepHours) ? String(sleepHours) : ''}
+                onChangeText={v => { const h = parseFloat(v); if (h > 0 && h <= 24) setSleep(h); }}
+                keyboardType="numeric"
+                placeholder="?"
+                placeholderTextColor={T.muted}
+                style={{ width: 36, height: 28, borderRadius: 6, borderWidth: 1.5, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'BarlowCondensed_700Bold', fontSize: 11, textAlign: 'center', marginLeft: 4 }}
+              />
             </View>
           </View>
 

@@ -1,8 +1,9 @@
 // src/screens/CalendarScreen.tsx — Full calendar with events and history overlay
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal, Pressable, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal, Pressable, TextInput, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, ChevronRight, Plus, X, Check, Target, Dumbbell, BookOpen, Heart } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Plus, X, Check, Target, Dumbbell, BookOpen, Heart, Bell } from 'lucide-react-native';
+import * as Notifications from 'expo-notifications';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Badge } from '../components';
 import { uid, fmt } from '../helpers';
@@ -16,7 +17,15 @@ interface CalEvent {
   done: boolean;
   color?: string;
   time?: string;
+  reminder?: 'day' | 'hour' | '30min' | null;
+  notifId?: string;
 }
+
+const REMIND_OPTIONS = [
+  { id: 'day' as const, label: 'За день', icon: '📅' },
+  { id: 'hour' as const, label: 'За час', icon: '⏰' },
+  { id: '30min' as const, label: 'За 30 мин', icon: '⏱' },
+];
 
 const CAT_INFO: Record<string, { emoji: string; color: string; label: string }> = {
   workout: { emoji: '💪', color: '#00C4F0', label: 'Тренировка' },
@@ -31,6 +40,28 @@ const CAT_INFO: Record<string, { emoji: string; color: string; label: string }> 
 const MONTH_NAMES = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const TODAY = fmt(new Date());
 
+async function scheduleEventReminder(event: CalEvent): Promise<string | null> {
+  if (!event.reminder || !event.time) return null;
+  try {
+    const [hours, minutes] = event.time.split(':').map(Number);
+    const eventDate = new Date(event.date + 'T12:00:00');
+    eventDate.setHours(hours, minutes, 0, 0);
+    
+    let reminderDate = new Date(eventDate);
+    if (event.reminder === 'day') reminderDate.setDate(reminderDate.getDate() - 1);
+    else if (event.reminder === 'hour') reminderDate.setHours(reminderDate.getHours() - 1);
+    else if (event.reminder === '30min') reminderDate.setMinutes(reminderDate.getMinutes() - 30);
+    
+    if (reminderDate <= new Date()) return null;
+    
+    const notifId = await Notifications.scheduleNotificationAsync({
+      content: { title: `⏰ ${event.title}`, body: `Через ${event.reminder === 'day' ? 'день' : event.reminder === 'hour' ? 'час' : '30 минут'}!`, sound: true },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: reminderDate },
+    });
+    return notifId;
+  } catch (e) { return null; }
+}
+
 export default function CalendarScreen() {
   const { state, setState, T } = useApp();
   const { history, journal } = state;
@@ -44,7 +75,7 @@ export default function CalendarScreen() {
   const [month, setMonth] = useState(new Date().getMonth());
   const [selectedDate, setSelectedDate] = useState(TODAY);
   const [showAdd, setShowAdd] = useState(false);
-  const [newEvent, setNewEvent] = useState({ title: '', category: 'note' as CalEvent['category'], time: '', done: false });
+  const [newEvent, setNewEvent] = useState({ title: '', category: 'note' as CalEvent['category'], time: '', done: false, reminder: null as CalEvent['reminder'] });
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
@@ -80,10 +111,14 @@ export default function CalendarScreen() {
   const selectedJournal = journal.filter((j: any) => j.date === selectedDate).slice(-1)[0];
   const selectedPlanDay = (() => { const d = new Date(selectedDate + 'T12:00:00'); const i = d.getDay() === 0 ? 6 : d.getDay() - 1; return PLAN[i]; })();
 
-  const addEvent = () => {
+  const addEvent = async () => {
     if (!newEvent.title.trim()) return;
-    setEvents(prev => [...prev, { id: uid(), date: selectedDate, ...newEvent, title: newEvent.title.trim() }]);
-    setNewEvent({ title: '', category: 'note', time: '', done: false });
+    const event: CalEvent = { id: uid(), date: selectedDate, title: newEvent.title.trim(), ...newEvent };
+    if (event.reminder && event.time) {
+      event.notifId = await scheduleEventReminder(event) || undefined;
+    }
+    setEvents(prev => [...prev, event]);
+    setNewEvent({ title: '', category: 'note', time: '', done: false, reminder: null });
     setShowAdd(false);
   };
 
@@ -249,6 +284,7 @@ export default function CalendarScreen() {
                     <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center', marginTop: 2 }}>
                       {event.time && <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted }}>🕐 {event.time}</Text>}
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: cat.color }}>{cat.label}</Text>
+                      {event.reminder && <Text style={{ fontSize: 10 }}>🔔</Text>}
                     </View>
                   </View>
                   <TouchableOpacity onPress={() => deleteEvent(event.id)} style={{ padding: 4, opacity: 0.5 }}>
@@ -279,6 +315,17 @@ export default function CalendarScreen() {
 
                 <TextInput value={newEvent.time} onChangeText={v => setNewEvent(n => ({ ...n, time: v }))} placeholder="Время (напр. 10:00)"  placeholderTextColor={T.muted} keyboardType="numbers-and-punctuation"
                   style={{ height: 40, borderRadius: 9, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 15, paddingHorizontal: 12, marginBottom: 12 }} />
+
+                <Lbl T={T} style={{ marginBottom: 8 }}>Напоминание</Lbl>
+                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+                  {REMIND_OPTIONS.map(r => (
+                    <TouchableOpacity key={r.id} onPress={() => setNewEvent(n => ({ ...n, reminder: n.reminder === r.id ? null : r.id }))}
+                      style={{ flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1.5, borderColor: newEvent.reminder === r.id ? T.primary : T.bord, backgroundColor: newEvent.reminder === r.id ? T.primary + '18' : T.lo, alignItems: 'center' }}>
+                      <Text style={{ fontSize: 16 }}>{r.icon}</Text>
+                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: newEvent.reminder === r.id ? T.primary : T.muted, marginTop: 2 }}>{r.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
 
                 <Lbl T={T} style={{ marginBottom: 8 }}>Категория</Lbl>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginBottom: 16 }}>
