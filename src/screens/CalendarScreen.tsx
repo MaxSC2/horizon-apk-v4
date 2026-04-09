@@ -76,6 +76,8 @@ export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(TODAY);
   const [showAdd, setShowAdd] = useState(false);
   const [newEvent, setNewEvent] = useState({ title: '', category: 'note' as CalEvent['category'], time: '', done: false, reminder: null as CalEvent['reminder'] });
+  const [eventHour, setEventHour] = useState(12);
+  const [eventMinute, setEventMinute] = useState(0);
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
@@ -113,12 +115,19 @@ export default function CalendarScreen() {
 
   const addEvent = async () => {
     if (!newEvent.title.trim()) return;
-    const event: CalEvent = { id: uid(), date: selectedDate, title: newEvent.title.trim(), ...newEvent };
-    if (event.reminder && event.time) {
+    const timeStr = `${String(eventHour).padStart(2, '0')}:${String(eventMinute).padStart(2, '0')}`;
+    const event: CalEvent = { id: uid(), date: selectedDate, title: newEvent.title.trim(), ...newEvent, time: timeStr };
+    if (event.reminder) {
       event.notifId = await scheduleEventReminder(event) || undefined;
     }
     setEvents(prev => [...prev, event]);
+    closeAddModal();
+  };
+
+  const closeAddModal = () => {
     setNewEvent({ title: '', category: 'note', time: '', done: false, reminder: null });
+    setEventHour(12);
+    setEventMinute(0);
     setShowAdd(false);
   };
 
@@ -299,8 +308,8 @@ export default function CalendarScreen() {
 
       {/* Add event modal */}
       {showAdd && (
-        <Modal visible transparent animationType="slide" onRequestClose={() => setShowAdd(false)}>
-          <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' }} onPress={() => setShowAdd(false)}>
+        <Modal visible transparent animationType="slide" onRequestClose={() => closeAddModal()}>
+          <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' }} onPress={() => closeAddModal()}>
             <Pressable onPress={() => {}}>
               <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%', padding: 20, paddingBottom: 54 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -313,8 +322,31 @@ export default function CalendarScreen() {
                 <TextInput value={newEvent.title} onChangeText={v => setNewEvent(n => ({ ...n, title: v }))} placeholder="Название события…" placeholderTextColor={T.muted} autoFocus
                   style={{ height: 46, borderRadius: 10, borderWidth: 1.5, borderColor: T.primary, backgroundColor: T.lo, color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 18, paddingHorizontal: 14, marginBottom: 12 }} />
 
-                <TextInput value={newEvent.time} onChangeText={v => setNewEvent(n => ({ ...n, time: v }))} placeholder="Время (напр. 10:00)"  placeholderTextColor={T.muted} keyboardType="numbers-and-punctuation"
-                  style={{ height: 40, borderRadius: 9, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 15, paddingHorizontal: 12, marginBottom: 12 }} />
+                <Lbl T={T} style={{ marginBottom: 8 }}>Время</Lbl>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <View style={{ alignItems: 'center', gap: 4 }}>
+                    <TouchableOpacity onPress={() => setEventHour(h => (h + 1) % 24)} style={{ width: 44, height: 32, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: T.muted, fontSize: 14 }}>▲</Text>
+                    </TouchableOpacity>
+                    <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 32, color: T.txt }}>{String(eventHour).padStart(2, '0')}</Text>
+                    <TouchableOpacity onPress={() => setEventHour(h => (h - 1 + 24) % 24)} style={{ width: 44, height: 32, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: T.muted, fontSize: 14 }}>▼</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 32, color: T.txt }}>:</Text>
+                  <View style={{ alignItems: 'center', gap: 4 }}>
+                    <TouchableOpacity onPress={() => setEventMinute(m => (m + 5) % 60)} style={{ width: 44, height: 32, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: T.muted, fontSize: 14 }}>▲</Text>
+                    </TouchableOpacity>
+                    <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 32, color: T.txt }}>{String(eventMinute).padStart(2, '0')}</Text>
+                    <TouchableOpacity onPress={() => setEventMinute(m => (m - 5 + 60) % 60)} style={{ width: 44, height: 32, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: T.muted, fontSize: 14 }}>▼</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <TouchableOpacity onPress={() => { setEventHour(0); setEventMinute(0); }} style={{ marginLeft: 8, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo }}>
+                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: T.muted }}>Без времени</Text>
+                  </TouchableOpacity>
+                </View>
 
                 <Lbl T={T} style={{ marginBottom: 8 }}>Напоминание</Lbl>
                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
@@ -339,7 +371,7 @@ export default function CalendarScreen() {
                 </View>
 
                 <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <TouchableOpacity onPress={() => setShowAdd(false)} style={{ flex: 1, height: 44, borderRadius: 10, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
+                  <TouchableOpacity onPress={() => closeAddModal()} style={{ flex: 1, height: 44, borderRadius: 10, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.muted }}>Отмена</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={addEvent} disabled={!newEvent.title.trim()} style={{ flex: 2, height: 44, borderRadius: 10, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center', opacity: !newEvent.title.trim() ? 0.5 : 1 }}>
