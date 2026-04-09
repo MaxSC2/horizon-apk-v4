@@ -176,7 +176,7 @@ export default function StatsScreen() {
         </View>
       </ScrollView>
 
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 24 }}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 100 }}>
 
         {sub === 'stats' && (
           <>

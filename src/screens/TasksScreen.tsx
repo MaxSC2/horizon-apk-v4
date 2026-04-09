@@ -101,7 +101,7 @@ export default function TasksScreen() {
         ))}
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 20 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 100 }}>
 
         {sub === 'tasks' && (
           <>

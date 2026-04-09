@@ -137,7 +137,7 @@ function AlarmAddModal({ T, onSave, onClose, initial }: any) {
               </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 0 }}>
+            <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 0, paddingBottom: 100 }}>
               {/* Big time picker */}
               <View style={{ alignItems: 'center', marginBottom: 20 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
