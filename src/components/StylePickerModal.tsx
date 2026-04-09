@@ -76,9 +76,10 @@ export default function StylePickerModal({ T, currentStyleId, currentThemeId, on
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'flex-end' }} onPress={onClose}>
-        <Pressable onPress={() => {}}>
-          <View style={{ backgroundColor: T.surf }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.88)' }}>
+        <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={onClose}>
+          <Pressable onPress={() => {}} style={{ backgroundColor: T.surf }}>
+            <View style={{ backgroundColor: T.surf, paddingBottom: 34 }}>
             {/* Header */}
             <View style={{ padding: 18, paddingBottom: 10 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
@@ -131,9 +132,10 @@ export default function StylePickerModal({ T, currentStyleId, currentThemeId, on
                 </View>
               ))}
             </ScrollView>
-          </View>
+            </View>
+          </Pressable>
         </Pressable>
-      </Pressable>
+      </View>
     </Modal>
   );
 }

@@ -485,57 +485,59 @@ export default function DashboardScreen() {
 
       {/* Sleep Picker Modal */}
       <Modal visible={showSleepModal} transparent animationType="slide" onRequestClose={() => setShowSleepModal(false)}>
-        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' }} onPress={() => setShowSleepModal(false)}>
-          <Pressable onPress={() => {}} style={{ backgroundColor: T.surf }}>
-            <View style={{ borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%', padding: 20, paddingBottom: 40 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>Время сна</Text>
-                <TouchableOpacity onPress={() => setShowSleepModal(false)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: T.muted, fontSize: 16 }}>✕</Text>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)' }}>
+          <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={() => setShowSleepModal(false)}>
+            <Pressable onPress={() => {}} style={{ backgroundColor: T.surf }}>
+              <View style={{ backgroundColor: T.surf, padding: 20, paddingBottom: 40 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>Время сна</Text>
+                  <TouchableOpacity onPress={() => setShowSleepModal(false)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ color: T.muted, fontSize: 16 }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 20, marginBottom: 30 }}>
+                  <View style={{ alignItems: 'center', gap: 8 }}>
+                    <TouchableOpacity onPress={() => setSleepHour(h => h >= 23 ? 0 : h + 1)} style={{ width: 70, height: 40, borderRadius: 10, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: T.muted, fontSize: 20 }}>▲</Text>
+                    </TouchableOpacity>
+                    <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt }}>{String(sleepHour).padStart(2, '0')}</Text>
+                    <TouchableOpacity onPress={() => setSleepHour(h => h <= 0 ? 23 : h - 1)} style={{ width: 70, height: 40, borderRadius: 10, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: T.muted, fontSize: 20 }}>▼</Text>
+                    </TouchableOpacity>
+                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: T.muted }}>часов</Text>
+                  </View>
+
+                  <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt, marginTop: -20 }}>:</Text>
+
+                  <View style={{ alignItems: 'center', gap: 8 }}>
+                    <TouchableOpacity onPress={() => setSleepMinute(m => m >= 59 ? 0 : m + 1)} style={{ width: 70, height: 40, borderRadius: 10, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: T.muted, fontSize: 20 }}>▲</Text>
+                    </TouchableOpacity>
+                    <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt }}>{String(sleepMinute).padStart(2, '0')}</Text>
+                    <TouchableOpacity onPress={() => setSleepMinute(m => m <= 0 ? 59 : m - 1)} style={{ width: 70, height: 40, borderRadius: 10, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: T.muted, fontSize: 20 }}>▼</Text>
+                    </TouchableOpacity>
+                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: T.muted }}>минут</Text>
+                  </View>
+                </View>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
+                  {[[6, 0], [7, 0], [8, 0], [9, 0]].map(([h, m]) => (
+                    <TouchableOpacity key={`${h}${m}`} onPress={() => { setSleepHour(h); setSleepMinute(m); }}
+                      style={{ paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5, borderColor: sleepHour === h && sleepMinute === m ? T.primary : T.bord, backgroundColor: sleepHour === h && sleepMinute === m ? T.primary + '22' : T.lo }}>
+                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: sleepHour === h && sleepMinute === m ? T.primary : T.muted }}>{h}ч</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <TouchableOpacity onPress={saveSleep} style={{ height: 50, borderRadius: 12, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: '#000' }}>Сохранить</Text>
                 </TouchableOpacity>
               </View>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 20, marginBottom: 30 }}>
-                <View style={{ alignItems: 'center', gap: 8 }}>
-                  <TouchableOpacity onPress={() => setSleepHour(h => h >= 23 ? 0 : h + 1)} style={{ width: 70, height: 40, borderRadius: 10, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: T.muted, fontSize: 20 }}>▲</Text>
-                  </TouchableOpacity>
-                  <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt }}>{String(sleepHour).padStart(2, '0')}</Text>
-                  <TouchableOpacity onPress={() => setSleepHour(h => h <= 0 ? 23 : h - 1)} style={{ width: 70, height: 40, borderRadius: 10, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: T.muted, fontSize: 20 }}>▼</Text>
-                  </TouchableOpacity>
-                  <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: T.muted }}>часов</Text>
-                </View>
-
-                <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt, marginTop: -20 }}>:</Text>
-
-                <View style={{ alignItems: 'center', gap: 8 }}>
-                  <TouchableOpacity onPress={() => setSleepMinute(m => m >= 59 ? 0 : m + 1)} style={{ width: 70, height: 40, borderRadius: 10, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: T.muted, fontSize: 20 }}>▲</Text>
-                  </TouchableOpacity>
-                  <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt }}>{String(sleepMinute).padStart(2, '0')}</Text>
-                  <TouchableOpacity onPress={() => setSleepMinute(m => m <= 0 ? 59 : m - 1)} style={{ width: 70, height: 40, borderRadius: 10, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: T.muted, fontSize: 20 }}>▼</Text>
-                  </TouchableOpacity>
-                  <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: T.muted }}>минут</Text>
-                </View>
-              </View>
-
-              <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
-                {[[6, 0], [7, 0], [8, 0], [9, 0]].map(([h, m]) => (
-                  <TouchableOpacity key={`${h}${m}`} onPress={() => { setSleepHour(h); setSleepMinute(m); }}
-                    style={{ paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5, borderColor: sleepHour === h && sleepMinute === m ? T.primary : T.bord, backgroundColor: sleepHour === h && sleepMinute === m ? T.primary + '22' : T.lo }}>
-                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: sleepHour === h && sleepMinute === m ? T.primary : T.muted }}>{h}ч</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <TouchableOpacity onPress={saveSleep} style={{ height: 50, borderRadius: 12, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: '#000' }}>Сохранить</Text>
-              </TouchableOpacity>
-            </View>
+            </Pressable>
           </Pressable>
-        </Pressable>
+        </View>
       </Modal>
     </SafeAreaView>
   );

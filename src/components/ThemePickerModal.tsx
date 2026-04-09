@@ -64,9 +64,10 @@ export default function ThemePickerModal({ T, currentThemeId, onSelect, onClose 
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' }} onPress={onClose}>
-        <Pressable onPress={() => {}}>
-          <View style={{ backgroundColor: T.surf }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)' }}>
+        <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={onClose}>
+          <Pressable onPress={() => {}} style={{ backgroundColor: T.surf }}>
+            <View style={{ backgroundColor: T.surf, paddingBottom: 34 }}>
             {/* Header */}
             <View style={{ padding: 18, paddingBottom: 0 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -113,9 +114,10 @@ export default function ThemePickerModal({ T, currentThemeId, onSelect, onClose 
                 {light.map(theme => <ThemeCard key={theme.id} theme={theme} />)}
               </View>
             </ScrollView>
-          </View>
+            </View>
+          </Pressable>
         </Pressable>
-      </Pressable>
+      </View>
     </Modal>
   );
 }
