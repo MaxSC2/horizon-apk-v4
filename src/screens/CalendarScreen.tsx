@@ -311,7 +311,7 @@ export default function CalendarScreen() {
         <Modal visible transparent animationType="slide" onRequestClose={() => closeAddModal()}>
           <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' }} onPress={() => closeAddModal()}>
             <Pressable onPress={() => {}}>
-              <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%', padding: 20, paddingBottom: 54 }}>
+              <View style={{ backgroundColor: T.surf, padding: 20, paddingBottom: 54 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: T.txt }}>Новое событие</Text>
                   <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted }}>

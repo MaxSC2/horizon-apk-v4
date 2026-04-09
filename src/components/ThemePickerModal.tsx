@@ -66,7 +66,7 @@ export default function ThemePickerModal({ T, currentThemeId, onSelect, onClose 
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' }} onPress={onClose}>
         <Pressable onPress={() => {}}>
-          <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%', paddingBottom: 34 }}>
+          <View style={{ backgroundColor: T.surf }}>
             {/* Header */}
             <View style={{ padding: 18, paddingBottom: 0 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
