@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Горизонт",
+    "slug": "horizon-life-tracker",
+    "version": "4.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#07090D"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#07090D"
+      },
+      "package": "com.horizon.lifetracker",
+      "versionCode": 4,
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE"
+      ]
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.horizon.lifetracker"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-haptics",
+      ["expo-notifications", {
+        "icon": "./assets/notification-icon.png",
+        "color": "#00C4F0"
+      }]
+    ],
+    "extra": {
+      "eas": { "projectId": "your-project-id" }
+    }
+  }
+}
