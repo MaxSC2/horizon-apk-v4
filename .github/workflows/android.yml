@@ -21,8 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Setup Expo
-        run: npx expo install --check
+
 
       - name: Prebuild Android
         run: npx expo prebuild --platform android --clean
