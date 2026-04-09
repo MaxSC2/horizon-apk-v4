@@ -115,17 +115,19 @@ export default function JournalScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
       {/* Sub-tabs */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord, maxHeight: 44 }}>
+      <View style={{ backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord }}>
         <View style={{ flexDirection: 'row' }}>
           {TABS.map(t => (
-            <TouchableOpacity key={t.id} onPress={() => setSub(t.id)} style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 2, borderBottomColor: sub === t.id ? T.primary : 'transparent' }}>
-              <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: sub === t.id ? T.primary : T.muted }}>{t.l}</Text>
-            </TouchableOpacity>
+            <View key={t.id} style={{ flex: 1 }}>
+              <TouchableOpacity onPress={() => setSub(t.id)} style={{ paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: sub === t.id ? T.primary : 'transparent' }}>
+                <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: sub === t.id ? T.primary : T.muted }}>{t.l}</Text>
+              </TouchableOpacity>
+            </View>
           ))}
         </View>
-      </ScrollView>
+      </View>
 
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
 
         {/* ═══ JOURNAL ═══ */}
         {sub === 'journal' && (
