@@ -28,12 +28,7 @@
       "bundleIdentifier": "com.horizon.lifetracker"
     },
     "plugins": [
-      "expo-font",
-      "expo-haptics",
-      ["expo-notifications", {
-        "icon": "./assets/notification-icon.png",
-        "color": "#00C4F0"
-      }]
+      "expo-font"
     ],
     "extra": {
       "eas": { "projectId": "your-project-id" }
