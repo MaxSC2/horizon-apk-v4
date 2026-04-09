@@ -43,7 +43,10 @@ async function requestPermissions(): Promise<boolean> {
 async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
   try {
     const granted = await requestPermissions();
-    if (!granted) return null;
+    if (!granted) {
+      Alert.alert('Нет разрешения', 'Для будильника нужно разрешение на уведомления');
+      return null;
+    }
 
     await Notifications.cancelScheduledNotificationAsync(alarm.notifId || '').catch(() => {});
 
@@ -53,7 +56,6 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
     if (trigger <= now) trigger.setDate(trigger.getDate() + 1);
 
     if (alarm.days.length === 0) {
-      // One-time
       const id = await Notifications.scheduleNotificationAsync({
         content: {
           title: alarm.label || '⏰ Будильник',
@@ -61,11 +63,13 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
           data: { alarmId: alarm.id },
           sound: true,
         },
-        trigger: { date: trigger },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: trigger,
+        },
       });
       return id;
     } else {
-      // Weekly repeating — schedule first day
       const day = alarm.days[0];
       const id = await Notifications.scheduleNotificationAsync({
         content: {
@@ -74,7 +78,12 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
           data: { alarmId: alarm.id },
           sound: true,
         },
-        trigger: { weekday: day + 1, hour: alarm.hour, minute: alarm.minute, repeats: true },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+          weekday: day + 1,
+          hour: alarm.hour,
+          minute: alarm.minute,
+        },
       });
       return id;
     }
@@ -243,6 +252,15 @@ export default function AlarmScreen() {
   const [editAlarm, setEditAlarm] = useState<Alarm | null>(null);
   const [sub, setSub] = useState<'alarms' | 'analysis'>('alarms');
 
+  useEffect(() => {
+    Notifications.setNotificationChannelAsync('alarms', {
+      name: 'Будильники',
+      importance: Notifications.AndroidImportance.MAX,
+      sound: 'default',
+      enableVibrate: true,
+    }).catch(console.error);
+  }, []);
+
   const setAlarms = (fn: (a: Alarm[]) => Alarm[]) => {
     setState((s: any) => ({ ...s, alarms: fn(s.alarms || []) }));
   };
@@ -329,7 +347,7 @@ export default function AlarmScreen() {
         ))}
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 24 }}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 100 }}>
 
         {/* ══ ALARMS ══ */}
         {sub === 'alarms' && (
