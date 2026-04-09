@@ -23,7 +23,7 @@ export default function ThemePickerModal({ T, currentThemeId, onSelect, onClose 
       <TouchableOpacity
         onPress={() => { onSelect(theme.id); onClose(); }}
         style={{
-          flex: 1,
+          width: '47%',
           padding: 12,
           borderRadius: 14,
           borderWidth: isActive ? 2 : 1.5,
