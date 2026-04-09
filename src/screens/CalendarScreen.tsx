@@ -301,8 +301,8 @@ export default function CalendarScreen() {
       {showAdd && (
         <Modal visible transparent animationType="slide" onRequestClose={() => setShowAdd(false)}>
           <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' }} onPress={() => setShowAdd(false)}>
-            <Pressable onPress={() => {}} style={{ backgroundColor: T.surf }}>
-              <View style={{ borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: 54 }}>
+            <Pressable onPress={() => {}}>
+              <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%', padding: 20, paddingBottom: 54 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: T.txt }}>Новое событие</Text>
                   <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted }}>
