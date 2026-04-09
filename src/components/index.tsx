@@ -135,6 +135,8 @@ export function Ring({ pct, size = 64, stroke = 6, color, bg, label, T }: RingPr
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const offset = circ - (circ * Math.min(pct, 100) / 100);
+  const displayPct = Math.round(pct);
+  const fontSize = size < 60 ? 10 : displayPct >= 100 ? 11 : 12;
   return (
     <View style={{ alignItems: 'center', gap: 3 }}>
       <Svg width={size} height={size}>
@@ -145,8 +147,8 @@ export function Ring({ pct, size = 64, stroke = 6, color, bg, label, T }: RingPr
           strokeLinecap="round"
           rotation="-90" origin={`${size / 2}, ${size / 2}`}
         />
-        <SvgText x={size / 2} y={size / 2 + 5} textAnchor="end" fill={color} fontSize={13} fontWeight="900" dx={-4}>
-          {pct}%
+        <SvgText x={size / 2} y={size / 2 + fontSize / 3} textAnchor="middle" fill={color} fontSize={fontSize} fontWeight="700">
+          {displayPct}%
         </SvgText>
       </Svg>
       {label && (
