@@ -50,13 +50,14 @@ export default function CalendarScreen() {
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
   // Build calendar days
-  const { days, startOffset } = useMemo(() => {
+  const { days, startOffset, endOffset } = useMemo(() => {
     const first = new Date(year, month, 1);
     const last = new Date(year, month + 1, 0);
-    const offset = (first.getDay() + 6) % 7; // Mon=0
+    const startOffset = (first.getDay() + 6) % 7; // Mon=0
+    const endOffset = (7 - last.getDay()) % 7; // days after last day of month
     const ds: string[] = [];
     for (let d = 1; d <= last.getDate(); d++) ds.push(fmt(new Date(year, month, d)));
-    return { days: ds, startOffset: offset };
+    return { days: ds, startOffset, endOffset };
   }, [year, month]);
 
   // Map date → data
@@ -129,9 +130,7 @@ export default function CalendarScreen() {
           <View style={{ paddingHorizontal: 8, paddingBottom: 10 }}>
             {/* Build weeks */}
             {(() => {
-              const allCells = [...Array(startOffset).fill(null), ...days];
-              // Pad to complete weeks
-              while (allCells.length % 7 !== 0) allCells.push(null);
+              const allCells = [...Array(startOffset).fill(null), ...days, ...Array(endOffset).fill(null)];
               const weeks: (string | null)[][] = [];
               for (let i = 0; i < allCells.length; i += 7) weeks.push(allCells.slice(i, i + 7));
               return weeks.map((week, wi) => (
