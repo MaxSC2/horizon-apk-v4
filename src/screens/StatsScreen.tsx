@@ -611,13 +611,15 @@ export default function StatsScreen() {
               <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.danger }}>Сбросить данные</Text>
             </TouchableOpacity>
 
-            <Card T={T}>
+            <Card T={T} style={{ marginBottom: 0 }}>
               <View style={{ alignItems: 'center', paddingVertical: 8 }}>
                 <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, letterSpacing: 2, color: T.txt }}>ГОРИЗОНТ</Text>
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted, marginTop: 4 }}>Life Tracker · v4.0 · Expo React Native</Text>
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 2 }}>Тело · Разум · Дисциплина · Горизонт</Text>
               </View>
             </Card>
+            
+            <View style={{ height: 100 }} />
           </>
         )}
       </ScrollView>
