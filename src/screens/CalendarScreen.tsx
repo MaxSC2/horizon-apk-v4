@@ -130,6 +130,8 @@ export default function CalendarScreen() {
             {/* Build weeks */}
             {(() => {
               const allCells = [...Array(startOffset).fill(null), ...days];
+              // Pad to complete weeks
+              while (allCells.length % 7 !== 0) allCells.push(null);
               const weeks: (string | null)[][] = [];
               for (let i = 0; i < allCells.length; i += 7) weeks.push(allCells.slice(i, i + 7));
               return weeks.map((week, wi) => (
