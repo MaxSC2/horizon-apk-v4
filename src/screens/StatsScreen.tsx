@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrendingUp, BedDouble, ChevronLeft, ChevronRight, Trash2, Palette } from 'lucide-react-native';
-import Svg, { Circle, Text as SvgText, Rect, Line, G } from 'react-native-svg';
+import Svg, { Circle, Text as SvgText, Rect, Line, G, Polygon, Polyline } from 'react-native-svg';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Badge, ProgressBar, Ring } from '../components';
 import {
@@ -61,8 +61,8 @@ function AreaChartSVG({ data, T, height = 80, color }: { data: (number | null)[]
   const area = linePts + ` ${lastValid!.x},${h + 10} ${firstValid!.x},${h + 10}`;
   return (
     <Svg width="100%" height={height} viewBox={`0 0 280 ${height}`}>
-      <Svg.Polygon points={area} fill={c + '30'} />
-      <Svg.Polyline points={linePts} fill="none" stroke={c} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Polygon points={area} fill={c + '30'} />
+      <Polyline points={linePts} fill="none" stroke={c} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 }
@@ -83,8 +83,8 @@ function RadarSVG({ data, T, size = 160 }: { data: { label: string; value: numbe
   }).join(' ');
   return (
     <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {[0.25, 0.5, 0.75, 1].map(s => <Svg.Polygon key={s} points={gridPts(s)} fill="none" stroke={T.bord} strokeWidth={1} />)}
-      <Svg.Polygon points={valuePts} fill={T.primary + '30'} stroke={T.primary} strokeWidth={2} />
+      {[0.25, 0.5, 0.75, 1].map(s => <Polygon key={s} points={gridPts(s)} fill="none" stroke={T.bord} strokeWidth={1} />)}
+      <Polygon points={valuePts} fill={T.primary + '30'} stroke={T.primary} strokeWidth={2} />
       {data.map((d, i) => {
         const a = angle(i);
         const lx = cx + Math.cos(a) * (r + 18);
