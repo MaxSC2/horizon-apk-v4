@@ -5,6 +5,7 @@ import {
   TextInput, StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Flame, Droplets, Trophy, Target, Zap, BedDouble, Palette } from 'lucide-react-native';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Ring, Badge, ProgressBar } from '../components';
@@ -88,7 +89,8 @@ function InsightsCard({ T, history, journal, tasks, goals }: any) {
 }
 
 export default function DashboardScreen() {
-  const { state, setState, T, startWorkout, navigateTo } = useApp();
+  const { state, setState, T, startWorkout } = useApp();
+  const navigation = useNavigation<any>();
   const { history, tasks, goals, journal } = state;
 
   const [showThemePicker, setShowThemePicker] = useState(false);
@@ -296,7 +298,7 @@ export default function DashboardScreen() {
             {todayLog?.completed
               ? <Badge color={T.success} T={T}>✓</Badge>
               : todayPlan.type !== 'rest'
-                ? <TouchableOpacity onPress={() => { startWorkout(todayI); navigateTo('Workout'); }} style={{ paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8, backgroundColor: T.primary }}>
+                ? <TouchableOpacity onPress={() => { startWorkout(todayI); navigation.navigate('Workout'); }} style={{ paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8, backgroundColor: T.primary }}>
                     <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: '#000' }}>▶ Начать</Text>
                   </TouchableOpacity>
                 : <Badge color={T.muted} T={T}>~</Badge>
