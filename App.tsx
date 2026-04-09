@@ -12,7 +12,7 @@ import {
 import { Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold } from '@expo-google-fonts/barlow';
 
 import {
-  Sunrise, Dumbbell, ClipboardList, Leaf,
+  Sun, Dumbbell, ClipboardList, Leaf,
   BookOpen, Sparkles, BarChart2, Activity,
   Bell, Calendar,
 } from 'lucide-react-native';
@@ -80,13 +80,13 @@ function Navigation() {
   };
 
   const TABS = [
-    { name: 'Dashboard', label: 'ГОРИЗОНТ', icon: Sunrise },
+    { name: 'Dashboard', label: 'ГЛАВНАЯ', icon: Sun },
     { name: 'Workout',   label: 'ТРЕН.',    icon: session ? Activity : Dumbbell, hasActive: !!session },
     { name: 'Tasks',     label: 'ЗАДАЧИ',   icon: ClipboardList },
     { name: 'Nutrition', label: 'ПИТАНИЕ',  icon: Leaf },
     { name: 'Journal',   label: 'ДНЕВНИК',  icon: BookOpen },
     { name: 'Calendar',  label: 'КАЛ.',     icon: Calendar },
-    { name: 'Mentor',    label: 'РАЗУМ',    icon: Sparkles },
+    { name: 'Mentor',    label: 'НЕЙРО',    icon: Sparkles },
     { name: 'Alarm',     label: 'ТРЕВОГА',  icon: Bell },
     { name: 'Stats',     label: 'СТАТЫ',    icon: BarChart2 },
   ];
