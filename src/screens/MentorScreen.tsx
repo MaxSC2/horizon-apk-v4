@@ -503,7 +503,7 @@ export default function MentorScreen() {
                     <Lbl T={T} style={{ marginBottom: 6 }}>Своя модель (опционально)</Lbl>
                     <TextInput
                       value={(aiConfig as any).customModel || ''} onChangeText={v => setState(s => ({ ...s, aiConfig: { ...s.aiConfig, model: v || (AI_PROVIDERS.find(p => p.id === (s.aiConfig.provider || 'claude'))?.defaultModel || '') } as any }))}
-                      placeholder="gpt-4o, gemini-2.0-flash, ..."
+                      placeholder="gpt-4o, gemini-2.5-flash, ..."
                       placeholderTextColor={T.muted} autoCapitalize="none"
                       style={{ height: 40, borderRadius: 9, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 14, paddingHorizontal: 12 }}
                     />
