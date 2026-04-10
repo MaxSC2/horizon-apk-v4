@@ -49,19 +49,31 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
     }
 
     await Notifications.cancelScheduledNotificationAsync(alarm.notifId || '').catch(() => {});
+    // Cancel all related notifications
+    if (alarm.id) {
+      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      for (const n of scheduled) {
+        if ((n.content.data as any)?.alarmId === alarm.id) {
+          await Notifications.cancelScheduledNotificationAsync(n.identifier).catch(() => {});
+        }
+      }
+    }
 
     const now = new Date();
-    const trigger = new Date();
-    trigger.setHours(alarm.hour, alarm.minute, 0, 0);
-    if (trigger <= now) trigger.setDate(trigger.getDate() + 1);
 
     if (alarm.days.length === 0) {
+      // Single alarm
+      const trigger = new Date();
+      trigger.setHours(alarm.hour, alarm.minute, 0, 0);
+      if (trigger <= now) trigger.setDate(trigger.getDate() + 1);
+      trigger.setSeconds(0);
+
       const id = await Notifications.scheduleNotificationAsync({
         content: {
           title: alarm.label || '⏰ Будильник',
           body: `${String(alarm.hour).padStart(2, '0')}:${String(alarm.minute).padStart(2, '0')}`,
           data: { alarmId: alarm.id },
-          sound: true,
+          sound: 'default',
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -70,25 +82,44 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
       });
       return id;
     } else {
-      const day = alarm.days[0];
-      const id = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: alarm.label || '⏰ Будильник',
-          body: `${String(alarm.hour).padStart(2, '0')}:${String(alarm.minute).padStart(2, '0')}`,
-          data: { alarmId: alarm.id },
-          sound: true,
-        },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-          weekday: day + 1,
-          hour: alarm.hour,
-          minute: alarm.minute,
-        },
-      });
-      return id;
+      // Weekly alarms — schedule for each selected day
+      const ids: string[] = [];
+      for (const day of alarm.days) {
+        const trigger = new Date();
+        trigger.setHours(alarm.hour, alarm.minute, 0, 0);
+        trigger.setSeconds(0);
+        // Find next occurrence of this weekday
+        const currentDay = now.getDay(); // 0=Sun, 1=Mon...
+        let daysUntil = day - currentDay;
+        if (daysUntil < 0) daysUntil += 7;
+        if (daysUntil === 0 && trigger <= now) daysUntil += 7;
+        trigger.setDate(trigger.getDate() + daysUntil);
+
+        try {
+          const id = await Notifications.scheduleNotificationAsync({
+            content: {
+              title: alarm.label || '⏰ Будильник',
+              body: `${String(alarm.hour).padStart(2, '0')}:${String(alarm.minute).padStart(2, '0')}`,
+              data: { alarmId: alarm.id, day },
+              sound: 'default',
+            },
+            trigger: {
+              type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+              weekday: day + 1,
+              hour: alarm.hour,
+              minute: alarm.minute,
+            },
+          });
+          if (ids.length === 0) ids.push(id); // return first id
+        } catch (e) {
+          console.warn('Failed to schedule for day', day, e);
+        }
+      }
+      return ids[0] || null;
     }
   } catch (e) {
     console.error('scheduleAlarm error', e);
+    Alert.alert('Ошибка', 'Не удалось создать будильник: ' + (e as Error).message);
     return null;
   }
 }
@@ -149,10 +180,13 @@ function AlarmAddModal({ T, onSave, onClose, initial }: any) {
                     </TouchableOpacity>
                     <TextInput 
                       value={String(hour).padStart(2, '0')} 
-                      onChangeText={v => { const n = parseInt(v); if (!isNaN(n) && n >= 0 && n <= 23) setHour(n); }}
+                      onChangeText={v => { 
+                        const cleaned = v.replace(/[^0-9]/g, '').slice(-2);
+                        const n = parseInt(cleaned || '0');
+                        if (!isNaN(n) && n >= 0 && n <= 23) setHour(n);
+                      }}
                       keyboardType="number-pad" 
                       maxLength={2}
-                      selectTextOnFocus
                       style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, textAlign: 'center' }}
                     />
                     <TouchableOpacity onPress={() => setHour(h => (h - 1 + 24) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
@@ -167,10 +201,13 @@ function AlarmAddModal({ T, onSave, onClose, initial }: any) {
                     </TouchableOpacity>
                     <TextInput 
                       value={String(minute).padStart(2, '0')} 
-                      onChangeText={v => { const n = parseInt(v); if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n); }}
+                      onChangeText={v => { 
+                        const cleaned = v.replace(/[^0-9]/g, '').slice(-2);
+                        const n = parseInt(cleaned || '0');
+                        if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
+                      }}
                       keyboardType="number-pad" 
                       maxLength={2}
-                      selectTextOnFocus
                       style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, textAlign: 'center' }}
                     />
                     <TouchableOpacity onPress={() => setMinute(m => (m - 5 + 60) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>

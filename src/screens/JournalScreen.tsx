@@ -209,12 +209,17 @@ export default function JournalScreen() {
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       <Text style={{ fontSize: 20 }}>{m?.e}</Text>
                       {entry.energy && <Text style={{ fontSize: 16, opacity: 0.7 }}>{en?.e}</Text>}
-                      {entry.sleep && (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: T.lo, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
-                          <BedDouble size={10} color={T.muted} />
-                          <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: T.muted }}>{entry.sleep}ч</Text>
-                        </View>
-                      )}
+                      {entry.sleep && (() => {
+                        const totalMin = Math.round((entry.sleep || 0) * 60);
+                        const h = Math.floor(totalMin / 60);
+                        const m = totalMin % 60;
+                        return (
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: T.lo, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
+                            <BedDouble size={10} color={T.muted} />
+                            <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: T.muted }}>{h}ч {m > 0 ? `${m}м` : ''}</Text>
+                          </View>
+                        );
+                      })()}
                       <View>
                         <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: entry.date === TODAY ? T.primary : T.muted }}>
                           {entry.date === TODAY ? 'Сегодня' : new Date(entry.date + 'T12:00:00').toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' })}
