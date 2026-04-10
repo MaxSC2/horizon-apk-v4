@@ -179,14 +179,18 @@ function AlarmAddModal({ T, onSave, onClose, initial }: any) {
                       <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
                     </TouchableOpacity>
                     <TextInput 
-                      value={String(hour).padStart(2, '0')} 
+                      defaultValue={String(hour).padStart(2, '0')}
                       onChangeText={v => { 
                         const cleaned = v.replace(/[^0-9]/g, '').slice(-2);
-                        const n = parseInt(cleaned || '0');
-                        if (!isNaN(n) && n >= 0 && n <= 23) setHour(n);
+                        if (cleaned.length === 2) {
+                          const n = parseInt(cleaned);
+                          if (!isNaN(n) && n >= 0 && n <= 23) setHour(n);
+                        }
                       }}
+                      onBlur={() => {}}
                       keyboardType="number-pad" 
                       maxLength={2}
+                      selectTextOnFocus
                       style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, textAlign: 'center' }}
                     />
                     <TouchableOpacity onPress={() => setHour(h => (h - 1 + 24) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
@@ -200,14 +204,18 @@ function AlarmAddModal({ T, onSave, onClose, initial }: any) {
                       <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
                     </TouchableOpacity>
                     <TextInput 
-                      value={String(minute).padStart(2, '0')} 
+                      defaultValue={String(minute).padStart(2, '0')}
                       onChangeText={v => { 
                         const cleaned = v.replace(/[^0-9]/g, '').slice(-2);
-                        const n = parseInt(cleaned || '0');
-                        if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
+                        if (cleaned.length === 2) {
+                          const n = parseInt(cleaned);
+                          if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
+                        }
                       }}
+                      onBlur={() => {}}
                       keyboardType="number-pad" 
                       maxLength={2}
+                      selectTextOnFocus
                       style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, textAlign: 'center' }}
                     />
                     <TouchableOpacity onPress={() => setMinute(m => (m - 5 + 60) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
