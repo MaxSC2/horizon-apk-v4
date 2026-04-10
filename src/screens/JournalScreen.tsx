@@ -127,7 +127,7 @@ export default function JournalScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
 
         {/* ═══ JOURNAL ═══ */}
         {sub === 'journal' && (

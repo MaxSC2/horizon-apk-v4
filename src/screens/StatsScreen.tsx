@@ -119,7 +119,8 @@ export default function StatsScreen() {
   })();
 
   const sleepEntries = journal.filter(j => (j.sleep || 0) > 0).slice(-30);
-  const avgSleep = sleepEntries.length ? (sleepEntries.reduce((s, j) => s + (j.sleep || 0), 0) / sleepEntries.length).toFixed(1) : '—';
+  const avgSleepVal = sleepEntries.length ? sleepEntries.reduce((s, j) => s + (j.sleep || 0), 0) / sleepEntries.length : null;
+  const avgSleepLabel = avgSleepVal ? (() => { const totalMin = Math.round(avgSleepVal * 60); const h = Math.floor(totalMin / 60); const m = totalMin % 60; return m > 0 ? `${h}ч ${m}м` : `${h}ч`; })() : '—';
 
   const trackedEx = PLAN.flatMap(d => d.exercises || []).reduce((a: any[], e) => {
     if (!a.find((x: any) => x.id === e.id)) a.push(e); return a;
@@ -176,7 +177,7 @@ export default function StatsScreen() {
         </View>
       </ScrollView>
 
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 20 }}>
 
         {sub === 'stats' && (
           <>
@@ -186,7 +187,7 @@ export default function StatsScreen() {
                 { l: 'Тренировок', v: totalW, c: T.primary },
                 { l: 'Ср. сложность', v: avgDiff, c: T.warn },
                 { l: '🔥 Серия', v: streak, c: T.success },
-                { l: '💤 Сон avg', v: avgSleep === '—' ? '—' : avgSleep + 'ч', c: T.primary },
+                { l: '💤 Сон avg', v: avgSleepLabel, c: T.primary },
               ].map((s, i) => (
                 <Card key={i} T={T} style={{ flex: 1, padding: 10, alignItems: 'center' }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: s.c, lineHeight: 24 }}>{s.v}</Text>
@@ -270,8 +271,8 @@ export default function StatsScreen() {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <Lbl T={T}>Сон / 30 дней</Lbl>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                    <BedDouble size={12} color={parseFloat(avgSleep) >= 7 ? T.success : T.warn} />
-                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: parseFloat(avgSleep) >= 7 ? T.success : T.warn }}>avg {avgSleep}ч</Text>
+                    <BedDouble size={12} color={avgSleepVal !== null && avgSleepVal >= 7 ? T.success : T.warn} />
+                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: avgSleepVal !== null && avgSleepVal >= 7 ? T.success : T.warn }}>avg {avgSleepLabel}</Text>
                   </View>
                 </View>
                 <AreaChartSVG data={sleepLine} T={T} height={80} color={T.primary} />

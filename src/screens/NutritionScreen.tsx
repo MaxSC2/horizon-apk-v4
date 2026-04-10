@@ -43,7 +43,7 @@ export default function NutritionScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt }}>🥗 Питание</Text>
         </View>

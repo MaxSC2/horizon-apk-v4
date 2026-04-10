@@ -183,7 +183,7 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
 
         {/* Quote */}
         <View style={{ padding: 12, backgroundColor: T.primary + '18', borderWidth: 1, borderColor: T.primary + '33', borderRadius: 12, marginBottom: 12 }}>
@@ -424,7 +424,7 @@ export default function DashboardScreen() {
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)' }}>
           <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={() => setShowSleepModal(false)}>
             <Pressable onPress={() => {}} style={{ backgroundColor: T.surf }}>
-              <View style={{ backgroundColor: T.surf, padding: 20, paddingBottom: 40 }}>
+              <View style={{ backgroundColor: T.surf, padding: 20, paddingBottom: 20 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>Время сна</Text>
                   <TouchableOpacity onPress={() => setShowSleepModal(false)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
