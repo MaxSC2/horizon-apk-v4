@@ -209,163 +209,162 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.88)' }}>
-        <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={onClose}>
-          <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: 34 }}>
-              <View style={{ padding: 16, paddingBottom: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>
-                  {initial ? 'Изменить' : 'Новый'} будильник
-                </Text>
-                <TouchableOpacity onPress={onClose} style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                  <X size={14} color={T.muted} />
+      {/* Dark background - closes modal when pressed */}
+      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.88)' }} onPress={onClose} />
+      
+      {/* Modal content - does NOT close when pressed */}
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%' }}>
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          {/* Header */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>
+              {initial ? 'Изменить' : 'Новый'} будильник
+            </Text>
+            <TouchableOpacity onPress={onClose} style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
+              <X size={14} color={T.muted} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Time picker */}
+          <View style={{ alignItems: 'center', marginBottom: 20 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              {/* Hour */}
+              <View style={{ alignItems: 'center', gap: 6 }}>
+                <TouchableOpacity onPress={() => setHour(h => (h + 1) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {}} style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
+                  <TextInput
+                    value={String(hour).padStart(2, '0')}
+                    onChangeText={v => {
+                      const n = parseInt(v);
+                      if (!isNaN(n) && n >= 0 && n <= 23) setHour(n);
+                      else if (v === '') setHour(0);
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    selectTextOnFocus
+                    style={{ width: 80, textAlign: 'center', color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, backgroundColor: 'transparent' }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setHour(h => (h - 1 + 24) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: T.muted, fontSize: 18 }}>▼</Text>
                 </TouchableOpacity>
               </View>
-
-              <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 0, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-                {/* Time picker */}
-                <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                    {/* Hour */}
-                    <View style={{ alignItems: 'center', gap: 6 }}>
-                      <TouchableOpacity onPress={() => setHour(h => (h + 1) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
-                      </TouchableOpacity>
-                      <TextInput
-                        defaultValue={String(hour).padStart(2, '0')}
-                        onChangeText={v => {
-                          const cleaned = v.replace(/[^0-9]/g, '').slice(-2);
-                          if (cleaned.length === 2) {
-                            const n = parseInt(cleaned);
-                            if (!isNaN(n) && n >= 0 && n <= 23) setHour(n);
-                          }
-                        }}
-                        keyboardType="number-pad"
-                        maxLength={2}
-                        selectTextOnFocus
-                        style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, textAlign: 'center' }}
-                      />
-                      <TouchableOpacity onPress={() => setHour(h => (h - 1 + 24) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: T.muted, fontSize: 18 }}>▼</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt, marginTop: -8 }}>:</Text>
-                    {/* Minute */}
-                    <View style={{ alignItems: 'center', gap: 6 }}>
-                      <TouchableOpacity onPress={() => setMinute(m => (m + 5) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
-                      </TouchableOpacity>
-                      <TextInput
-                        value={String(minute).padStart(2, '0')}
-                        onChangeText={v => {
-                          const cleaned = v.replace(/[^0-9]/g, '');
-                          if (cleaned === '') {
-                            setMinute(0);
-                          } else {
-                            const n = parseInt(cleaned);
-                            if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
-                          }
-                        }}
-                        keyboardType="number-pad"
-                        maxLength={2}
-                        selectTextOnFocus
-                        style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, textAlign: 'center' }}
-                      />
-                      <TouchableOpacity onPress={() => setMinute(m => (m - 5 + 60) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: T.muted, fontSize: 18 }}>▼</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  {/* Quick times */}
-                  <View style={{ flexDirection: 'row', gap: 6 }}>
-                    {[[6, 0], [6, 30], [7, 0], [7, 30], [8, 0]].map(([h, m]) => (
-                      <TouchableOpacity key={`${h}${m}`} onPress={() => { setHour(h); setMinute(m); }}
-                        style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: hour === h && minute === m ? T.primary : T.bord, backgroundColor: hour === h && minute === m ? T.primary + '22' : T.lo }}>
-                        <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: hour === h && minute === m ? T.primary : T.muted }}>
-                          {String(h).padStart(2, '0')}:{String(m).padStart(2, '0')}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                {/* Sound selection */}
-                <Lbl T={T} style={{ marginBottom: 8 }}>🔊 Мелодия</Lbl>
-                <View style={{ flexDirection: 'row', gap: 6, marginBottom: 14 }}>
-                  {SOUND_OPTIONS.map(s => (
-                    <TouchableOpacity key={s.id} onPress={() => setSoundId(s.id)}
-                      style={{ flex: 1, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5, borderColor: soundId === s.id ? T.primary : T.bord, backgroundColor: soundId === s.id ? T.primary + '22' : T.lo, alignItems: 'center' }}>
-                      <Text style={{ fontSize: 16, marginBottom: 2 }}>{s.emoji}</Text>
-                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: soundId === s.id ? T.primary : T.muted }}>{s.label}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* Category */}
-                <Lbl T={T} style={{ marginBottom: 8 }}>Категория</Lbl>
-                <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
-                  {(Object.entries(CATEGORY_INFO) as [Alarm['category'], typeof CATEGORY_INFO[string]][]).map(([k, v]) => (
-                    <TouchableOpacity key={k} onPress={() => setCategory(k)}
-                      style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1.5, borderColor: category === k ? v.color : T.bord, backgroundColor: category === k ? v.color + '22' : T.lo, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                      <Text style={{ fontSize: 14 }}>{v.emoji}</Text>
-                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: category === k ? v.color : T.muted }}>{v.label}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* Label */}
-                <Lbl T={T} style={{ marginBottom: 6 }}>Название</Lbl>
-                <TextInput value={label} onChangeText={setLabel} placeholder={CATEGORY_INFO[category].label} placeholderTextColor={T.muted}
-                  style={{ height: 40, borderRadius: 9, borderWidth: 1.5, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 15, paddingHorizontal: 12, marginBottom: 14 }} />
-
-                {/* Days */}
-                <Lbl T={T} style={{ marginBottom: 8 }}>Повтор</Lbl>
-                <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
-                  {DAYS.map((d, i) => (
-                    <TouchableOpacity key={i} onPress={() => toggleDay(i)}
-                      style={{ flex: 1, height: 38, borderRadius: 9, borderWidth: 1.5, borderColor: days.includes(i) ? T.primary : T.bord, backgroundColor: days.includes(i) ? T.primary + '22' : T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: days.includes(i) ? T.primary : T.muted }}>{d}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
-                  {[
-                    { l: 'Будни', d: [1, 2, 3, 4, 5] },
-                    { l: 'Выходные', d: [0, 6] },
-                    { l: 'Каждый', d: [0, 1, 2, 3, 4, 5, 6] },
-                    { l: 'Однажды', d: [] },
-                  ].map(p => (
-                    <TouchableOpacity key={p.l} onPress={() => setDays(p.d)}
-                      style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: JSON.stringify(days) === JSON.stringify(p.d) ? T.success : T.bord, backgroundColor: JSON.stringify(days) === JSON.stringify(p.d) ? T.success + '18' : T.lo }}>
-                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 11, color: JSON.stringify(days) === JSON.stringify(p.d) ? T.success : T.muted }}>{p.l}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* Options */}
-                <View style={{ borderBottomWidth: 1, borderBottomColor: T.bord, marginBottom: 8 }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 }}>
-                    <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt }}>📳 Вибрация</Text>
-                    <Switch value={vibrate} onValueChange={setVibrate} trackColor={{ false: T.bord, true: T.primary + '99' }} thumbColor={vibrate ? T.primary : T.muted} />
-                  </View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 }}>
-                    <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt }}>🌙 Умный подъём</Text>
-                    <Switch value={smartWake} onValueChange={setSmartWake} trackColor={{ false: T.bord, true: T.primary + '99' }} thumbColor={smartWake ? T.primary : T.muted} />
-                  </View>
-                </View>
-
-                <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
-                  <TouchableOpacity onPress={onClose} style={{ flex: 1, height: 44, borderRadius: 10, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.muted }}>Отмена</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => onSave({ hour, minute, label: label || CATEGORY_INFO[category].label, days, vibrate, smartWake, category, soundId })}
-                    style={{ flex: 2, height: 44, borderRadius: 10, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 15, color: '#000' }}>Сохранить {fmtTime}</Text>
-                  </TouchableOpacity>
-                </View>
-              </ScrollView>
+              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt, marginTop: -8 }}>:</Text>
+              {/* Minute */}
+              <View style={{ alignItems: 'center', gap: 6 }}>
+                <TouchableOpacity onPress={() => setMinute(m => (m + 5) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {}} style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
+                  <TextInput
+                    value={String(minute).padStart(2, '0')}
+                    onChangeText={v => {
+                      const n = parseInt(v);
+                      if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
+                      else if (v === '') setMinute(0);
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    selectTextOnFocus
+                    style={{ width: 80, textAlign: 'center', color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, backgroundColor: 'transparent' }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setMinute(m => (m - 5 + 60) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: T.muted, fontSize: 18 }}>▼</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </Pressable>
-        </View>
+            {/* Quick times */}
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              {[[6, 0], [6, 30], [7, 0], [7, 30], [8, 0]].map(([h, m]) => (
+                <TouchableOpacity key={`${h}${m}`} onPress={() => { setHour(h); setMinute(m); }}
+                  style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: hour === h && minute === m ? T.primary : T.bord, backgroundColor: hour === h && minute === m ? T.primary + '22' : T.lo }}>
+                  <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: hour === h && minute === m ? T.primary : T.muted }}>
+                    {String(h).padStart(2, '0')}:{String(m).padStart(2, '0')}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Sound selection */}
+          <Lbl T={T} style={{ marginBottom: 8 }}>🔊 Мелодия</Lbl>
+          <View style={{ flexDirection: 'row', gap: 6, marginBottom: 14 }}>
+            {SOUND_OPTIONS.map(s => (
+              <TouchableOpacity key={s.id} onPress={() => setSoundId(s.id)}
+                style={{ flex: 1, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5, borderColor: soundId === s.id ? T.primary : T.bord, backgroundColor: soundId === s.id ? T.primary + '22' : T.lo, alignItems: 'center' }}>
+                <Text style={{ fontSize: 16, marginBottom: 2 }}>{s.emoji}</Text>
+                <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: soundId === s.id ? T.primary : T.muted }}>{s.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Category */}
+          <Lbl T={T} style={{ marginBottom: 8 }}>Категория</Lbl>
+          <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
+            {(Object.entries(CATEGORY_INFO) as [Alarm['category'], typeof CATEGORY_INFO[string]][]).map(([k, v]) => (
+              <TouchableOpacity key={k} onPress={() => setCategory(k)}
+                style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1.5, borderColor: category === k ? v.color : T.bord, backgroundColor: category === k ? v.color + '22' : T.lo, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <Text style={{ fontSize: 14 }}>{v.emoji}</Text>
+                <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: category === k ? v.color : T.muted }}>{v.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Label */}
+          <Lbl T={T} style={{ marginBottom: 6 }}>Название</Lbl>
+          <TextInput value={label} onChangeText={setLabel} placeholder={CATEGORY_INFO[category].label} placeholderTextColor={T.muted}
+            style={{ height: 40, borderRadius: 9, borderWidth: 1.5, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 15, paddingHorizontal: 12, marginBottom: 14 }} />
+
+          {/* Days */}
+          <Lbl T={T} style={{ marginBottom: 8 }}>Повтор</Lbl>
+          <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
+            {DAYS.map((d, i) => (
+              <TouchableOpacity key={i} onPress={() => toggleDay(i)}
+                style={{ flex: 1, height: 38, borderRadius: 9, borderWidth: 1.5, borderColor: days.includes(i) ? T.primary : T.bord, backgroundColor: days.includes(i) ? T.primary + '22' : T.lo, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: days.includes(i) ? T.primary : T.muted }}>{d}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
+            {[
+              { l: 'Будни', d: [1, 2, 3, 4, 5] },
+              { l: 'Выходные', d: [0, 6] },
+              { l: 'Каждый', d: [0, 1, 2, 3, 4, 5, 6] },
+              { l: 'Однажды', d: [] },
+            ].map(p => (
+              <TouchableOpacity key={p.l} onPress={() => setDays(p.d)}
+                style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: JSON.stringify(days) === JSON.stringify(p.d) ? T.success : T.bord, backgroundColor: JSON.stringify(days) === JSON.stringify(p.d) ? T.success + '18' : T.lo }}>
+                <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 11, color: JSON.stringify(days) === JSON.stringify(p.d) ? T.success : T.muted }}>{p.l}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Options */}
+          <View style={{ borderBottomWidth: 1, borderBottomColor: T.bord, marginBottom: 8 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 }}>
+              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt }}>📳 Вибрация</Text>
+              <Switch value={vibrate} onValueChange={setVibrate} trackColor={{ false: T.bord, true: T.primary + '99' }} thumbColor={vibrate ? T.primary : T.muted} />
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 }}>
+              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt }}>🌙 Умный подъём</Text>
+              <Switch value={smartWake} onValueChange={setSmartWake} trackColor={{ false: T.bord, true: T.primary + '99' }} thumbColor={smartWake ? T.primary : T.muted} />
+            </View>
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
+            <TouchableOpacity onPress={onClose} style={{ flex: 1, height: 44, borderRadius: 10, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.muted }}>Отмена</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => onSave({ hour, minute, label: label || CATEGORY_INFO[category].label, days, vibrate, smartWake, category, soundId })}
+              style={{ flex: 2, height: 44, borderRadius: 10, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 15, color: '#000' }}>Сохранить {fmtTime}</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
     </Modal>
   );
 }

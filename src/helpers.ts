@@ -2,7 +2,12 @@
 import { AppState, WorkoutLog, JournalEntry, Task, Goal } from './types';
 import { PLAN } from './data';
 
-export const fmt = (d: Date): string => d.toISOString().split('T')[0];
+export const fmt = (d: Date): string => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 export const uid = (): string => Math.random().toString(36).slice(2, 9);
 
 export function getMonday(): Date {
