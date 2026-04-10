@@ -74,9 +74,26 @@ async function checkExactAlarmPermission(): Promise<boolean> {
       const canSchedule = await notifee.canScheduleExactAlarms();
       if (!canSchedule) {
         Alert.alert(
-          'Нет разрешения на точные будильники',
-          'Для работы будильника нужно разрешение на Android 12+.\n\nОткройте Настройки → Приложения → Будильники и включите.',
-          [{ text: 'OK' }]
+          '⚠️ Разрешение не получено',
+          'Для работы будильника нужно разрешение на Android 12+.\n\nНажмите "Открыть настройки" и включите "Будильники и напоминания".',
+          [
+            { text: 'Отмена', style: 'cancel' },
+            { 
+              text: 'Открыть настройки', 
+              onPress: async () => {
+                try {
+                  if (typeof (notifee as any).openAlarmPermissionSettings === 'function') {
+                    await (notifee as any).openAlarmPermissionSettings();
+                  }
+                } catch (e) {
+                  // Fallback: try to open app settings
+                  try {
+                    await notifee.openNotificationSettings();
+                  } catch (e2) {}
+                }
+              }
+            },
+          ]
         );
         return false;
       }
