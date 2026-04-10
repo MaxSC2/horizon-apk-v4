@@ -144,53 +144,52 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
             importance: AndroidImportance.HIGH,
             pressAction: { id: 'default' },
             fullScreenAction: { id: 'default' },
-            category: 'alarm',
-            vibrationPattern: alarm.vibrate ? [300, 500, 300, 500] : undefined,
-            circularIcon: 'ic_launcher',
-            color: '#FFD600',
+            vibrationPattern: alarm.vibrate ? [300, 500, 300, 500] : [0, 500, 200, 500],
           },
           data: { alarmId: alarm.id, type: 'alarm' },
         },
         {
           type: TriggerType.TIMESTAMP,
           timestamp: triggerTime,
-          alarmManager: { allowWhileIdle: true, alarmClock: true },
+          alarmManager: { allowWhileIdle: true },
         }
       );
       return notificationId;
     } else {
-      for (const day of alarm.days) {
+      // Schedule individual notification for each selected day
+      const ids: string[] = [];
+      for (let i = 0; i < alarm.days.length; i++) {
+        const day = alarm.days[i];
         const weeklyTrigger = getNextWeekdayTrigger(alarm.hour, alarm.minute, day);
-        await notifee.createTriggerNotification(
+        const dayId = `${alarm.id}-${day}`;
+        const id = await notifee.createTriggerNotification(
           {
+            id: dayId,
             title: `⏰ ${alarm.label}`,
             body: `${String(alarm.hour).padStart(2, '0')}:${String(alarm.minute).padStart(2, '0')}`,
             android: {
               channelId: CHANNEL_ID,
-            sound: 'default', // alarm sound — built-in Android alarm sound
+              sound: 'default',
               importance: AndroidImportance.HIGH,
               pressAction: { id: 'default' },
               fullScreenAction: { id: 'default' },
-              category: 'alarm',
-              vibrationPattern: alarm.vibrate ? [300, 500, 300, 500] : undefined,
-              circularIcon: 'ic_launcher',
-              color: '#FFD600',
+              vibrationPattern: alarm.vibrate ? [300, 500, 300, 500] : [0, 500, 200, 500],
             },
             data: { alarmId: alarm.id, day: String(day), type: 'alarm' },
           },
           {
             type: TriggerType.TIMESTAMP,
             timestamp: weeklyTrigger,
-            repeatFrequency: RepeatFrequency.WEEKLY,
-            alarmManager: { allowWhileIdle: true, alarmClock: true },
+            alarmManager: { allowWhileIdle: true },
           }
         );
+        ids.push(id);
       }
-      return alarm.id;
+      return ids[0] || alarm.id;
     }
   } catch (e) {
     console.error('scheduleAlarm error:', e);
-    Alert.alert('Ошибка', 'Не удалось создать будильник: ' + (e as Error).message);
+    Alert.alert('Ошибка', 'Не удалось создать будильник');
     return null;
   }
 }
