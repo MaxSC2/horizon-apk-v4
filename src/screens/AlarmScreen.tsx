@@ -144,7 +144,7 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
             body: `${String(alarm.hour).padStart(2, '0')}:${String(alarm.minute).padStart(2, '0')}`,
             android: {
               channelId: CHANNEL_ID,
-              sound: alarm.soundId,
+            sound: 'default', // alarm sound — built-in Android alarm sound
               importance: AndroidImportance.HIGH,
               pressAction: { id: 'default' },
               fullScreenAction: { id: 'default' },
@@ -209,10 +209,9 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.88)' }}>
         <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={onClose}>
-          <Pressable onPress={() => {}} style={{ backgroundColor: T.surf }}>
-            <View style={{ backgroundColor: T.surf, paddingBottom: 34, maxHeight: '95%' }}>
+          <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: 34 }}>
               <View style={{ padding: 16, paddingBottom: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                 <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>
                   {initial ? 'Изменить' : 'Новый'} будильник
@@ -256,10 +255,12 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
                         <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
                       </TouchableOpacity>
                       <TextInput
-                        defaultValue={String(minute).padStart(2, '0')}
+                        value={String(minute).padStart(2, '0')}
                         onChangeText={v => {
-                          const cleaned = v.replace(/[^0-9]/g, '').slice(-2);
-                          if (cleaned.length === 2) {
+                          const cleaned = v.replace(/[^0-9]/g, '');
+                          if (cleaned === '') {
+                            setMinute(0);
+                          } else {
                             const n = parseInt(cleaned);
                             if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
                           }
@@ -364,8 +365,7 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
               </ScrollView>
             </View>
           </Pressable>
-        </Pressable>
-      </View>
+        </View>
     </Modal>
   );
 }

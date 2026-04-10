@@ -87,7 +87,7 @@ export default function CalendarScreen() {
     const first = new Date(year, month, 1);
     const last = new Date(year, month + 1, 0);
     const startOffset = (first.getDay() + 6) % 7; // Mon=0
-    const endOffset = (7 - last.getDay()) % 7; // days after last day of month
+    const endOffset = last.getDay() === 0 ? 0 : 7 - last.getDay(); // days after last day of month (0 if ends on Sunday)
     const ds: string[] = [];
     for (let d = 1; d <= last.getDate(); d++) ds.push(fmt(new Date(year, month, d)));
     return { days: ds, startOffset, endOffset };
