@@ -68,6 +68,22 @@ async function initAlarmChannel(): Promise<void> {
   });
 }
 
+async function checkExactAlarmPermission(): Promise<boolean> {
+  const canSchedule = await notifee.canScheduleExactAlarms();
+  if (!canSchedule) {
+    Alert.alert(
+      'Нет разрешения на точные будильники',
+      'Для работы будильника нужно разрешение на Android 12+.\n\nОткройте Настройки → Приложения → ГОРИЗОНТ → Будильники и включите "Разрешить точное время".',
+      [
+        { text: 'Отмена', style: 'cancel' },
+        { text: 'Открыть настройки', onPress: () => notifee.openAlarmPermissionSettings() },
+      ]
+    );
+    return false;
+  }
+  return true;
+}
+
 async function requestPermissions(): Promise<boolean> {
   const settings = await notifee.requestPermission();
   return (
@@ -106,6 +122,10 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
       return null;
     }
 
+    // Check exact alarm permission (Android 12+)
+    const exactAllowed = await checkExactAlarmPermission();
+    if (!exactAllowed) return null;
+
     await cancelAlarm(alarm.id);
 
     if (alarm.days.length === 0) {
@@ -117,7 +137,7 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
           body: `${String(alarm.hour).padStart(2, '0')}:${String(alarm.minute).padStart(2, '0')}`,
           android: {
             channelId: CHANNEL_ID,
-            sound: alarm.soundId,
+            sound: 'default',
             importance: AndroidImportance.HIGH,
             pressAction: { id: 'default' },
             fullScreenAction: { id: 'default' },
@@ -131,7 +151,7 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
         {
           type: TriggerType.TIMESTAMP,
           timestamp: triggerTime,
-          alarmManager: { allowWhileIdle: true },
+          alarmManager: { allowWhileIdle: true, alarmClock: true },
         }
       );
       return notificationId;
@@ -159,7 +179,7 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
             type: TriggerType.TIMESTAMP,
             timestamp: weeklyTrigger,
             repeatFrequency: RepeatFrequency.WEEKLY,
-            alarmManager: { allowWhileIdle: true },
+            alarmManager: { allowWhileIdle: true, alarmClock: true },
           }
         );
       }
