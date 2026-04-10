@@ -69,17 +69,20 @@ async function initAlarmChannel(): Promise<void> {
 }
 
 async function checkExactAlarmPermission(): Promise<boolean> {
-  const canSchedule = await notifee.canScheduleExactAlarms();
-  if (!canSchedule) {
-    Alert.alert(
-      'Нет разрешения на точные будильники',
-      'Для работы будильника нужно разрешение на Android 12+.\n\nОткройте Настройки → Приложения → ГОРИЗОНТ → Будильники и включите "Разрешить точное время".',
-      [
-        { text: 'Отмена', style: 'cancel' },
-        { text: 'Открыть настройки', onPress: () => notifee.openAlarmPermissionSettings() },
-      ]
-    );
-    return false;
+  try {
+    if (typeof notifee.canScheduleExactAlarms === 'function') {
+      const canSchedule = await notifee.canScheduleExactAlarms();
+      if (!canSchedule) {
+        Alert.alert(
+          'Нет разрешения на точные будильники',
+          'Для работы будильника нужно разрешение на Android 12+.\n\nОткройте Настройки → Приложения → Будильники и включите.',
+          [{ text: 'OK' }]
+        );
+        return false;
+      }
+    }
+  } catch (e) {
+    // Ignore if function doesn't exist
   }
   return true;
 }
@@ -255,20 +258,22 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
                 <TouchableOpacity onPress={() => setHour(h => (h + 1) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {}} style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
                   <TextInput
                     value={String(hour).padStart(2, '0')}
                     onChangeText={v => {
                       const n = parseInt(v);
                       if (!isNaN(n) && n >= 0 && n <= 23) setHour(n);
-                      else if (v === '') setHour(0);
+                    }}
+                    onKeyPress={e => {
+                      // Allow typing full number
                     }}
                     keyboardType="number-pad"
                     maxLength={2}
                     selectTextOnFocus
-                    style={{ width: 80, textAlign: 'center', color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, backgroundColor: 'transparent' }}
+                    style={{ width: 80, textAlign: 'center', color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, backgroundColor: 'transparent', padding: 0 }}
                   />
-                </TouchableOpacity>
+                </View>
                 <TouchableOpacity onPress={() => setHour(h => (h - 1 + 24) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: T.muted, fontSize: 18 }}>▼</Text>
                 </TouchableOpacity>
@@ -279,20 +284,19 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
                 <TouchableOpacity onPress={() => setMinute(m => (m + 5) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {}} style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
                   <TextInput
                     value={String(minute).padStart(2, '0')}
                     onChangeText={v => {
                       const n = parseInt(v);
                       if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
-                      else if (v === '') setMinute(0);
                     }}
                     keyboardType="number-pad"
                     maxLength={2}
                     selectTextOnFocus
-                    style={{ width: 80, textAlign: 'center', color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, backgroundColor: 'transparent' }}
+                    style={{ width: 80, textAlign: 'center', color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, backgroundColor: 'transparent', padding: 0 }}
                   />
-                </TouchableOpacity>
+                </View>
                 <TouchableOpacity onPress={() => setMinute(m => (m - 5 + 60) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: T.muted, fontSize: 18 }}>▼</Text>
                 </TouchableOpacity>
