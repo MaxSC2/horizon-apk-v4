@@ -368,7 +368,7 @@ export default function StatsScreen() {
                       { l: 'Тренировок', v: `${ms.workoutDays}/${ms.totalDays}`, c: T.primary },
                       { l: 'Консист.', v: ms.consistency + '%', c: ms.consistency >= 80 ? T.success : ms.consistency >= 50 ? T.warn : T.danger },
                       { l: 'Настроение', v: ms.avgMood ? `${ms.avgMood} ${MOOD_EMOJI[Math.round(parseFloat(ms.avgMood))]}` : '—', c: T.success },
-                      { l: 'Сон avg', v: ms.avgSleep ? ms.avgSleep + 'ч' : '—', c: T.primary },
+                      { l: 'Сон avg', v: ms.avgSleep ? (() => { const totalMin = Math.round(parseFloat(ms.avgSleep) * 60); const h = Math.floor(totalMin / 60); const m = totalMin % 60; return m > 0 ? `${h}ч ${m}м` : `${h}ч`; })() : '—', c: T.primary },
                     ].map((s, i) => (
                       <View key={i} style={{ flex: 1, padding: 8, backgroundColor: T.lo, borderRadius: 10, alignItems: 'center' }}>
                         <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 14, color: s.c, lineHeight: 18 }}>{s.v}</Text>

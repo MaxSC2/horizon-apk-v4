@@ -539,7 +539,7 @@ export default function AlarmScreen() {
         ))}
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
         {sub === 'alarms' && (
           <>
             {alarms.length === 0 ? (
