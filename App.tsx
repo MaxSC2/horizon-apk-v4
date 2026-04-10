@@ -160,7 +160,7 @@ function AppContent() {
   const { T } = useApp();
   return (
     <>
-      <StatusBar backgroundColor={T.surf} barStyle={T.dark ? 'light-content' : 'dark-content'} translucent={false} androidNavigationBarColor={T.surf} />
+      <StatusBar backgroundColor={T.surf} barStyle={T.dark ? 'light-content' : 'dark-content'} translucent={false} />
       <NavigationContainer>
         <Navigation />
       </NavigationContainer>

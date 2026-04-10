@@ -386,6 +386,7 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
             </TouchableOpacity>
           </View>
         </ScrollView>
+        </View>
       </View>
     </Modal>
   );
