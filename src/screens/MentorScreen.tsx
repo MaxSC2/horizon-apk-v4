@@ -18,7 +18,7 @@ import { ChatMessage, AIConfig } from '../types';
 
 const PLAN_PROMPT = `Составь персональный план тренировок на следующую неделю. Формат: день — тренировка — упражнения — комментарий.`;
 
-async function callAI(messages: ChatMessage[], systemPrompt: string, aiConfig: AIConfig): Promise<string> {
+export async function callAI(messages: ChatMessage[], systemPrompt: string, aiConfig: AIConfig): Promise<string> {
   const cfg = aiConfig || {};
   const prov = AI_PROVIDERS.find(p => p.id === cfg.provider) || AI_PROVIDERS[0];
   const model = cfg.model || prov.defaultModel;
