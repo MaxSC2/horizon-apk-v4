@@ -161,7 +161,11 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
             importance: AndroidImportance.HIGH,
             pressAction: { id: 'default' },
             fullScreenAction: { id: 'default' },
-            vibrationPattern: alarm.vibrate ? [300, 500, 300, 500] : [0, 500, 200, 500],
+            vibrationPattern: alarm.vibrate ? [300, 500, 300, 500, 300, 500] : [0, 500, 200, 500, 200, 500],
+            actions: [
+              { title: '⏰ Отложить 10 мин', pressAction: { id: 'snooze' } },
+              { title: '✓ Остановить', pressAction: { id: 'stop' } },
+            ],
           },
           data: { alarmId: alarm.id, type: 'alarm' },
         },
@@ -190,7 +194,11 @@ async function scheduleAlarm(alarm: Alarm): Promise<string | null> {
               importance: AndroidImportance.HIGH,
               pressAction: { id: 'default' },
               fullScreenAction: { id: 'default' },
-              vibrationPattern: alarm.vibrate ? [300, 500, 300, 500] : [0, 500, 200, 500],
+              vibrationPattern: alarm.vibrate ? [300, 500, 300, 500, 300, 500] : [0, 500, 200, 500, 200, 500],
+              actions: [
+                { title: '⏰ Отложить 10 мин', pressAction: { id: 'snooze' } },
+                { title: '✓ Остановить', pressAction: { id: 'stop' } },
+              ],
             },
             data: { alarmId: alarm.id, day: String(day), type: 'alarm' },
           },
@@ -242,9 +250,23 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
   const [smartWake, setSmartWake] = useState(initial?.smartWake ?? false);
   const [category, setCategory] = useState<Alarm['category']>(initial?.category ?? 'wake');
   const [soundId, setSoundId] = useState<Alarm['soundId']>(initial?.soundId ?? 'default');
+  const [hourInput, setHourInput] = useState(String(initial?.hour ?? 7).padStart(2, '0'));
+  const [minuteInput, setMinuteInput] = useState(String(initial?.minute ?? 0).padStart(2, '0'));
 
   const toggleDay = (d: number) => setDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d].sort());
   const fmtTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+
+  const commitHourInput = (v: string) => {
+    const n = parseInt(v);
+    if (!isNaN(n) && n >= 0 && n <= 23) setHour(n);
+    setHourInput(String(hour).padStart(2, '0'));
+  };
+
+  const commitMinuteInput = (v: string) => {
+    const n = parseInt(v);
+    if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
+    setMinuteInput(String(minute).padStart(2, '0'));
+  };
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
@@ -271,45 +293,38 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               {/* Hour */}
               <View style={{ alignItems: 'center', gap: 6 }}>
-                <TouchableOpacity onPress={() => setHour(h => (h + 1) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={() => { setHour(h => (h + 1) % 24); setHourInput(String((hour + 1) % 24).padStart(2, '0')); }} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
                 </TouchableOpacity>
                 <View style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
                   <TextInput
-                    value={String(hour).padStart(2, '0')}
-                    onChangeText={v => {
-                      const n = parseInt(v);
-                      if (!isNaN(n) && n >= 0 && n <= 23) setHour(n);
-                    }}
-                    onKeyPress={e => {
-                      // Allow typing full number
-                    }}
+                    value={hourInput}
+                    onChangeText={setHourInput}
+                    onEndEditing={e => commitHourInput(e.nativeEvent.text)}
+                    onBlur={() => commitHourInput(hourInput)}
                     keyboardType="number-pad"
                     maxLength={2}
-                    selectTextOnFocus
                     style={{ width: 80, textAlign: 'center', color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, backgroundColor: 'transparent', padding: 0 }}
                   />
                 </View>
-                <TouchableOpacity onPress={() => setHour(h => (h - 1 + 24) % 24)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={() => { setHour(h => (h - 1 + 24) % 24); setHourInput(String((hour - 1 + 24) % 24).padStart(2, '0')); }} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: T.muted, fontSize: 18 }}>▼</Text>
                 </TouchableOpacity>
               </View>
               <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 52, color: T.txt, marginTop: -8 }}>:</Text>
               {/* Minute */}
               <View style={{ alignItems: 'center', gap: 6 }}>
-                <TouchableOpacity onPress={() => setMinute(m => (m + 5) % 60)} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={() => { setMinute(m => (m + 5) % 60); setMinuteInput(String((minute + 5) % 60).padStart(2, '0')); }} style={{ width: 50, height: 36, borderRadius: 8, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: T.muted, fontSize: 18 }}>▲</Text>
                 </TouchableOpacity>
                 <View style={{ width: 88, height: 80, borderRadius: 12, backgroundColor: T.lo, borderWidth: 2, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
                   <TextInput
-                    value={String(minute).padStart(2, '0')}
-                    onChangeText={v => {
-                      const n = parseInt(v);
-                      if (!isNaN(n) && n >= 0 && n <= 59) setMinute(n);
-                    }}
+                    value={minuteInput}
+                    onChangeText={setMinuteInput}
+                    onEndEditing={e => commitMinuteInput(e.nativeEvent.text)}
+                    onBlur={() => commitMinuteInput(minuteInput)}
                     keyboardType="number-pad"
                     maxLength={2}
-                    selectTextOnFocus
                     style={{ width: 80, textAlign: 'center', color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 48, backgroundColor: 'transparent', padding: 0 }}
                   />
                 </View>
@@ -422,12 +437,49 @@ export default function AlarmScreen() {
   useEffect(() => {
     initAlarmChannel().catch(console.error);
 
-    const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+    const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
       if (type === EventType.PRESS || type === EventType.ACTION_PRESS) {
+        const actionId = detail.pressAction?.id;
         const alarmId = detail.notification?.data?.alarmId as string;
-        if (alarmId) {
-          // Navigate or show alarm UI
-          console.log('Alarm pressed:', alarmId);
+        
+        if (actionId === 'stop') {
+          await notifee.cancelNotification(alarmId);
+          // Toggle alarm off
+          setAlarms(prev => prev.map(a => a.id === alarmId ? { ...a, enabled: false } : a));
+        } else if (actionId === 'snooze') {
+          // Reschedule for 10 minutes later
+          await notifee.cancelNotification(alarmId);
+          const alarm = alarms.find(a => a.id === alarmId);
+          if (alarm) {
+            const snoozeTime = Date.now() + 10 * 60 * 1000;
+            await notifee.createTriggerNotification(
+              {
+                id: `snooze-${alarmId}`,
+                title: `⏰ ${alarm.label} (Отложено)`,
+                body: `${String(alarm.hour).padStart(2, '0')}:${String(alarm.minute).padStart(2, '0')}`,
+                android: {
+                  channelId: CHANNEL_ID,
+                  sound: 'default',
+                  importance: AndroidImportance.HIGH,
+                  pressAction: { id: 'default' },
+                  fullScreenAction: { id: 'default' },
+                  vibrationPattern: [300, 500, 300, 500],
+                  actions: [
+                    { title: '✓ Остановить', pressAction: { id: 'stop' } },
+                  ],
+                },
+                data: { alarmId: alarm.id, type: 'alarm', snoozed: 'true' },
+              },
+              {
+                type: TriggerType.TIMESTAMP,
+                timestamp: snoozeTime,
+                alarmManager: { allowWhileIdle: true },
+              }
+            );
+          }
+        } else if (alarmId) {
+          // Just pressed the notification - dismiss it
+          await notifee.cancelNotification(alarmId);
         }
       }
     });
