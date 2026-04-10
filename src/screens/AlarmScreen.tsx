@@ -12,6 +12,15 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({ shouldShowAlert: true, shouldPlaySound: true, shouldSetBadge: false }),
 });
 
+// TODO: Перейти на @notifee/react-native для полноценного будильника
+// Пока используется expo-notifications (не работает при закрытом приложении)
+import * as Notifications from 'expo-notifications';
+import { initAlarmChannel, scheduleAlarm as notifeeSchedule, cancelAlarmById } from '../alarm';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({ shouldShowAlert: true, shouldPlaySound: true, shouldSetBadge: false }),
+});
+
 interface Alarm {
   id: string;
   hour: number;
@@ -23,6 +32,7 @@ interface Alarm {
   vibrate: boolean;
   smartWake: boolean; // wake up to 30min early in light sleep
   category: 'wake' | 'workout' | 'meal' | 'meds' | 'custom';
+  soundId?: 'default' | 'twilight' | 'chime'; // для Notifee
 }
 
 const DAYS = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
