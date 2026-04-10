@@ -209,12 +209,14 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      {/* Dark background - closes modal when pressed */}
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.88)' }} onPress={onClose} />
-      
-      {/* Modal content - does NOT close when pressed */}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%' }}>
-        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      {/* Full screen dark overlay */}
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.88)' }}>
+        {/* Dark background - closes modal when pressed */}
+        <Pressable style={{ flex: 1 }} onPress={onClose} />
+        
+        {/* Modal content - stretches to bottom */}
+        <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: 34 }}>
+          <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           {/* Header */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>
