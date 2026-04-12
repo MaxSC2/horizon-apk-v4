@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Plus, X, Check, Target, Dumbbell, BookOpen, 
 import * as Notifications from 'expo-notifications';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Badge } from '../components';
-import { uid, fmt } from '../helpers';
+import { uid, fmt, fmtSleep } from '../helpers';
 import { PLAN, MOODS } from '../data';
 
 interface CalEvent {
@@ -265,12 +265,7 @@ export default function CalendarScreen() {
                 <View>
                   <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.txt }}>
                     {MOODS.find(m => m.v === selectedJournal.mood)?.l || 'Нейтр.'}
-                    {selectedJournal.sleep ? (() => {
-                      const totalMin = Math.round((selectedJournal.sleep || 0) * 60);
-                      const h = Math.floor(totalMin / 60);
-                      const m = totalMin % 60;
-                      return ` · 💤 ${h}ч ${m > 0 ? `${m}м` : ''}`;
-                    })() : ''}
+                    {selectedJournal.sleep ? ` · 💤 ${fmtSleep(selectedJournal.sleep)}` : ''}
                   </Text>
                   {selectedJournal.text ? <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted, marginTop: 2 }} numberOfLines={2}>{selectedJournal.text}</Text> : null}
                 </View>

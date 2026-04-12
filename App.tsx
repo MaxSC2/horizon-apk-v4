@@ -110,6 +110,7 @@ function Navigation() {
           tabBarIcon: ({ color, focused }) => (
             <IconComp size={20} color={color} strokeWidth={focused ? 2.5 : 1.8} />
           ),
+          animation: 'fade',
         };
       }}
     >
@@ -161,7 +162,19 @@ function AppContent() {
   return (
     <>
       <StatusBar backgroundColor={T.surf} barStyle={T.dark ? 'light-content' : 'dark-content'} translucent={false} />
-      <NavigationContainer>
+      <NavigationContainer
+        theme={{
+          dark: true,
+          colors: {
+            primary: T.primary,
+            background: T.bg,
+            card: T.surf,
+            text: T.txt,
+            border: T.bord,
+            notification: T.primary,
+          },
+        }}
+      >
         <Navigation />
       </NavigationContainer>
     </>

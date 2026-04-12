@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Flame, Droplets, Trophy, Target, Zap, BedDouble, Palette } from 'lucide-react-native';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Ring, Badge, ProgressBar } from '../components';
-import { calcLifeScore, calcStreak, generateInsights, TODAY, fmt, weekDates, todayIdx, uid, getHeatMapData } from '../helpers';
+import { calcLifeScore, calcStreak, generateInsights, TODAY, fmt, weekDates, todayIdx, uid, getHeatMapData, fmtSleep } from '../helpers';
 import { MOODS, ENERGY, QUOTES, PLAN } from '../data';
 import ThemePickerModal from '../components/ThemePickerModal';
 
@@ -306,9 +306,7 @@ export default function DashboardScreen() {
               <View>
                 <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.txt }}>Сон</Text>
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: sleepColor }}>
-                  {sleepHours > 0 
-                    ? `${Math.floor(sleepHours)}ч ${Math.round((sleepHours % 1) * 60)}м` 
-                    : 'Нажмите'}
+                  {sleepHours > 0 ? fmtSleep(sleepHours) : 'Нажмите'}
                 </Text>
               </View>
             </View>

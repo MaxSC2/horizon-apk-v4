@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus, X, Check } from 'lucide-react-native';
 import { useApp } from '../AppContext';
 import { Card, Lbl, ProgressBar } from '../components';
-import { uid, TODAY } from '../helpers';
+import { uid, TODAY, fmtSleep } from '../helpers';
 
 // Notifee alarm integration
 // Установить: npx expo install @notifee/react-native
@@ -678,7 +678,7 @@ export default function AlarmScreen() {
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted }}>Sleep Score / 100</Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
-                      <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 28, color: T.txt }}>{sleepScore.avg}ч</Text>
+                      <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 28, color: T.txt }}>{fmtSleep(sleepScore.avg)}</Text>
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted }}>средний за {sleepScore.entries} дн.</Text>
                       <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: sleepScore.score >= 80 ? T.success : sleepScore.score >= 60 ? T.warn : T.danger, marginTop: 4 }}>
                         {sleepScore.score >= 80 ? '😴 Отлично' : sleepScore.score >= 60 ? '😐 Нормально' : '😰 Мало сна'}
@@ -700,7 +700,7 @@ export default function AlarmScreen() {
                           <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.txt }}>
                             {new Date(entry.date + 'T12:00:00').toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' })}
                           </Text>
-                          <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: col }}>{h}ч</Text>
+                          <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: col }}>{fmtSleep(h)}</Text>
                         </View>
                         <ProgressBar pct={pct} color={col} T={T} height={6} />
                       </View>

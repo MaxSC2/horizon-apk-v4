@@ -9,7 +9,7 @@ import { Card, Lbl, Badge, ProgressBar, Ring } from '../components';
 import {
   calcStreak, getPRs, weeklyTonnage, computeAuto1RM, calcLifeScore,
   getAllProgressionSuggestions, moodWorkoutCorrelation, weeklyWorkoutStats,
-  exerciseTrend, getMonthlyStats, TODAY, fmt,
+  exerciseTrend, getMonthlyStats, TODAY, fmt, fmtSleep,
 } from '../helpers';
 import { PLAN, ACHIEVEMENT_DEFS } from '../data';
 import { DEFAULTS } from '../storage';
@@ -120,7 +120,7 @@ export default function StatsScreen() {
 
   const sleepEntries = journal.filter(j => (j.sleep || 0) > 0).slice(-30);
   const avgSleepVal = sleepEntries.length ? sleepEntries.reduce((s, j) => s + (j.sleep || 0), 0) / sleepEntries.length : null;
-  const avgSleepLabel = avgSleepVal ? (() => { const totalMin = Math.round(avgSleepVal * 60); const h = Math.floor(totalMin / 60); const m = totalMin % 60; return m > 0 ? `${h}ч ${m}м` : `${h}ч`; })() : '—';
+  const avgSleepLabel = avgSleepVal ? fmtSleep(avgSleepVal) : '—';
 
   const trackedEx = PLAN.flatMap(d => d.exercises || []).reduce((a: any[], e) => {
     if (!a.find((x: any) => x.id === e.id)) a.push(e); return a;
@@ -368,7 +368,7 @@ export default function StatsScreen() {
                       { l: 'Тренировок', v: `${ms.workoutDays}/${ms.totalDays}`, c: T.primary },
                       { l: 'Консист.', v: ms.consistency + '%', c: ms.consistency >= 80 ? T.success : ms.consistency >= 50 ? T.warn : T.danger },
                       { l: 'Настроение', v: ms.avgMood ? `${ms.avgMood} ${MOOD_EMOJI[Math.round(parseFloat(ms.avgMood))]}` : '—', c: T.success },
-                      { l: 'Сон avg', v: ms.avgSleep ? (() => { const totalMin = Math.round(parseFloat(ms.avgSleep) * 60); const h = Math.floor(totalMin / 60); const m = totalMin % 60; return m > 0 ? `${h}ч ${m}м` : `${h}ч`; })() : '—', c: T.primary },
+                      { l: 'Сон avg', v: ms.avgSleep ? fmtSleep(parseFloat(ms.avgSleep)) : '—', c: T.primary },
                     ].map((s, i) => (
                       <View key={i} style={{ flex: 1, padding: 8, backgroundColor: T.lo, borderRadius: 10, alignItems: 'center' }}>
                         <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 14, color: s.c, lineHeight: 18 }}>{s.v}</Text>
