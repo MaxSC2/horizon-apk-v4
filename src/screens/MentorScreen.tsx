@@ -14,7 +14,7 @@ import { useApp } from '../AppContext';
 import { Card, Btn, Lbl } from '../components';
 import { buildAIContext, calcStreak, getPRs } from '../helpers';
 import { AI_PROVIDERS, QUICK_PROMPTS } from '../data';
-import { ChatMessage, AIConfig } from '../types';
+import { ChatMessage, AIConfig, AIProvider } from '../types';
 
 const PLAN_PROMPT = `Составь персональный план тренировок на следующую неделю. Формат: день — тренировка — упражнения — комментарий.`;
 
@@ -109,7 +109,7 @@ export default function MentorScreen() {
     setMessages(newMsgs);
     setLoading(true);
     try {
-      const reply = await callAI(newMsgs, buildAIContext(state), aiConfig as any);
+      const reply = await callAI(newMsgs, buildAIContext(state), aiConfig);
       const aMsg: ChatMessage = { role: 'assistant', content: reply, ts: Date.now(), provider: aiConfig.provider || 'claude' };
       const final = [...newMsgs, aMsg];
       setMessages(final);
@@ -130,7 +130,7 @@ export default function MentorScreen() {
     setLoading(true);
     setError(null);
     try {
-      const reply = await callAI(trimmed, buildAIContext(state), aiConfig as any);
+      const reply = await callAI(trimmed, buildAIContext(state), aiConfig);
       const aMsg: ChatMessage = { role: 'assistant', content: reply, ts: Date.now(), provider: aiConfig.provider || 'claude' };
       const final = [...trimmed, aMsg];
       setMessages(final);
@@ -417,8 +417,8 @@ export default function MentorScreen() {
                         <View style={{ flex: 1 }}>
                           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
                             <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 15, color: isActive ? p.color : T.txt }}>{p.name}</Text>
-                            {(p as any).badge && <View style={{ paddingHorizontal: 6, paddingVertical: 1, backgroundColor: T.success + '22', borderRadius: 5 }}>
-                              <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 9, color: T.success }}>{(p as any).badge}</Text>
+                            {p.badge && <View style={{ paddingHorizontal: 6, paddingVertical: 1, backgroundColor: T.success + '22', borderRadius: 5 }}>
+                              <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 9, color: T.success }}>{p.badge}</Text>
                             </View>}
                           </View>
                           <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 1 }}>{p.desc}</Text>
@@ -502,7 +502,7 @@ export default function MentorScreen() {
                   <View style={{ marginBottom: 16 }}>
                     <Lbl T={T} style={{ marginBottom: 6 }}>Своя модель (опционально)</Lbl>
                     <TextInput
-                      value={(aiConfig as any).customModel || ''} onChangeText={v => setState(s => ({ ...s, aiConfig: { ...s.aiConfig, model: v || (AI_PROVIDERS.find(p => p.id === (s.aiConfig.provider || 'claude'))?.defaultModel || '') } as any }))}
+                      value={aiConfig.customModel || ''} onChangeText={v => setState(s => ({ ...s, aiConfig: { ...s.aiConfig, model: v || (AI_PROVIDERS.find(p => p.id === (s.aiConfig.provider || 'claude'))?.defaultModel || '') } }))}
                       placeholder="gpt-4o, gemini-2.5-flash, ..."
                       placeholderTextColor={T.muted} autoCapitalize="none"
                       style={{ height: 40, borderRadius: 9, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 14, paddingHorizontal: 12 }}
@@ -533,7 +533,7 @@ export default function MentorScreen() {
                     })}
                     <Lbl T={T} style={{ marginBottom: 6, marginTop: 8 }}>Или свой промпт</Lbl>
                     <TextInput
-                      value={(aiConfig as any).systemExtra || ''} onChangeText={v => setState(s => ({ ...s, aiConfig: { ...s.aiConfig, systemExtra: v } as any }))}
+                      value={aiConfig.systemExtra || ''} onChangeText={v => setState(s => ({ ...s, aiConfig: { ...s.aiConfig, systemExtra: v } }))}
                       placeholder="Дополнительные инструкции для ИИ…"
                       placeholderTextColor={T.muted} multiline numberOfLines={3}
                       style={{ borderRadius: 9, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 14, padding: 10, minHeight: 70, textAlignVertical: 'top' }}

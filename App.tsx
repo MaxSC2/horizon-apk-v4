@@ -45,7 +45,7 @@ function getTabLabel(base: string, styleId: string): string {
 
 function Navigation() {
   const { state, T, session, loading } = useApp();
-  const uiStyle = getUIStyle((state as any).uiStyleId || 'default');
+  const uiStyle = getUIStyle(state.uiStyleId || 'default');
   const navigationRef = useRef<any>(null);
 
   useEffect(() => {
@@ -127,7 +127,7 @@ function Navigation() {
             tab.name === 'Alarm'      ? AlarmScreen      :
             StatsScreen
           }
-          options={{ tabBarLabel: getTabLabel(tab.label, (state as any).uiStyleId || 'default') }}
+          options={{ tabBarLabel: getTabLabel(tab.label, state.uiStyleId || 'default') }}
         />
       ))}
     </Tab.Navigator>

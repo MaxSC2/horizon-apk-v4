@@ -429,7 +429,7 @@ function AlarmAddModal({ T, onSave, onClose, initial }: { T: any; onSave: (a: Pa
 
 export default function AlarmScreen() {
   const { state, setState, T } = useApp();
-  const alarms: Alarm[] = (state as any).alarms || [];
+  const alarms: Alarm[] = state.alarms || [];
   const [showAdd, setShowAdd] = useState(false);
   const [editAlarm, setEditAlarm] = useState<Alarm | null>(null);
   const [sub, setSub] = useState<'alarms' | 'analysis'>('alarms');

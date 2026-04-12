@@ -17,7 +17,7 @@ export default function NutritionScreen() {
   const [data, setData] = useState<Record<string, any>>({});
   const [goals, setGoals] = useState(DEFAULT_GOALS);
   const [adding, setAdding] = useState(false);
-  const [custom, setCustom] = useState({ name: '', cal: '', p: '', c: '', f: '' });
+  const [custom, setCustom] = useState<Record<string, string>>({ name: '', cal: '', p: '', c: '', f: '' });
 
   useEffect(() => { loadNutrition().then(setData); }, []);
 
@@ -110,7 +110,7 @@ export default function NutritionScreen() {
               {[['cal', 'Ккал'], ['p', 'Белок'], ['c', 'Углев'], ['f', 'Жиры']].map(([k, l]) => (
                 <View key={k} style={{ flex: 1 }}>
                   <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted, marginBottom: 3 }}>{l}</Text>
-                  <TextInput value={(custom as any)[k]} onChangeText={v => setCustom(c => ({ ...c, [k]: v }))} keyboardType="numeric"
+                  <TextInput value={custom[k] || ''} onChangeText={v => setCustom(c => ({ ...c, [k]: v }))} keyboardType="numeric"
                     style={{ height: 36, borderRadius: 7, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'BarlowCondensed_700Bold', fontSize: 16, textAlign: 'center' }} />
                 </View>
               ))}

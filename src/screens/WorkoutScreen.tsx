@@ -10,6 +10,7 @@ import { fmt, weekDates, todayIdx, getPRs } from '../helpers';
 import { PLAN } from '../data';
 import { AI_PROVIDERS } from '../data';
 import { callAI } from './MentorScreen';
+import { SetLog, WorkoutLog } from '../types';
 
 function NumpadModal({ T, value, onChange, onConfirm, unit, placeholder, color }: any) {
   const [display, setDisplay] = useState(value || '');
@@ -268,6 +269,7 @@ function EditWorkoutModal({ T, workout, onSave, onClose }: { T: any; workout: an
 
 // ==================== FEATURE 3: AI Auto-Correction ====================
 function AISuggestionModal({ T, history, prs, streak, onApply, onClose }: { T: any; history: any; prs: any; streak: number; onApply: (suggestion: string) => void; onClose: () => void }) {
+  const { state } = useApp();
   const [loading, setLoading] = useState(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
@@ -278,9 +280,8 @@ function AISuggestionModal({ T, history, prs, streak, onApply, onClose }: { T: a
   const generateSuggestions = async () => {
     setLoading(true);
     try {
-      const cfg = (await import('../AppContext')).useApp?.()?.state?.aiConfig || {};
+      const cfg = state.aiConfig;
       const prov = AI_PROVIDERS.find(p => p.id === (cfg.provider || 'claude')) || AI_PROVIDERS[0];
-      const model = cfg.model || prov.defaultModel;
       
       const totalWorkouts = Object.values(history).filter((l: any) => l.completed).length;
       const recentWorkouts = Object.entries(history).filter(([,l]: any) => l.completed).sort(([a]: any, [b]: any) => b > a ? 1 : -1).slice(0, 5);
@@ -288,9 +289,9 @@ function AISuggestionModal({ T, history, prs, streak, onApply, onClose }: { T: a
       const exerciseStats: Record<string, number[]> = {};
       Object.entries(history).forEach(([, log]: any) => {
         if (!log.exercises) return;
-        Object.entries(log.exercises).forEach(([exId, sets]: any) => {
+        Object.entries(log.exercises).forEach(([exId, sets]) => {
           if (!exerciseStats[exId]) exerciseStats[exId] = [];
-          (sets as any[]).forEach(s => {
+          (sets as SetLog[]).forEach(s => {
             const v = parseInt(s.value) || 0;
             if (v > 0) exerciseStats[exId].push(v);
           });
@@ -316,7 +317,7 @@ function AISuggestionModal({ T, history, prs, streak, onApply, onClose }: { T: a
 - Упражнение: конкретный совет
 - Ещё упражнение: ещё совет`;
 
-      const reply = await callAI([{ role: 'user', content: prompt, ts: Date.now() }], '', cfg as any, prov);
+      const reply = await callAI([{ role: 'user', content: prompt, ts: Date.now() }], '', cfg, prov);
       const lines = reply.split('\n').filter(l => l.trim() && (l.includes(':') || l.startsWith('-') || l.startsWith('•')));
       setSuggestions(lines.slice(0, 4));
     } catch (e) {
@@ -476,7 +477,7 @@ export default function WorkoutScreen() {
 
   if (!session) {
     const entries = Object.entries(history).filter(([,l])=>l.completed).sort(([a],[b])=>b>a?1:-1);
-    const filtered = histSearch ? entries.filter(([d,l])=>d.includes(histSearch)||PLAN.find(p=>p.id===(l as any).dayId)?.name.toLowerCase().includes(histSearch.toLowerCase())) : entries.slice(0,20);
+    const filtered = histSearch ? entries.filter(([d,l])=>d.includes(histSearch)||PLAN.find(p=>p.id===(l as WorkoutLog).dayId)?.name.toLowerCase().includes(histSearch.toLowerCase())) : entries.slice(0,20);
     return (
       <SafeAreaView style={{ flex:1, backgroundColor:T.bg }}>
         {editExercise && (
@@ -531,8 +532,8 @@ export default function WorkoutScreen() {
             <>
               <TextInput value={histSearch} onChangeText={setHistSearch} placeholder="Поиск…" placeholderTextColor={T.muted} style={{ height:40, borderRadius:10, borderWidth:1.5, borderColor:T.bord, backgroundColor:T.lo, color:T.txt, fontFamily:'Barlow_400Regular', fontSize:14, paddingHorizontal:14, marginBottom:12 }}/>
               {filtered.map(([date,log])=>{
-                const plan=PLAN.find(p=>p.id===(log as any).dayId)||{name:'Тренировка',emoji:'💪', exercises:[]};
-                const reps=Object.values((log as any).exercises||{}).flat().reduce((s:number,x:any)=>s+(parseInt(x.value)||0),0);
+                const plan=PLAN.find(p=>p.id===(log as WorkoutLog).dayId)||{name:'Тренировка',emoji:'💪', exercises:[]};
+                const reps=Object.values((log as WorkoutLog).exercises||{}).flat().reduce((s:number,x)=>s+(parseInt((x as SetLog).value)||0),0);
                 return (
                   <Card key={date} T={T} style={{ marginBottom:8 }}>
                     <TouchableOpacity onPress={() => setEditWorkout({ date, ...log })}>
@@ -542,9 +543,9 @@ export default function WorkoutScreen() {
                           <Text style={{ fontFamily:'BarlowCondensed_700Bold', fontSize:15, color:T.txt }}>{plan.name}</Text>
                           <Text style={{ fontFamily:'Barlow_400Regular', fontSize:12, color:T.muted }}>{new Date(date+'T12:00:00').toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'short'})}</Text>
                           <View style={{ flexDirection:'row', gap:6, marginTop:4 }}>
-                            <Badge color={T.primary} T={T}>{Object.keys((log as any).exercises||{}).length} упр.</Badge>
+                            <Badge color={T.primary} T={T}>{Object.keys((log as WorkoutLog).exercises||{}).length} упр.</Badge>
                             {reps>0&&<Badge color={T.success} T={T}>{reps} повт</Badge>}
-                            {(log as any).difficulty&&<Badge color={(log as any).difficulty>=8?T.danger:T.warn} T={T}>💪 {(log as any).difficulty}/10</Badge>}
+                            {(log as WorkoutLog).difficulty&&<Badge color={(log as WorkoutLog).difficulty>=8?T.danger:T.warn} T={T}>💪 {(log as WorkoutLog).difficulty}/10</Badge>
                           </View>
                         </View>
                         <Edit2 size={16} color={T.muted} />

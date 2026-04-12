@@ -278,7 +278,7 @@ export function exerciseTrend(history: Record<string, WorkoutLog>, exId: string)
     .slice(-12)
     .map(([date, l]) => ({
       date: date.slice(5),
-      val: Math.max(0, ...((l.exercises?.[exId] || []) as any[]).map((s: any) => parseInt(s.value) || 0)),
+      val: Math.max(0, ...((l.exercises?.[exId] || []) as SetLog[]).map((s) => parseInt(s.value) || 0)),
     }));
 }
 

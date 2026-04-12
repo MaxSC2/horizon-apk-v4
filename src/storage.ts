@@ -19,6 +19,9 @@ export const DEFAULTS: AppState = {
   onboarded: false,
   user: { maxPushups: 15, note: '' },
   themeId: 'cosmos',
+  uiStyleId: 'default',
+  alarms: [],
+  calEvents: [],
   aiConfig: {
     provider: 'claude',
     apiKey: '',

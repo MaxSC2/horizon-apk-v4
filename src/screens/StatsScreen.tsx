@@ -566,7 +566,7 @@ export default function StatsScreen() {
               </View>
               <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
                 {UI_STYLES.map(s => {
-                  const cur = ((state as any).uiStyleId || 'default') === s.id;
+                  const cur = (state.uiStyleId || 'default') === s.id;
                   return (
                     <TouchableOpacity key={s.id} onPress={() => setState((st: any) => ({ ...st, uiStyleId: s.id }))}
                       style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: cur ? 2 : 1, borderColor: cur ? T.success : T.bord, backgroundColor: cur ? T.success + '18' : T.lo, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
@@ -623,7 +623,7 @@ export default function StatsScreen() {
         )}
       </ScrollView>
       {showThemePicker && <ThemePickerModal T={T} currentThemeId={state.themeId} onSelect={id => setState((s: any) => ({ ...s, themeId: id }))} onClose={() => setShowThemePicker(false)} />}
-      {showStylePicker && <StylePickerModal T={T} currentStyleId={(state as any).uiStyleId || 'default'} currentThemeId={state.themeId} onSelect={id => setState((s: any) => ({ ...s, uiStyleId: id }))} onClose={() => setShowStylePicker(false)} />}
+      {showStylePicker && <StylePickerModal T={T} currentStyleId={state.uiStyleId || 'default'} currentThemeId={state.themeId} onSelect={id => setState((s: any) => ({ ...s, uiStyleId: id }))} onClose={() => setShowStylePicker(false)} />}
     </SafeAreaView>
   );
 }

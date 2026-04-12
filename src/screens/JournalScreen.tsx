@@ -31,7 +31,7 @@ export default function JournalScreen() {
 
   // Body state
   const [addBody, setAddBody] = useState(false);
-  const [bodyForm, setBodyForm] = useState({ weight: '', height: '', chest: '', waist: '', arms: '', hips: '' });
+  const [bodyForm, setBodyForm] = useState<Record<string, string>>({ weight: '', height: '', chest: '', waist: '', arms: '', hips: '' });
   const [photos, setPhotos] = useState<any[]>([]);
   const [photosLoaded, setPhotosLoaded] = useState(false);
 
@@ -261,7 +261,7 @@ export default function JournalScreen() {
                   {([['weight', '⚖️ Вес (кг)', '70'], ['height', '📐 Рост (см)', '175'], ['chest', '📏 Грудь (см)', '90'], ['waist', '📏 Талия (см)', '80'], ['arms', '💪 Бицепс (см)', '30'], ['hips', '📏 Бёдра (см)', '95']] as [string, string, string][]).map(([k, l, ph]) => (
                     <View key={k} style={{ width: '47%' }}>
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginBottom: 4 }}>{l}</Text>
-                      <TextInput keyboardType="numeric" value={(bodyForm as any)[k]} onChangeText={v => setBodyForm(f => ({ ...f, [k]: v }))} placeholder={ph} placeholderTextColor={T.muted}
+                      <TextInput keyboardType="numeric" value={bodyForm[k] || ''} onChangeText={v => setBodyForm(f => ({ ...f, [k]: v }))} placeholder={ph} placeholderTextColor={T.muted}
                         style={{ height: 40, borderRadius: 8, borderWidth: 1.5, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'BarlowCondensed_900Black', fontSize: 20, paddingHorizontal: 10, textAlign: 'center' }} />
                     </View>
                   ))}

@@ -1,5 +1,20 @@
 // src/types.ts
 
+export interface AIProvider {
+  id: string;
+  name: string;
+  short: string;
+  color: string;
+  needsKey: boolean;
+  free: boolean;
+  badge?: string;
+  defaultModel: string;
+  models: string[];
+  desc: string;
+  hint?: string;
+  keyPrefix?: string;
+}
+
 export interface Theme {
   id: string;
   name: string;
@@ -147,6 +162,32 @@ export interface AIConfig {
   endpoint: string;
   persona?: string;
   systemExtra?: string;
+  customModel?: string;
+}
+
+export interface Alarm {
+  id: string;
+  hour: number;
+  minute: number;
+  label: string;
+  days: number[];
+  enabled: boolean;
+  vibrate: boolean;
+  smartWake: boolean;
+  category: 'wake' | 'workout' | 'meal' | 'meds' | 'custom';
+  soundId: 'default' | 'twilight' | 'chime';
+}
+
+export type CalEventCategory = 'workout' | 'goal' | 'note' | 'health' | 'study' | 'social' | 'other';
+
+export interface CalEvent {
+  id: string;
+  date: string;
+  title: string;
+  category: CalEventCategory;
+  time?: string;
+  reminder: string;
+  completed: boolean;
 }
 
 export interface AppState {
@@ -169,6 +210,9 @@ export interface AppState {
     reminderEnabled?: boolean;
   };
   themeId: string;
+  uiStyleId: string;
+  alarms: Alarm[];
+  calEvents: CalEvent[];
   aiConfig: AIConfig;
   streak?: number;
 }

@@ -65,7 +65,7 @@ async function scheduleEventReminder(event: CalEvent): Promise<string | null> {
 export default function CalendarScreen() {
   const { state, setState, T } = useApp();
   const { history, journal } = state;
-  const events: CalEvent[] = (state as any).calEvents || [];
+  const events: CalEvent[] = state.calEvents || [];
 
   const setEvents = (fn: (e: CalEvent[]) => CalEvent[]) => {
     setState((s: any) => ({ ...s, calEvents: fn(s.calEvents || []) }));
@@ -363,7 +363,7 @@ export default function CalendarScreen() {
                 <Lbl T={T} style={{ marginBottom: 8 }}>Категория</Lbl>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginBottom: 16 }}>
                   {Object.entries(CAT_INFO).map(([k, v]) => (
-                    <TouchableOpacity key={k} onPress={() => setNewEvent(n => ({ ...n, category: k as any }))}
+                    <TouchableOpacity key={k} onPress={() => setNewEvent(n => ({ ...n, category: k as CalEventCategory }))}
                       style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1.5, borderColor: newEvent.category === k ? v.color : T.bord, backgroundColor: newEvent.category === k ? v.color + '22' : T.lo, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                       <Text style={{ fontSize: 13 }}>{v.emoji}</Text>
                       <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: newEvent.category === k ? v.color : T.muted }}>{v.label}</Text>
