@@ -99,7 +99,7 @@ export default function MentorScreen() {
     setState(s => ({ ...s, aiHistory: msgs.slice(-80) }));
   };
 
-  const send = async (text?: string) => {
+  const send = useCallback(async (text?: string) => {
     const userText = (text || input).trim();
     if (!userText || loading) return;
     setInput('');
@@ -119,7 +119,7 @@ export default function MentorScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [input, loading, messages, state, aiConfig]);
 
   const regenerate = async () => {
     const lastUserIdx = [...messages].reverse().findIndex(m => m.role === 'user');

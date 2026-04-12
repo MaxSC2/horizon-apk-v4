@@ -261,7 +261,7 @@ export default function CalendarScreen() {
           {selectedJournal && (
             <Card T={T} style={{ marginBottom: 10 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <Text style={{ fontSize: 24 }}>{MOOD_EMOJI[selectedJournal.mood || 3]}</Text>
+                <Text style={{ fontSize: 24 }}>{MOOD_EMOJI[selectedJournal.mood] || '😐'}</Text>
                 <View>
                   <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.txt }}>
                     {MOODS.find(m => m.v === selectedJournal.mood)?.l || 'Нейтр.'}

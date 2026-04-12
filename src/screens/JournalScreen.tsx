@@ -43,7 +43,13 @@ export default function JournalScreen() {
   const [refForm, setRefForm] = useState({ went: '', didnt: '', focus: '' });
 
   React.useEffect(() => {
-    if (!photosLoaded) { loadPhotos().then(p => { setPhotos(p); setPhotosLoaded(true); }); }
+    let cancelled = false;
+    if (!photosLoaded) {
+      loadPhotos().then(p => {
+        if (!cancelled) { setPhotos(p); setPhotosLoaded(true); }
+      });
+    }
+    return () => { cancelled = true; };
   }, [photosLoaded]);
 
   // ── Journal

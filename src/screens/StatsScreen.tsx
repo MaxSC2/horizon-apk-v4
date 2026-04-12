@@ -367,7 +367,7 @@ export default function StatsScreen() {
                     {[
                       { l: 'Тренировок', v: `${ms.workoutDays}/${ms.totalDays}`, c: T.primary },
                       { l: 'Консист.', v: ms.consistency + '%', c: ms.consistency >= 80 ? T.success : ms.consistency >= 50 ? T.warn : T.danger },
-                      { l: 'Настроение', v: ms.avgMood ? `${ms.avgMood} ${MOOD_EMOJI[Math.round(parseFloat(ms.avgMood))]}` : '—', c: T.success },
+                      { l: 'Настроение', v: ms.avgMood ? `${ms.avgMood} ${MOOD_EMOJI[Math.round(parseFloat(ms.avgMood))] || ''}` : '—', c: T.success },
                       { l: 'Сон avg', v: ms.avgSleep ? fmtSleep(parseFloat(ms.avgSleep)) : '—', c: T.primary },
                     ].map((s, i) => (
                       <View key={i} style={{ flex: 1, padding: 8, backgroundColor: T.lo, borderRadius: 10, alignItems: 'center' }}>
@@ -392,7 +392,7 @@ export default function StatsScreen() {
                         const isRest = PLAN[new Date(d.date + 'T12:00:00').getDay() === 0 ? 6 : new Date(d.date + 'T12:00:00').getDay() - 1]?.type === 'rest';
                         return (
                           <View key={di} style={{ flex: 1, aspectRatio: 1, borderRadius: 3, backgroundColor: d.workout ? T.success + '99' : isRest ? T.bord + '44' : T.lo, borderWidth: d.date === TODAY ? 1.5 : 0, borderColor: T.primary, alignItems: 'center', justifyContent: 'center' }}>
-                            {d.mood && !d.workout && <Text style={{ fontSize: 7 }}>{MOOD_EMOJI[d.mood]}</Text>}
+                            {d.mood && !d.workout && <Text style={{ fontSize: 7 }}>{MOOD_EMOJI[d.mood] || ''}</Text>}
                           </View>
                         );
                       })}
