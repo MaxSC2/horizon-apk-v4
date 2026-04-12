@@ -470,8 +470,7 @@ export default function DashboardScreen() {
               </View>
             </Pressable>
           </View>
-        </View>
-      </Modal>
+        </Modal>
     </SafeAreaView>
   );
 }
