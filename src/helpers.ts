@@ -8,6 +8,20 @@ export const fmt = (d: Date): string => {
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
+export function fmtSleep(hours: number): string {
+  const totalMin = Math.round(hours * 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return m === 0 ? `${h}ч` : `${h}ч ${m}м`;
+}
+
+export function fmtElapsed(secs: number): string {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
 export const uid = (): string => Math.random().toString(36).slice(2, 9);
 
 export function getMonday(): Date {
