@@ -96,7 +96,7 @@ function Navigation() {
       ref={navigationRef}
       screenOptions={({ route }) => {
         const tabInfo = TABS.find(t => t.name === route.name);
-        const IconComp = tabInfo?.icon || Sunrise;
+        const IconComp = tabInfo?.icon || Sun;
         return {
           headerShown: false,
           tabBarStyle,

@@ -441,22 +441,20 @@ export default function AlarmScreen() {
       if (type === EventType.PRESS || type === EventType.ACTION_PRESS) {
         const actionId = detail.pressAction?.id;
         const alarmId = detail.notification?.data?.alarmId as string;
+        const alarmData = detail.notification?.data as { label?: string; hour?: number; minute?: number } | undefined;
         
         if (actionId === 'stop') {
           await notifee.cancelNotification(alarmId);
-          // Toggle alarm off
           setAlarms(prev => prev.map(a => a.id === alarmId ? { ...a, enabled: false } : a));
         } else if (actionId === 'snooze') {
-          // Reschedule for 10 minutes later
           await notifee.cancelNotification(alarmId);
-          const alarm = alarms.find(a => a.id === alarmId);
-          if (alarm) {
+          if (alarmData?.hour !== undefined && alarmData?.minute !== undefined) {
             const snoozeTime = Date.now() + 10 * 60 * 1000;
             await notifee.createTriggerNotification(
               {
                 id: `snooze-${alarmId}`,
-                title: `⏰ ${alarm.label} (Отложено)`,
-                body: `${String(alarm.hour).padStart(2, '0')}:${String(alarm.minute).padStart(2, '0')}`,
+                title: `⏰ ${alarmData.label || 'Будильник'} (Отложено)`,
+                body: `${String(alarmData.hour).padStart(2, '0')}:${String(alarmData.minute).padStart(2, '0')}`,
                 android: {
                   channelId: CHANNEL_ID,
                   sound: 'default',
@@ -468,7 +466,7 @@ export default function AlarmScreen() {
                     { title: '✓ Остановить', pressAction: { id: 'stop' } },
                   ],
                 },
-                data: { alarmId: alarm.id, type: 'alarm', snoozed: 'true' },
+                data: { alarmId, type: 'alarm', snoozed: 'true', label: alarmData.label, hour: alarmData.hour, minute: alarmData.minute },
               },
               {
                 type: TriggerType.TIMESTAMP,
@@ -478,7 +476,6 @@ export default function AlarmScreen() {
             );
           }
         } else if (alarmId) {
-          // Just pressed the notification - dismiss it
           await notifee.cancelNotification(alarmId);
         }
       }

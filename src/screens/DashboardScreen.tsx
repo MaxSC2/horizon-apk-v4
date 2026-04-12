@@ -421,8 +421,7 @@ export default function DashboardScreen() {
       <Modal visible={showSleepModal} transparent animationType="slide" onRequestClose={() => setShowSleepModal(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)' }}>
           <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={() => setShowSleepModal(false)}>
-            <Pressable onPress={() => {}} style={{ backgroundColor: T.surf }}>
-              <View style={{ backgroundColor: T.surf, padding: 20, paddingBottom: 20 }}>
+            <View style={{ backgroundColor: T.surf, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: 34 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>Время сна</Text>
                   <TouchableOpacity onPress={() => setShowSleepModal(false)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
@@ -469,7 +468,7 @@ export default function DashboardScreen() {
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: '#000' }}>Сохранить</Text>
                 </TouchableOpacity>
               </View>
-            </Pressable>
+            </View>
           </Pressable>
         </View>
       </Modal>

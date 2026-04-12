@@ -452,17 +452,21 @@ export default function WorkoutScreen() {
     const startMs = session.startTime ? new Date(session.startTime).getTime() : Date.now();
     const t = setInterval(() => setElapsed(Math.floor((Date.now()-startMs)/1000)), 1000);
     return () => clearInterval(t);
-  }, [!!session]);
+  }, [session]);
 
   const fmtTime = (s: number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
   const upd = (patch: any) => setSession((s: any) => s ? {...s,...patch} : s);
 
   const handleSaveExercise = (ex: any) => {
-    const newPlan = [...PLAN];
-    const dayIdx = editExercise?.dayIdx || 0;
-    const exIdx = newPlan[dayIdx].exercises.findIndex((e: any) => e.id === ex.id);
-    if (exIdx >= 0) {
-      newPlan[dayIdx].exercises[exIdx] = ex;
+    const currentPlan = state.customPlan || PLAN;
+    const newPlan = currentPlan.map((day: any) => ({ ...day, exercises: [...day.exercises] }));
+    const dayIdx = editExercise?.dayIdx ?? 0;
+    if (dayIdx >= 0 && dayIdx < newPlan.length) {
+      const exIdx = newPlan[dayIdx].exercises.findIndex((e: any) => e.id === ex.id);
+      if (exIdx >= 0) {
+        newPlan[dayIdx].exercises[exIdx] = ex;
+        setState((s: any) => ({ ...s, customPlan: newPlan }));
+      }
     }
   };
 
