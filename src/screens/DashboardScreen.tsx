@@ -468,8 +468,8 @@ export default function DashboardScreen() {
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: '#000' }}>Сохранить</Text>
                 </TouchableOpacity>
               </View>
-            </View>
-          </Pressable>
+            </Pressable>
+          </View>
         </View>
       </Modal>
     </SafeAreaView>
