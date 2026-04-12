@@ -1,5 +1,5 @@
 // src/screens/MentorScreen.tsx
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, ScrollView,
   KeyboardAvoidingView, Platform, Modal, Pressable, Alert,
