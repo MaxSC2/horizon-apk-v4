@@ -545,7 +545,7 @@ export default function WorkoutScreen() {
                           <View style={{ flexDirection:'row', gap:6, marginTop:4 }}>
                             <Badge color={T.primary} T={T}>{Object.keys((log as WorkoutLog).exercises||{}).length} упр.</Badge>
                             {reps>0&&<Badge color={T.success} T={T}>{reps} повт</Badge>}
-                            {(log as WorkoutLog).difficulty&&<Badge color={(log as WorkoutLog).difficulty>=8?T.danger:T.warn} T={T}>💪 {(log as WorkoutLog).difficulty}/10</Badge>
+                            {(log as WorkoutLog).difficulty&&<Badge color={(log as WorkoutLog).difficulty>=8?T.danger:T.warn} T={T}>💪 {(log as WorkoutLog).difficulty}/10</Badge>}
                           </View>
                         </View>
                         <Edit2 size={16} color={T.muted} />
