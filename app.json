@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "Горизонт",
+    "slug": "horizon-life-tracker",
+    "version": "4.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#07090D"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#07090D"
+      },
+      "package": "com.horizon.lifetracker",
+      "versionCode": 5,
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.USE_EXACT_ALARM",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.WAKE_LOCK",
+        "android.permission.FOREGROUND_SERVICE"
+      ]
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.horizon.lifetracker"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "@notifee/react-native",
+        {
+          "notifications": [
+            {
+              "id": "horizon-alarms",
+              "name": "Будильники ГОРИЗОНТ",
+              "description": "Уведомления будильника приложения ГОРИЗОНТ",
+              "lights": true,
+              "lightColor": "#FFD600",
+              "vibration": true,
+              "sound": "default",
+              "importance": "HIGH",
+              "visibility": "PUBLIC",
+              "bypassDnd": true
+            }
+          ]
+        }
+      ]
+    ],
+    "extra": {
+      "eas": { "projectId": "your-project-id" }
+    }
+  }
+}
