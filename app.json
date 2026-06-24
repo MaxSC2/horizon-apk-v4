@@ -33,26 +33,7 @@
       "bundleIdentifier": "com.horizon.lifetracker"
     },
     "plugins": [
-      "expo-font",
-      [
-        "@notifee/react-native",
-        {
-          "notifications": [
-            {
-              "id": "horizon-alarms",
-              "name": "Будильники ГОРИЗОНТ",
-              "description": "Уведомления будильника приложения ГОРИЗОНТ",
-              "lights": true,
-              "lightColor": "#FFD600",
-              "vibration": true,
-              "sound": "default",
-              "importance": "HIGH",
-              "visibility": "PUBLIC",
-              "bypassDnd": true
-            }
-          ]
-        }
-      ]
+      "expo-font"
     ],
     "extra": {
       "eas": { "projectId": "your-project-id" }
