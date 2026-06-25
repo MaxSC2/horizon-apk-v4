@@ -71,7 +71,7 @@ function HeatMap({ T, history }: any) {
 }
 
 export default function DashboardScreen() {
-  const { state, setState, T, startWorkout, session } = useApp();
+  const { state, setState, T, startWorkout } = useApp();
   const navigation = useNavigation<any>();
   const { history, tasks, goals, journal } = state;
 
@@ -228,7 +228,7 @@ export default function DashboardScreen() {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <Lbl T={T}>🎯 Главный фокус дня</Lbl>
             {!editFocus && (
-              <TouchableOpacity onPress={() => setEditFocus(true)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <TouchableOpacity onPress={() => setEditFocus(true)}>
                 <Text style={{ fontSize: 14, color: T.muted }}>✏️</Text>
               </TouchableOpacity>
             )}
@@ -255,96 +255,6 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           )}
         </Card>
-
-        {/* Quick Actions — v4.1 — primary actions one tap away */}
-        <View style={{ marginBottom: 12 }}>
-          <Lbl T={T} style={{ marginBottom: 8 }}>⚡ Быстрые действия</Lbl>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <TouchableOpacity
-              onPress={() => {
-                if (session) { navigation.navigate('Workout'); return; }
-                startWorkout(todayI);
-                navigation.navigate('Workout');
-              }}
-              activeOpacity={0.75}
-              hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-              style={{
-                flex: 1, borderRadius: 14, padding: 12,
-                backgroundColor: T.primary + '15', borderWidth: 1.5, borderColor: T.primary + '55',
-                alignItems: 'center', gap: 4,
-              }}
-            >
-              <Text style={{ fontSize: 22 }}>{todayPlan?.emoji || '💪'}</Text>
-              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 12, color: T.primary, letterSpacing: 0.5 }}>
-                {session ? 'ПРОДОЛЖИТЬ' : 'ТРЕНИРОВКА'}
-              </Text>
-              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 9, color: T.muted }}>{todayPlan?.name || ''}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Journal')}
-              activeOpacity={0.75}
-              hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-              style={{
-                flex: 1, borderRadius: 14, padding: 12,
-                backgroundColor: T.success + '15', borderWidth: 1.5, borderColor: T.success + '55',
-                alignItems: 'center', gap: 4,
-              }}
-            >
-              <Text style={{ fontSize: 22 }}>📔</Text>
-              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 12, color: T.success, letterSpacing: 0.5 }}>ДНЕВНИК</Text>
-              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 9, color: T.muted }}>{todayJournal ? '✓ есть запись' : 'добавить'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Mentor')}
-              activeOpacity={0.75}
-              hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-              style={{
-                flex: 1, borderRadius: 14, padding: 12,
-                backgroundColor: '#C77DFF' + '15', borderWidth: 1.5, borderColor: '#C77DFF' + '55',
-                alignItems: 'center', gap: 4,
-              }}
-            >
-              <Text style={{ fontSize: 22 }}>🤖</Text>
-              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 12, color: '#C77DFF', letterSpacing: 0.5 }}>НЕЙРО</Text>
-              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 9, color: T.muted }}>совет AI</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Today's plan card — v4.1 — shows what workout is scheduled today */}
-        {todayPlan && todayPlan.type !== 'rest' && (
-          <Card T={T} style={{ marginBottom: 12, borderLeftWidth: 4, borderLeftColor: T.primary }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <View style={{ flex: 1 }}>
-                <Lbl T={T} style={{ marginBottom: 4 }}>Сегодня · {todayPlan.day}</Lbl>
-                <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt, marginBottom: 4 }}>{todayPlan.emoji} {todayPlan.name}</Text>
-                <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted }}>
-                  {todayLog?.completed
-                    ? '✓ Выполнено сегодня'
-                    : `${todayPlan.exercises.length} упр. · ${todayPlan.warmup.length + todayPlan.exercises.length + todayPlan.stretch.length} блока`}
-                </Text>
-              </View>
-              {!todayLog?.completed && (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (session) { navigation.navigate('Workout'); return; }
-                    startWorkout(todayI);
-                    navigation.navigate('Workout');
-                  }}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  style={{
-                    paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12,
-                    backgroundColor: T.primary,
-                  }}
-                >
-                  <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 13, color: '#000' }}>
-                    {session ? 'ПРОДОЛЖ.' : 'НАЧАТЬ'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </Card>
-        )}
 
         {/* Life Score */}
         <Card T={T} style={{ marginBottom: 12, backgroundColor: T.card }}>

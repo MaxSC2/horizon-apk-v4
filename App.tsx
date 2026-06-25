@@ -1,14 +1,6 @@
-// App.tsx — Горизонт Life Tracker v4.1
-//
-// v4.1 navigation reorganization:
-//   Bottom tab bar reduced from 9 tabs to 5 (Главная, Тренировка, Дневник, НЕЙРО, Ещё).
-//   Less-frequent screens (Задачи, Питание, Календарь, Будильник, Статы, Настройки)
-//   are reached from the new "Ещё" screen via a 2-column grid of large tappable cards.
-//   This dramatically improves one-handed reachability — primary actions are always
-//   within thumb's reach, and the tab bar no longer overflows on smaller phones.
+// App.tsx — Горизонт Life Tracker
 import React, { useEffect, useRef } from 'react';
-import { View, Text, ActivityIndicator, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, ActivityIndicator, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -18,24 +10,24 @@ import {
   BarlowCondensed_400Regular, BarlowCondensed_700Bold, BarlowCondensed_900Black,
 } from '@expo-google-fonts/barlow-condensed';
 import { Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold } from '@expo-google-fonts/barlow';
+
 import {
-  Sun, Dumbbell, BookOpen, Sparkles, Grid,
-  ClipboardList, Leaf, BarChart2, Activity,
-  Bell, Calendar, Settings as SettingsIcon,
+  Sun, Dumbbell, ClipboardList, Leaf,
+  BookOpen, Sparkles, BarChart2, Activity,
+  Bell, Calendar,
 } from 'lucide-react-native';
 
 import { AppProvider, useApp, setGlobalNavigate } from './src/AppContext';
 import { getUIStyle } from './src/styles';
 import DashboardScreen  from './src/screens/DashboardScreen';
 import WorkoutScreen    from './src/screens/WorkoutScreen';
-import JournalScreen    from './src/screens/JournalScreen';
-import MentorScreen     from './src/screens/MentorScreen';
 import TasksScreen      from './src/screens/TasksScreen';
 import NutritionScreen  from './src/screens/NutritionScreen';
+import JournalScreen    from './src/screens/JournalScreen';
+import MentorScreen     from './src/screens/MentorScreen';
 import StatsScreen      from './src/screens/StatsScreen';
 import AlarmScreen      from './src/screens/AlarmScreen';
 import CalendarScreen   from './src/screens/CalendarScreen';
-import SettingsScreen   from './src/screens/SettingsScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { ensureAlarmHandlersRegistered } from './src/alarm';
 
@@ -46,87 +38,15 @@ ensureAlarmHandlersRegistered();
 
 const Tab = createBottomTabNavigator();
 
-// "Ещё" screen — a hub for less-frequent destinations.
-function MoreScreen() {
-  const { T, state, navigateTo } = useApp();
-  const insets = useSafeAreaInsets();
-  const items = [
-    { label: 'Задачи',    desc: 'Привычки и цели',     icon: ClipboardList, color: '#00C4F0', target: 'TasksScreen' },
-    { label: 'Питание',   desc: 'Калории и макросы',   icon: Leaf,          color: '#00E676', target: 'NutritionScreen' },
-    { label: 'Календарь', desc: 'События и история',   icon: Calendar,      color: '#C77DFF', target: 'CalendarScreen' },
-    { label: 'Будильник', desc: 'Уведомления и сон',   icon: Bell,          color: '#FFD600', target: 'AlarmScreen' },
-    { label: 'Статы',     desc: 'Графики и рекорды',   icon: BarChart2,     color: '#FF9500', target: 'StatsScreen' },
-    { label: 'Настройки', desc: 'Темы, AI, данные',    icon: SettingsIcon,  color: '#7EB8FF', target: 'SettingsScreen' },
-  ];
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
-      <View style={{
-        backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord,
-        paddingHorizontal: 16, paddingVertical: 12,
-      }}>
-        <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt, letterSpacing: 1 }}>Ещё</Text>
-        <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 2 }}>Все разделы приложения</Text>
-      </View>
-      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 24 }}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-          {items.map(item => {
-            const IconComp = item.icon;
-            return (
-              <TouchableOpacity
-                key={item.label}
-                onPress={() => navigateTo(item.target)}
-                activeOpacity={0.75}
-                style={{
-                  width: '48%',
-                  backgroundColor: T.card,
-                  borderWidth: 1,
-                  borderColor: T.bord,
-                  borderRadius: 16,
-                  padding: 16,
-                  aspectRatio: 1.05,
-                }}
-              >
-                <View style={{
-                  width: 44, height: 44, borderRadius: 12,
-                  backgroundColor: item.color + '18',
-                  borderWidth: 1.5, borderColor: item.color + '44',
-                  alignItems: 'center', justifyContent: 'center',
-                  marginBottom: 10,
-                }}>
-                  <IconComp size={22} color={item.color} />
-                </View>
-                <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: T.txt }}>{item.label}</Text>
-                <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 2 }}>{item.desc}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {/* Quick summary at bottom */}
-        <View style={{ marginTop: 18, padding: 14, borderRadius: 14, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord }}>
-          <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 11, color: T.muted, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>Быстрая сводка</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.primary }}>{state.tasks?.length || 0}</Text>
-              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>задач</Text>
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.warn }}>{state.alarms?.filter((a: any) => a.enabled).length || 0}</Text>
-              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>будильников</Text>
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.success }}>{state.goals?.filter((g: any) => !g.completed).length || 0}</Text>
-              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>целей</Text>
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: '#C77DFF' }}>{state.journal?.length || 0}</Text>
-              <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>записей</Text>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+// Style-aware tab label helper
+function getTabLabel(base: string, styleId: string): string {
+  const RPG: Record<string, string> = { 'ГОРИЗОНТ': '⚔️ МИР', 'ТРЕН.': '🗡️ БИТВА', 'ЗАДАЧИ': '📜 КВЕСТ', 'ПИТАНИЕ': '🍖 ЗЕЛЬЯ', 'ДНЕВНИК': '📕 LOG', 'РАЗУМ': '🔮 ОРАКУЛ', 'СТАТЫ': '🏆 СТАТЫ', 'ТРЕВОГА': '🔔', 'КАЛ.': '📅' };
+  const KAWAII: Record<string, string> = { 'ГОРИЗОНТ': '🌸 HOME', 'ТРЕН.': '💪 ГО!', 'ЗАДАЧИ': '✅ TODO', 'ПИТАНИЕ': '🍡 ЕДА', 'ДНЕВНИК': '📔 ♡', 'РАЗУМ': '✨ AI', 'СТАТЫ': '⭐ СТАТ', 'ТРЕВОГА': '🔔', 'КАЛ.': '📅' };
+  const PIXEL: Record<string, string> = { 'ГОРИЗОНТ': '► HOME', 'ТРЕН.': '► FIGHT', 'ЗАДАЧИ': '► QUEST', 'ПИТАНИЕ': '► FOOD', 'ДНЕВНИК': '► LOG', 'РАЗУМ': '► AI', 'СТАТЫ': '► RPT', 'ТРЕВОГА': '► ALM', 'КАЛ.': '► CAL' };
+  if (styleId === 'rpg') return RPG[base] || base;
+  if (styleId === 'kawaii') return KAWAII[base] || base;
+  if (styleId === 'pixel') return PIXEL[base] || base;
+  return base;
 }
 
 function Navigation() {
@@ -148,38 +68,33 @@ function Navigation() {
 
   if (!state.onboarded) return <OnboardingScreen />;
 
-  const isPixel = uiStyle.id === 'pixel';
+  // RPG/Kawaii/Pixel tab bar styles
   const isRPG = uiStyle.id === 'rpg';
+  const isKawaii = uiStyle.id === 'kawaii';
+  const isPixel = uiStyle.id === 'pixel';
   const isGlow = uiStyle.id === 'glow';
 
   const tabBarStyle: any = {
     backgroundColor: T.surf,
     borderTopColor: isPixel ? T.primary : isRPG ? T.primary + '88' : T.bord,
     borderTopWidth: isPixel ? 3 : isRPG ? 2 : 1,
-    height: 64,
-    paddingBottom: 10,
-    paddingTop: 8,
+    height: 62,
+    paddingBottom: 8,
+    paddingTop: 6,
     ...(isGlow ? { shadowColor: T.primary, shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.25, shadowRadius: 12 } : {}),
+    ...(isRPG ? { borderTopStyle: 'solid' } : {}),
   };
 
-  // 5 primary tabs — fits comfortably on any phone
   const TABS = [
-    { name: 'Dashboard', label: 'ГЛАВНАЯ',  icon: Sun,                              comp: DashboardScreen },
-    { name: 'Workout',   label: 'ТРЕН.',     icon: session ? Activity : Dumbbell,   comp: WorkoutScreen   },
-    { name: 'Journal',   label: 'ДНЕВНИК',   icon: BookOpen,                        comp: JournalScreen   },
-    { name: 'Mentor',    label: 'НЕЙРО',     icon: Sparkles,                        comp: MentorScreen    },
-    { name: 'More',      label: 'ЕЩЁ',       icon: Grid,                            comp: MoreScreen      },
-  ];
-
-  // Secondary screens — registered without tab bar icons, reached via "Ещё" or
-  // via navigation.navigate() from anywhere.
-  const HIDDEN_SCREENS = [
-    { name: 'TasksScreen',       comp: TasksScreen      },
-    { name: 'NutritionScreen',   comp: NutritionScreen  },
-    { name: 'CalendarScreen',    comp: CalendarScreen   },
-    { name: 'AlarmScreen',       comp: AlarmScreen      },
-    { name: 'StatsScreen',       comp: StatsScreen      },
-    { name: 'SettingsScreen',    comp: SettingsScreen   },
+    { name: 'Dashboard', label: 'ГЛАВНАЯ', icon: Sun },
+    { name: 'Workout',   label: 'ТРЕН.',    icon: session ? Activity : Dumbbell, hasActive: !!session },
+    { name: 'Tasks',     label: 'ЗАДАЧИ',   icon: ClipboardList },
+    { name: 'Nutrition', label: 'ПИТАНИЕ',  icon: Leaf },
+    { name: 'Journal',   label: 'ДНЕВНИК',  icon: BookOpen },
+    { name: 'Calendar',  label: 'КАЛ.',     icon: Calendar },
+    { name: 'Mentor',    label: 'НЕЙРО',    icon: Sparkles },
+    { name: 'Alarm',     label: 'ТРЕВОГА',  icon: Bell },
+    { name: 'Stats',     label: 'СТАТЫ',    icon: BarChart2 },
   ];
 
   return (
@@ -190,28 +105,36 @@ function Navigation() {
         const IconComp = tabInfo?.icon || Sun;
         return {
           headerShown: false,
-          tabBarStyle: HIDDEN_SCREENS.some(s => s.name === route.name) ? { display: 'none' } : tabBarStyle,
-          tabBarButton: HIDDEN_SCREENS.some(s => s.name === route.name) ? () => null : undefined,
+          tabBarStyle,
           tabBarActiveTintColor: T.primary,
           tabBarInactiveTintColor: T.muted,
           tabBarLabelStyle: {
             fontFamily: isPixel ? 'BarlowCondensed_900Black' : 'BarlowCondensed_700Bold',
-            fontSize: isPixel ? 8 : 9,
+            fontSize: isPixel ? 7 : 7.5,
             letterSpacing: isPixel ? 0 : 0.5,
-            marginTop: 2,
           },
           tabBarIcon: ({ color, focused }) => (
-            <IconComp size={22} color={color} strokeWidth={focused ? 2.5 : 1.8} />
+            <IconComp size={20} color={color} strokeWidth={focused ? 2.5 : 1.8} />
           ),
           animation: 'fade',
         };
       }}
     >
       {TABS.map(tab => (
-        <Tab.Screen key={tab.name} name={tab.name} component={tab.comp} options={{ tabBarLabel: tab.label }} />
-      ))}
-      {HIDDEN_SCREENS.map(s => (
-        <Tab.Screen key={s.name} name={s.name} component={s.comp} options={{ tabBarButton: () => null }} />
+        <Tab.Screen key={tab.name} name={tab.name}
+          component={
+            tab.name === 'Dashboard'  ? DashboardScreen  :
+            tab.name === 'Workout'    ? WorkoutScreen    :
+            tab.name === 'Tasks'      ? TasksScreen      :
+            tab.name === 'Nutrition'  ? NutritionScreen  :
+            tab.name === 'Journal'    ? JournalScreen    :
+            tab.name === 'Calendar'   ? CalendarScreen   :
+            tab.name === 'Mentor'     ? MentorScreen     :
+            tab.name === 'Alarm'      ? AlarmScreen      :
+            StatsScreen
+          }
+          options={{ tabBarLabel: getTabLabel(tab.label, state.uiStyleId || 'default') }}
+        />
       ))}
     </Tab.Navigator>
   );

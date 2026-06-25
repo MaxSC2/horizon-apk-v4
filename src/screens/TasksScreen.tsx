@@ -7,7 +7,6 @@ import { useApp } from '../AppContext';
 import { Card, Lbl, Btn, Badge, ProgressBar } from '../components';
 import { uid, TODAY, goalForecast } from '../helpers';
 import { Task, Goal } from '../types';
-import { Haptic } from '../haptics';
 
 const TASK_CATS = [
   { id: 'workout', label: 'Тренировка', emoji: '💪', color: '#00C4F0' },
@@ -57,7 +56,6 @@ export default function TasksScreen() {
         return { ...task, completedDates: done ? task.completedDates.filter(d => d !== TODAY) : [...(task.completedDates || []), TODAY] };
       }),
     }));
-    Haptic.toggle();
   };
 
   const addGoal = () => {
