@@ -318,7 +318,7 @@ function AISuggestionModal({ T, history, prs, streak, onApply, onClose }: { T: a
 - Упражнение: конкретный совет
 - Ещё упражнение: ещё совет`;
 
-      const reply = await callAI([{ role: 'user', content: prompt, ts: Date.now() }], '', cfg, prov);
+      const reply = await callAI([{ role: 'user', content: prompt, ts: Date.now() }], '', cfg);
       const lines = reply.split('\n').filter(l => l.trim() && (l.includes(':') || l.startsWith('-') || l.startsWith('•')));
       setSuggestions(lines.slice(0, 4));
     } catch (e) {
@@ -457,7 +457,7 @@ export default function WorkoutScreen() {
   }, [session]);
 
   const fmtTime = (s: number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
-  const upd = (patch: any) => setSession((s: any) => s ? {...s,...patch} : s);
+  const upd = (patch: any) => setSession(session ? { ...session, ...patch } : null);
 
   const handleSaveExercise = (ex: any) => {
     const currentPlan = state.customPlan || PLAN;
@@ -488,7 +488,7 @@ export default function WorkoutScreen() {
           <EditWorkoutModal T={T} workout={editWorkout} onSave={handleSaveWorkout} onClose={() => setEditWorkout(null)} />
         )}
         {showAISuggest && (
-          <AISuggestionModal T={T} history={history} prs={prs} streak={0} onApply={(s) => console.log('Apply suggestion:', s)} onClose={() => setShowAISuggest(false)} />
+          <AISuggestionModal T={T} history={history} prs={prs} streak={0} onApply={(s) => { upd({ workoutNotes: ((session?.workoutNotes || '') ? session.workoutNotes + '\n' : '') + '💡 ' + s }); setShowAISuggest(false); }} onClose={() => setShowAISuggest(false)} />
         )}
         <ScrollView contentContainerStyle={{ padding:14, paddingBottom:20 }}>
           <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>

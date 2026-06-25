@@ -23,7 +23,7 @@ import { Theme } from '../types';
 const { width: W, height: H } = Dimensions.get('window');
 
 // ── Mode definition ─────────────────────────────────────────────────────────
-export type UIModeId = 'focus' | 'aurora' | 'neon' | 'paper' | 'quest';
+export type UIModeId = 'focus' | 'aurora' | 'neon' | 'paper' | 'quest' | 'cosmic' | 'mono' | 'synthwave';
 
 export interface UIMode {
   id: UIModeId;
@@ -134,6 +134,60 @@ export const UI_MODES: UIMode[] = [
     fontBody: 'Barlow_400Regular',
     fontMono: 'BarlowCondensed_700Bold',
     accentOverride: (T) => T.warn,
+  },
+  {
+    id: 'cosmic',
+    name: 'Космос',
+    emoji: '🪐',
+    desc: 'Глубокий космос. Орбиты планет, мерцающие звёзды, туманности. Для мечтателей.',
+    cardBg: (T) => T.card,
+    cardBorder: (T) => T.primary + '55',
+    cardBorderWidth: 1,
+    cardRadius: 16,
+    cardBlur: false,
+    cardShadow: true,
+    cardGlow: true,
+    btnRadius: 12,
+    fontTitle: 'BarlowCondensed_900Black',
+    fontBody: 'Barlow_400Regular',
+    fontMono: 'Barlow_500Medium',
+    accentOverride: (T) => T.primary,
+  },
+  {
+    id: 'mono',
+    name: 'Газета',
+    emoji: '📰',
+    desc: 'Газетный стиль. Чёрно-белый, серифные акценты, колонки. Для любителей классики.',
+    cardBg: (T) => T.card,
+    cardBorder: (T) => T.txt + '33',
+    cardBorderWidth: 1,
+    cardRadius: 2,
+    cardBlur: false,
+    cardShadow: false,
+    cardGlow: false,
+    btnRadius: 0,
+    fontTitle: 'BarlowCondensed_900Black',
+    fontBody: 'Barlow_400Regular',
+    fontMono: 'Barlow_500Medium',
+    accentOverride: (T) => T.txt,
+  },
+  {
+    id: 'synthwave',
+    name: 'Synthwave',
+    emoji: '🌅',
+    desc: 'Ретро 80-х. Сетка-перспектива, неоновый закат, лазурно-розовая палитра.',
+    cardBg: (T) => T.card,
+    cardBorder: (T) => '#FF00FF',
+    cardBorderWidth: 1.5,
+    cardRadius: 6,
+    cardBlur: false,
+    cardShadow: true,
+    cardGlow: true,
+    btnRadius: 4,
+    fontTitle: 'BarlowCondensed_900Black',
+    fontBody: 'Barlow_400Regular',
+    fontMono: 'BarlowCondensed_700Bold',
+    accentOverride: () => '#FF00FF',
   },
 ];
 
@@ -288,15 +342,163 @@ function QuestBackground({ T }: { T: Theme }) {
   );
 }
 
+// 6. COSMIC — deep space with orbiting planets + twinkling stars
+function CosmicBackground({ T }: { T: Theme }) {
+  const orbit = useRef(new Animated.Value(0)).current;
+  const twinkle = useRef(new Animated.Value(0.3)).current;
+
+  useEffect(() => {
+    const loopOrbit = Animated.loop(Animated.timing(orbit, { toValue: 1, duration: 40000, easing: Easing.linear, useNativeDriver: false }));
+    const loopTwinkle = Animated.loop(Animated.sequence([
+      Animated.timing(twinkle, { toValue: 1, duration: 2000, useNativeDriver: false }),
+      Animated.timing(twinkle, { toValue: 0.3, duration: 2000, useNativeDriver: false }),
+    ]));
+    loopOrbit.start(); loopTwinkle.start();
+    return () => { loopOrbit.stop(); loopTwinkle.stop(); };
+  }, []);
+
+  const angle = orbit.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const angle2 = orbit.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-360deg'] });
+
+  return (
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: T.bg, overflow: 'hidden' }}>
+      {/* Nebula glow */}
+      <View style={{ position: 'absolute', top: -100, left: -100, width: 400, height: 400, borderRadius: 200, backgroundColor: T.primary, opacity: 0.08 }} />
+      <View style={{ position: 'absolute', bottom: -100, right: -100, width: 350, height: 350, borderRadius: 175, backgroundColor: '#C77DFF', opacity: 0.07 }} />
+
+      {/* Twinkling stars */}
+      {Array.from({ length: 40 }, (_, i) => {
+        const x = (i * 89) % W;
+        const y = (i * 53) % H;
+        const size = i % 3 === 0 ? 2 : 1;
+        return (
+          <Animated.View
+            key={i}
+            style={{
+              position: 'absolute', left: x, top: y,
+              width: size, height: size, borderRadius: size / 2,
+              backgroundColor: '#FFFFFF',
+              opacity: twinkle,
+            }}
+          />
+        );
+      })}
+
+      {/* Orbit 1 — large planet */}
+      <Animated.View style={{
+        position: 'absolute', left: W / 2 - 130, top: H / 3 - 130,
+        width: 260, height: 260, borderRadius: 130,
+        borderWidth: 1, borderColor: T.primary + '22',
+        transform: [{ rotate: angle }],
+      }}>
+        <View style={{ position: 'absolute', top: -8, left: 130 - 8, width: 16, height: 16, borderRadius: 8, backgroundColor: T.primary, opacity: 0.7 }} />
+      </Animated.View>
+
+      {/* Orbit 2 — small planet */}
+      <Animated.View style={{
+        position: 'absolute', left: W / 2 - 80, top: H / 3 - 80,
+        width: 160, height: 160, borderRadius: 80,
+        borderWidth: 1, borderColor: '#C77DFF33',
+        transform: [{ rotate: angle2 }],
+      }}>
+        <View style={{ position: 'absolute', top: -5, left: 80 - 5, width: 10, height: 10, borderRadius: 5, backgroundColor: '#C77DFF', opacity: 0.6 }} />
+      </Animated.View>
+    </View>
+  );
+}
+
+// 7. MONO — newspaper column lines, no animation, classic print
+function MonoBackground({ T }: { T: Theme }) {
+  return (
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: T.bg, overflow: 'hidden' }}>
+      {/* Column rules (vertical lines like in newspaper) */}
+      {[0.33, 0.66].map((pct, i) => (
+        <View key={i} style={{ position: 'absolute', top: 0, bottom: 0, left: W * pct, width: 1, backgroundColor: T.txt, opacity: 0.06 }} />
+      ))}
+      {/* Horizontal rules at top and bottom */}
+      <View style={{ position: 'absolute', top: 80, left: 16, right: 16, height: 2, backgroundColor: T.txt, opacity: 0.18 }} />
+      <View style={{ position: 'absolute', top: 84, left: 16, right: 16, height: 1, backgroundColor: T.txt, opacity: 0.12 }} />
+      {/* Paper grain */}
+      <Svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
+        {Array.from({ length: 60 }, (_, i) => {
+          const x = (i * 113) % W;
+          const y = (i * 67) % H;
+          return <Circle key={i} cx={x} cy={y} r={0.6} fill={T.txt} opacity={0.05} />;
+        })}
+      </Svg>
+    </View>
+  );
+}
+
+// 8. SYNTHWAVE — 80s perspective grid + neon sunset
+function SynthwaveBackground({ T }: { T: Theme }) {
+  const grid = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(Animated.timing(grid, { toValue: 1, duration: 3000, easing: Easing.linear, useNativeDriver: false }));
+    loop.start();
+    return () => loop.stop();
+  }, []);
+
+  const offset = grid.interpolate({ inputRange: [0, 1], outputRange: [0, 40] });
+  const horizon = H * 0.45;
+
+  return (
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: T.bg, overflow: 'hidden' }}>
+      {/* Sunset gradient (top half) */}
+      <LinearGradient
+        colors={['#1A0033', '#3D0066', '#FF006E', '#FFB400']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: horizon }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      />
+      {/* Sun (semicircle) */}
+      <View style={{
+        position: 'absolute', top: horizon - 80, left: W / 2 - 80,
+        width: 160, height: 160, borderRadius: 80,
+        backgroundColor: '#FF006E',
+        opacity: 0.85,
+      }} />
+      {/* Sun horizontal lines (80s style) */}
+      {[0, 1, 2, 3, 4].map(i => (
+        <View key={i} style={{
+          position: 'absolute', top: horizon - 70 + i * 20, left: W / 2 - 80,
+          width: 160, height: 3, backgroundColor: T.bg, opacity: 0.6,
+        }} />
+      ))}
+
+      {/* Perspective grid (bottom half) */}
+      <View style={{ position: 'absolute', top: horizon, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+        <Animated.View style={{ position: 'absolute', top: -40, left: 0, right: 0, bottom: -40, transform: [{ translateY: offset }] }}>
+          <Svg width="100%" height="100%">
+            {/* Horizontal grid lines (perspective) */}
+            {Array.from({ length: 20 }, (_, i) => (
+              <Rect key={`h${i}`} x={0} y={i * 30} width={W} height={1} fill="#FF00FF" opacity={0.35 - i * 0.01} />
+            ))}
+            {/* Vertical converging lines */}
+            {Array.from({ length: 21 }, (_, i) => {
+              const x = (i / 20) * W;
+              const cx = W / 2;
+              return <Rect key={`v${i}`} x={x} y={0} width={1} height={H * 0.6} fill="#00FFFF" opacity={0.25} transform={`translate(${(cx - x) * 0.7}, 0)`} />;
+            })}
+          </Svg>
+        </Animated.View>
+      </View>
+    </View>
+  );
+}
+
 // ── Dispatcher ──────────────────────────────────────────────────────────────
 export function ModeBackground({ T, mode }: { T: Theme; mode: UIModeId }) {
   switch (mode) {
-    case 'focus':  return <FocusBackground T={T} />;
-    case 'aurora': return <AuroraBackground T={T} />;
-    case 'neon':   return <NeonBackground T={T} />;
-    case 'paper':  return <PaperBackground T={T} />;
-    case 'quest':  return <QuestBackground T={T} />;
-    default:       return <FocusBackground T={T} />;
+    case 'focus':     return <FocusBackground T={T} />;
+    case 'aurora':    return <AuroraBackground T={T} />;
+    case 'neon':      return <NeonBackground T={T} />;
+    case 'paper':     return <PaperBackground T={T} />;
+    case 'quest':     return <QuestBackground T={T} />;
+    case 'cosmic':    return <CosmicBackground T={T} />;
+    case 'mono':      return <MonoBackground T={T} />;
+    case 'synthwave': return <SynthwaveBackground T={T} />;
+    default:          return <FocusBackground T={T} />;
   }
 }
 
@@ -354,6 +556,30 @@ export function ModeCard({ children, T, mode, style, padding }: ModeCardProps) {
           <View style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, borderBottomRightRadius: m.cardRadius, borderRightWidth: 3, borderBottomWidth: 3, borderColor: T.warn }} />
         </>
       )}
+      {mode === 'cosmic' && (
+        <>
+          {/* tiny star in top-right corner */}
+          <View style={{ position: 'absolute', top: 8, right: 8, width: 4, height: 4, borderRadius: 2, backgroundColor: '#FFFFFF', opacity: 0.8 }} />
+          <View style={{ position: 'absolute', top: 14, right: 16, width: 2, height: 2, borderRadius: 1, backgroundColor: T.primary, opacity: 0.7 }} />
+        </>
+      )}
+      {mode === 'mono' && (
+        <>
+          {/* Double rule at top */}
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, borderTopWidth: 2, borderBottomWidth: 1, borderColor: T.txt, opacity: 0.7 }} />
+        </>
+      )}
+      {mode === 'synthwave' && (
+        <>
+          {/* Neon underline at bottom */}
+          <LinearGradient
+            colors={['#FF00FF', '#00FFFF', '#FF00FF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, opacity: 0.85 }}
+          />
+        </>
+      )}
       {children}
     </View>
   );
@@ -390,8 +616,8 @@ export function ModeBtn({
   const heights = { sm: 36, md: 48, lg: 56 };
   const fontSizes = { sm: 13, md: 15, lg: 17 };
 
-  const glowStyle: ViewStyle = mode === 'neon' && variant === 'primary' ? {
-    shadowColor: T.primary,
+  const glowStyle: ViewStyle = (mode === 'neon' || mode === 'synthwave' || mode === 'cosmic') && variant === 'primary' ? {
+    shadowColor: mode === 'synthwave' ? '#FF00FF' : T.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 10,
@@ -426,7 +652,8 @@ export function ModeBtn({
                   fontFamily: mode === 'paper' ? 'Barlow_600SemiBold' : 'BarlowCondensed_700Bold',
                   fontSize: fontSizes[size],
                   color: v.textColor,
-                  letterSpacing: mode === 'neon' ? 1.5 : 0.5,
+                  letterSpacing: mode === 'neon' ? 1.5 : mode === 'mono' ? 0 : mode === 'synthwave' ? 1.5 : 0.5,
+                  textTransform: mode === 'mono' ? 'uppercase' as any : 'none' as any,
                 }}>{children}</Text>
               : children}
           </>
@@ -447,11 +674,12 @@ export function ModeHeader({ T, mode, title, subtitle }: { T: Theme; mode: UIMod
     }}>
       <Text style={{
         fontFamily: m.fontTitle,
-        fontSize: mode === 'paper' ? 24 : 22,
+        fontSize: mode === 'paper' ? 24 : mode === 'mono' ? 26 : 22,
         color: m.accentOverride(T) || T.txt,
-        letterSpacing: mode === 'neon' ? 3 : 1,
+        letterSpacing: mode === 'neon' ? 3 : mode === 'mono' ? 0 : mode === 'synthwave' ? 2 : 1,
+        textTransform: mode === 'mono' ? 'uppercase' as any : 'none' as any,
       }}>
-        {mode === 'neon' ? '> ' : mode === 'quest' ? '⚜ ' : ''}{title}
+        {mode === 'neon' ? '> ' : mode === 'quest' ? '⚜ ' : mode === 'cosmic' ? '✦ ' : mode === 'mono' ? '▎ ' : mode === 'synthwave' ? '◆ ' : ''}{title}
       </Text>
       {subtitle && (
         <Text style={{

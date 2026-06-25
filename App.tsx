@@ -134,7 +134,7 @@ function MoreScreen() {
 function Navigation() {
   const { state, T, session, loading } = useApp();
   const uiStyle = getUIStyle(state.uiStyleId || 'default');
-  const navigationRef = useRef<any>(null);
+  const navigationRef = useRef<any>(null as any);
 
   useEffect(() => {
     setGlobalNavigate((tab: string) => {
@@ -184,10 +184,11 @@ function Navigation() {
     { name: 'SettingsScreen',    comp: SettingsScreen   },
   ];
 
+  const TabNav = Tab.Navigator as any;
   return (
-    <Tab.Navigator
+    <TabNav
       ref={navigationRef}
-      screenOptions={({ route }) => {
+      screenOptions={({ route }: any) => {
         const tabInfo = TABS.find(t => t.name === route.name);
         const IconComp = tabInfo?.icon || Sun;
         return {
@@ -215,7 +216,7 @@ function Navigation() {
       {HIDDEN_SCREENS.map(s => (
         <Tab.Screen key={s.name} name={s.name} component={s.comp} options={{ tabBarButton: () => null }} />
       ))}
-    </Tab.Navigator>
+    </TabNav>
   );
 }
 

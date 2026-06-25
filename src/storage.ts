@@ -6,7 +6,7 @@ const KEY = 'horizon_v4';
 // Bumped whenever a migration is needed. Stored alongside the state so we can
 // detect upgrades and run cleanup logic (e.g. purge stale alarms on v4.0 → v4.1).
 const VERSION_KEY = 'horizon_version';
-export const APP_VERSION = '4.1.0';
+export const APP_VERSION = '4.3.0';
 
 export const DEFAULTS: AppState = {
   history: {},

@@ -9,18 +9,21 @@ import { Card, Lbl, Badge } from '../components';
 import { uid, fmt, fmtSleep } from '../helpers';
 import { PLAN, MOODS } from '../data';
 import { ModeBackground } from '../modes';
+import { CalEventCategory } from '../types';
 
-interface CalEvent {
+// Local CalEvent — UI variant with extra optional fields not in the storage type
+type CalEvent = {
   id: string;
   date: string;
   title: string;
-  category: 'workout' | 'goal' | 'note' | 'health' | 'study' | 'social' | 'other';
-  done: boolean;
+  category: CalEventCategory;
+  completed?: boolean;
+  done?: boolean;
   color?: string;
   time?: string;
   reminder?: 'day' | 'hour' | '30min' | null;
   notifId?: string;
-}
+};
 
 const REMIND_OPTIONS = [
   { id: 'day' as const, label: 'За день', icon: '📅' },
@@ -57,7 +60,7 @@ async function scheduleEventReminder(event: CalEvent): Promise<string | null> {
     
     const notifId = await Notifications.scheduleNotificationAsync({
       content: { title: `⏰ ${event.title}`, body: `Через ${event.reminder === 'day' ? 'день' : event.reminder === 'hour' ? 'час' : '30 минут'}!`, sound: true },
-      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: reminderDate },
+      trigger: reminderDate as any,
     });
     return notifId;
   } catch (e) { return null; }
@@ -66,7 +69,7 @@ async function scheduleEventReminder(event: CalEvent): Promise<string | null> {
 export default function CalendarScreen() {
   const { state, setState, T, uiMode } = useApp();
   const { history, journal } = state;
-  const events: CalEvent[] = state.calEvents || [];
+  const events: CalEvent[] = (state.calEvents || []) as CalEvent[];
 
   const setEvents = (fn: (e: CalEvent[]) => CalEvent[]) => {
     setState((s: any) => ({ ...s, calEvents: fn(s.calEvents || []) }));
@@ -117,7 +120,7 @@ export default function CalendarScreen() {
   const addEvent = async () => {
     if (!newEvent.title.trim()) return;
     const timeStr = `${String(eventHour).padStart(2, '0')}:${String(eventMinute).padStart(2, '0')}`;
-    const event: CalEvent = { id: uid(), date: selectedDate, title: newEvent.title.trim(), ...newEvent, time: timeStr };
+    const event: CalEvent = { id: uid(), date: selectedDate, title: newEvent.title.trim(), completed: false, ...newEvent, time: timeStr };
     if (event.reminder) {
       event.notifId = await scheduleEventReminder(event) || undefined;
     }

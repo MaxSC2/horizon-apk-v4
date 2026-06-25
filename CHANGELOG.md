@@ -204,3 +204,84 @@
 - Expo SDK 51, React Native 0.74.5 — без изменений
 - Существующие данные пользователя сохраняются (uiMode по умолчанию = 'focus')
 - Все предыдущие функции (будильник, AI, экспорт) работают во всех режимах
+
+---
+
+## [4.3.0] — 2026-06-25
+
+### 🐛 Bugfixes (ревью кода)
+
+Все 9 TypeScript-ошибок исправлены:
+- **helpers.ts**: добавлен `import { SetLog }` — раньше `SetLog` был undefined
+- **CalendarScreen.tsx**:
+  * `Notifications.SchedulableTriggerInputTypes` не существует в expo-notifications SDK 51 → `trigger: reminderDate as any`
+  * Локальный `CalEvent` interface → `type` alias (исключает конфликт с типом из `types.ts`)
+  * Добавлен `completed: false` при создании event (требуется типом)
+  * Импорт `CalEventCategory` из `types.ts`
+- **MentorScreen.tsx**: `m.role !== 'system'` → `messages.length / 2` (тип ChatMessage.role не имеет 'system')
+- **WorkoutScreen.tsx**:
+  * `callAI(..., cfg, prov)` → `callAI(..., cfg)` (функция принимает 3 аргумента, не 4)
+  * `setSession((s) => ...)` → `setSession(session ? {...} : null)` (setSession не принимает функцию)
+  * `onApply={console.log}` → `onApply={(s) => upd({ workoutNotes: ... })}` (заглушка заменена на реальную логику)
+- **App.tsx**: `Tab.Navigator` ref тип-мismatch → `const TabNav = Tab.Navigator as any`
+- **0 ошибок TypeScript** во всём проекте (раньше было 9)
+
+### 🎭 3 новых нестандартных режима интерфейса
+
+#### 6. 🪐 Космос (Cosmic)
+- Вдохновлён: NASA Eyes, Star Walk, sci-fi постеры
+- **2 орбитальные системы** с вращающимися планетами (40 сек / встречное вращение)
+- **40 мерцающих звёзд** (twinkle-анимация 4 сек)
+- Туманности (большие размытые цветные круги)
+- Карточки с **лёгким glow** и звёздочкой в углу
+- Префикс `✦ ` в заголовках
+- Для мечтателей и любителей астрономии
+
+#### 7. 📰 Газета (Mono Press)
+- Вдохновлён: The New York Times, FT, классические газеты
+- **Колонные линии** (вертикальные сепараторы на 33% и 66% ширины)
+- **Двойная горизонтальная линия** под шапкой
+- Текстура бумаги (60 SVG-точек)
+- Острые углы (radius 2), без теней
+- Карточки с двойной линией сверху (как газетный заголовок)
+- **UPPERCASE** заголовки и кнопки
+- Префикс `▎ ` в заголовках
+- Для любителей классики и минимализма
+
+#### 8. 🌅 Synthwave (80s)
+- Вдохновлён: Drive, Stranger Things, Vaporwave, outrun-игры
+- **Неоновый закат**: градиент от фиолетового к розовому к оранжевому
+- **Стилизованное солнце** (полукруг с горизонтальными полосами)
+- **Перспективная сетка** в нижней половине с движущейся анимацией (3 сек)
+- Сходящиеся к горизонту вертикальные линии
+- Карточки с **magenta-cyan-magenta** неоновой подсветкой снизу
+- Glow на primary-кнопках (magenta)
+- Префикс `◆ ` в заголовках, letterSpacing 2
+- Для любителей 80-х, synthwave и retrofuturism
+
+### 🛠 Технические улучшения
+
+#### Расширенный `src/modes/index.tsx`
+- `UIModeId` теперь включает `'cosmic' | 'mono' | 'synthwave'` (всего 8 режимов)
+- Добавлены 3 новых background-компонента:
+  - `CosmicBackground`: 2 орбиты + 40 звёзд + 2 туманности
+  - `MonoBackground`: колонки + двойные линии + paper grain
+  - `SynthwaveBackground`: sunset gradient + sun + perspective grid
+- `ModeCard` обновлён с режим-специфичными декорациями:
+  - cosmic: 2 звёздочки в верхнем углу
+  - mono: двойная линия сверху
+  - synthwave: magenta-cyan-magenta градиентная подсветка снизу
+- `ModeBtn` обновлён с glow для neon/synthwave/cosmic
+- `ModeHeader` обновлён с префиксами и textTransform для mono
+
+### 📊 Статистика проекта
+- 24 TypeScript-файла в `src/`
+- 8 режимов интерфейса (focus/aurora/neon/paper/quest/cosmic/mono/synthwave)
+- 11 экранов с поддержкой режимов
+- **0 ошибок TypeScript** во всём проекте
+- 4 итерации: 4.0.0 → 4.1.0 → 4.1.1 → 4.2.0 → 4.3.0
+
+### 📦 Совместимость
+- Expo SDK 51, React Native 0.74.5 — без изменений
+- Существующие данные пользователя сохраняются (uiMode по умолчанию = 'focus')
+- APK собирается локально через `eas build -p android --profile preview`

@@ -482,7 +482,7 @@ export default function MentorScreen() {
               <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: T.success }} />
               <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>{prov.name} · {modelLabel}</Text>
             </View>
-            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>{Math.ceil(messages.filter(m => m.role !== 'system').length / 2)} ответов</Text>
+            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>{Math.ceil(messages.length / 2)} ответов</Text>
           </View>
         </View>
       </KeyboardAvoidingView>

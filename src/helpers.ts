@@ -1,5 +1,5 @@
 // src/helpers.ts
-import { AppState, WorkoutLog, JournalEntry, Task, Goal } from './types';
+import { AppState, WorkoutLog, JournalEntry, Task, Goal, SetLog } from './types';
 import { PLAN } from './data';
 
 export const fmt = (d: Date): string => {
