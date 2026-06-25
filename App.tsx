@@ -1,19 +1,15 @@
-// App.tsx — Горизонт Life Tracker v4.4
+// App.tsx — Горизонт Life Tracker v4.1
 //
-// v4.4 FIXES (критично):
-//   • navigationRef теперь привязан к NavigationContainer (раньше к Tab.Navigator).
-//     Это чинит баг когда вкладка "Ещё" не могла открыть Settings/Tasks/etc.
-//   • setGlobalNavigate использует createNavigationContainerRef() — type-safe и
-//     гарантированно работает для cross-tab навигации.
-//   • Все 9 экранов теперь регистрируются как Tab.Screen, но 6 из них скрыты из
-//     таб-бара через tabBarButton: () => null. К ним можно перейти через
-//     navigation.navigate('SettingsScreen') и т.д.
-//   • Добавлен ModeQuickSwitcher — кнопка в шапке дашборда + FAB для быстрого
-//     переключения режимов интерфейса без захода в Настройки.
+// v4.1 navigation reorganization:
+//   Bottom tab bar reduced from 9 tabs to 5 (Главная, Тренировка, Дневник, НЕЙРО, Ещё).
+//   Less-frequent screens (Задачи, Питание, Календарь, Будильник, Статы, Настройки)
+//   are reached from the new "Ещё" screen via a 2-column grid of large tappable cards.
+//   This dramatically improves one-handed reachability — primary actions are always
+//   within thumb's reach, and the tab bar no longer overflows on smaller phones.
 import React, { useEffect, useRef } from 'react';
-import { View, Text, ActivityIndicator, StatusBar, TouchableOpacity, ScrollView, Pressable, Modal } from 'react-native';
+import { View, Text, ActivityIndicator, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -25,7 +21,7 @@ import { Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold } from '@expo-g
 import {
   Sun, Dumbbell, BookOpen, Sparkles, Grid,
   ClipboardList, Leaf, BarChart2, Activity,
-  Bell, Calendar, Settings as SettingsIcon, X, Palette,
+  Bell, Calendar, Settings as SettingsIcon,
 } from 'lucide-react-native';
 
 import { AppProvider, useApp, setGlobalNavigate } from './src/AppContext';
@@ -42,9 +38,13 @@ import CalendarScreen   from './src/screens/CalendarScreen';
 import SettingsScreen   from './src/screens/SettingsScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { ensureAlarmHandlersRegistered } from './src/alarm';
-import { ModeBackground, UI_MODES, getUIMode } from './src/modes';
-import { Haptic } from './src/haptics';
-import { SplashView } from './src/components/SplashView';
+import { V5App } from './src/v5/V5App';
+
+// HORIZON V5.0 — полный rebuild UI. Включено по умолчанию.
+// V5 = 4 радикально новых темы (Solo Leveling, Dev Command, Glass Future, Cyberpunk Nexus),
+// кастомные загрузчики, floating dock, typewriter AI.
+// V4 код остаётся в src/screens/, src/modes/, src/design/ — доступен через V5_ENABLED = false.
+const V5_ENABLED = true;
 
 // Register background event handler ASAP — before any screen mounts — so
 // snooze/stop actions on notifications work even if the app was cold-started
@@ -53,13 +53,9 @@ ensureAlarmHandlersRegistered();
 
 const Tab = createBottomTabNavigator();
 
-// v4.4 — type-safe navigation ref, attached to NavigationContainer
-// (NOT to Tab.Navigator — that was the bug that broke "Ещё" navigation).
-export const navigationRef = createNavigationContainerRef();
-
 // "Ещё" screen — a hub for less-frequent destinations.
 function MoreScreen() {
-  const { T, state, navigateTo, uiMode } = useApp();
+  const { T, state, navigateTo } = useApp();
   const insets = useSafeAreaInsets();
   const items = [
     { label: 'Задачи',    desc: 'Привычки и цели',     icon: ClipboardList, color: '#00C4F0', target: 'TasksScreen' },
@@ -69,24 +65,10 @@ function MoreScreen() {
     { label: 'Статы',     desc: 'Графики и рекорды',   icon: BarChart2,     color: '#FF9500', target: 'StatsScreen' },
     { label: 'Настройки', desc: 'Темы, AI, данные',    icon: SettingsIcon,  color: '#7EB8FF', target: 'SettingsScreen' },
   ];
-
-  const handleNavigate = (target: string) => {
-    Haptic.tap();
-    // v4.4 — direct navigate via navigationRef (works now because ref is on
-    // NavigationContainer, not Tab.Navigator).
-    if (navigationRef.isReady()) {
-      (navigationRef.navigate as any)(target);
-    } else {
-      // fallback to context navigateTo
-      navigateTo(target);
-    }
-  };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
-      <ModeBackground T={T} mode={uiMode} />
       <View style={{
-        backgroundColor: uiMode === 'aurora' ? 'transparent' : T.surf, borderBottomWidth: uiMode === 'aurora' ? 0 : 1, borderBottomColor: T.bord,
+        backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord,
         paddingHorizontal: 16, paddingVertical: 12,
       }}>
         <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt, letterSpacing: 1 }}>Ещё</Text>
@@ -99,7 +81,7 @@ function MoreScreen() {
             return (
               <TouchableOpacity
                 key={item.label}
-                onPress={() => handleNavigate(item.target)}
+                onPress={() => navigateTo(item.target)}
                 activeOpacity={0.75}
                 style={{
                   width: '48%',
@@ -157,14 +139,11 @@ function MoreScreen() {
 function Navigation() {
   const { state, T, session, loading } = useApp();
   const uiStyle = getUIStyle(state.uiStyleId || 'default');
+  const navigationRef = useRef<any>(null);
 
-  // v4.4 — register global navigate using navigationRef (attached to NavigationContainer).
-  // This fixes the "Ещё" tab navigation bug.
   useEffect(() => {
     setGlobalNavigate((tab: string) => {
-      if (navigationRef.isReady()) {
-        (navigationRef.navigate as any)(tab);
-      }
+      navigationRef.current?.navigate(tab);
     });
   }, []);
 
@@ -190,7 +169,7 @@ function Navigation() {
     ...(isGlow ? { shadowColor: T.primary, shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.25, shadowRadius: 12 } : {}),
   };
 
-  // 5 primary tabs
+  // 5 primary tabs — fits comfortably on any phone
   const TABS = [
     { name: 'Dashboard', label: 'ГЛАВНАЯ',  icon: Sun,                              comp: DashboardScreen },
     { name: 'Workout',   label: 'ТРЕН.',     icon: session ? Activity : Dumbbell,   comp: WorkoutScreen   },
@@ -199,8 +178,8 @@ function Navigation() {
     { name: 'More',      label: 'ЕЩЁ',       icon: Grid,                            comp: MoreScreen      },
   ];
 
-  // Secondary screens — registered as Tab.Screen with hidden tab button.
-  // v4.4 — these now actually work because navigationRef is on NavigationContainer.
+  // Secondary screens — registered without tab bar icons, reached via "Ещё" or
+  // via navigation.navigate() from anywhere.
   const HIDDEN_SCREENS = [
     { name: 'TasksScreen',       comp: TasksScreen      },
     { name: 'NutritionScreen',   comp: NutritionScreen  },
@@ -213,14 +192,14 @@ function Navigation() {
   const TabNav = Tab.Navigator as any;
   return (
     <TabNav
+      ref={navigationRef}
       screenOptions={({ route }: any) => {
         const tabInfo = TABS.find(t => t.name === route.name);
         const IconComp = tabInfo?.icon || Sun;
-        const isHidden = HIDDEN_SCREENS.some(s => s.name === route.name);
         return {
           headerShown: false,
-          tabBarStyle: isHidden ? { display: 'none' } : tabBarStyle,
-          tabBarButton: isHidden ? () => null : undefined,
+          tabBarStyle: HIDDEN_SCREENS.some(s => s.name === route.name) ? { display: 'none' } : tabBarStyle,
+          tabBarButton: HIDDEN_SCREENS.some(s => s.name === route.name) ? () => null : undefined,
           tabBarActiveTintColor: T.primary,
           tabBarInactiveTintColor: T.muted,
           tabBarLabelStyle: {
@@ -229,7 +208,7 @@ function Navigation() {
             letterSpacing: isPixel ? 0 : 0.5,
             marginTop: 2,
           },
-          tabBarIcon: ({ color, focused }: any) => (
+          tabBarIcon: ({ color, focused }) => (
             <IconComp size={22} color={color} strokeWidth={focused ? 2.5 : 1.8} />
           ),
           animation: 'fade',
@@ -252,18 +231,24 @@ export default function App() {
     Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold,
   });
 
-  // v4.5 — красивая анимированная загрузка вместо чёрного экрана + ActivityIndicator
   if (!fontsLoaded) {
-    // Космос тема по умолчанию для splash (стандартная для приложения)
-    const splashTheme = {
-      bg: '#07090D', surf: '#0D1520', card: '#111D2C', bord: '#1A2E42',
-      txt: '#DDE6EE', muted: '#3D5A72', lo: '#0F1C2C',
-      primary: '#00C4F0', success: '#00E676', warn: '#FFD600', danger: '#FF4455',
-      dark: true, id: 'cosmos', name: 'Космос', icon: '🌌',
-    } as any;
-    return <SplashView T={splashTheme} mode="focus" label="Загрузка" duration={0} showWordmark />;
+    return <View style={{ flex: 1, backgroundColor: '#07090D', alignItems: 'center', justifyContent: 'center' }}>
+      <ActivityIndicator color="#00C4F0" size="large" />
+    </View>;
   }
 
+  // V5 — полный rebuild UI, активирован по умолчанию
+  if (V5_ENABLED) {
+    return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <V5App />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    );
+  }
+
+  // V4 — legacy path (если V5_ENABLED = false)
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -281,7 +266,6 @@ function AppContent() {
     <>
       <StatusBar backgroundColor={T.surf} barStyle={T.dark ? 'light-content' : 'dark-content'} translucent={false} />
       <NavigationContainer
-        ref={navigationRef}
         theme={{
           dark: true,
           colors: {

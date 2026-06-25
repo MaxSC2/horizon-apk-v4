@@ -16,7 +16,6 @@ import { buildAIContext, calcStreak, getPRs } from '../helpers';
 import { AI_PROVIDERS, QUICK_PROMPTS } from '../data';
 import { ChatMessage, AIConfig, AIProvider } from '../types';
 import { Share } from 'react-native';
-import { ModeBackground } from '../modes';
 
 const PLAN_PROMPT = `Составь персональный план тренировок на следующую неделю. Формат: день — тренировка — упражнения — комментарий.`;
 
@@ -68,7 +67,7 @@ export async function callAI(messages: ChatMessage[], systemPrompt: string, aiCo
 }
 
 export default function MentorScreen() {
-  const { state, setState, T, navigateTo, uiMode } = useApp();
+  const { state, setState, T, navigateTo } = useApp();
   const aiConfig: AIConfig = state.aiConfig || { provider: 'claude', apiKey: '', model: '', endpoint: '', persona: '', systemExtra: '' };
   const prov = AI_PROVIDERS.find(p => p.id === (aiConfig.provider || 'claude')) || AI_PROVIDERS[0];
   const provColor = prov.color;
@@ -204,7 +203,6 @@ export default function MentorScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
-      <ModeBackground T={T} mode={uiMode} />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={62}>
 
         {/* Header */}
@@ -482,7 +480,7 @@ export default function MentorScreen() {
               <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: T.success }} />
               <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>{prov.name} · {modelLabel}</Text>
             </View>
-            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>{Math.ceil(messages.length / 2)} ответов</Text>
+            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>{Math.ceil(messages.filter(m => m.role !== 'system').length / 2)} ответов</Text>
           </View>
         </View>
       </KeyboardAvoidingView>

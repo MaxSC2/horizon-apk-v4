@@ -6,13 +6,11 @@ import { Clock, Pencil, Check, Trophy, AlertTriangle, Sparkles, Edit2, Save, X }
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Badge, ProgressBar } from '../components';
-import { UnifiedCard } from '../components/UnifiedCard';
 import { fmt, weekDates, todayIdx, getPRs } from '../helpers';
 import { PLAN } from '../data';
 import { AI_PROVIDERS } from '../data';
 import { callAI } from './MentorScreen';
 import { SetLog, WorkoutLog } from '../types';
-import { ModeBackground } from '../modes';
 
 function NumpadModal({ T, value, onChange, onConfirm, unit, placeholder, color }: any) {
   const [display, setDisplay] = useState(value || '');
@@ -232,7 +230,7 @@ function EditWorkoutModal({ T, workout, onSave, onClose }: { T: any; workout: an
               const logs = exercises[ex.id] || [];
               if (logs.length === 0) return null;
               return (
-                <UnifiedCard key={ex.id} T={T} style={{ marginBottom: 10 }}>
+                <Card key={ex.id} T={T} style={{ marginBottom: 10 }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 15, color: T.txt, marginBottom: 8 }}>{ex.name}</Text>
                   {logs.map((log: any, si: number) => (
                     <View key={si} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
@@ -244,7 +242,7 @@ function EditWorkoutModal({ T, workout, onSave, onClose }: { T: any; workout: an
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted }}>{ex.type === 'seconds' ? 'сек' : 'повт'}</Text>
                     </View>
                   ))}
-                </UnifiedCard>
+                </Card>
               );
             })}
 
@@ -319,7 +317,7 @@ function AISuggestionModal({ T, history, prs, streak, onApply, onClose }: { T: a
 - Упражнение: конкретный совет
 - Ещё упражнение: ещё совет`;
 
-      const reply = await callAI([{ role: 'user', content: prompt, ts: Date.now() }], '', cfg);
+      const reply = await callAI([{ role: 'user', content: prompt, ts: Date.now() }], '', cfg, prov);
       const lines = reply.split('\n').filter(l => l.trim() && (l.includes(':') || l.startsWith('-') || l.startsWith('•')));
       setSuggestions(lines.slice(0, 4));
     } catch (e) {
@@ -380,7 +378,7 @@ function ExerciseCard({ T, exercise, logs, onComplete, onValueChange, onRest, pr
           onConfirm={(val) => { if(val) onValueChange(activeNumpad, val); setActiveNumpad(null); onComplete(activeNumpad); onRest(); }}
           unit={exercise.type==='seconds'?'сек':'повт'} placeholder={exercise.reps} color={T.primary}/>
       )}
-      <UnifiedCard T={T} style={{ marginBottom:10, borderWidth:allDone?1.5:1, borderColor:allDone?T.success+'66':T.bord }}>
+      <Card T={T} style={{ marginBottom:10, borderWidth:allDone?1.5:1, borderColor:allDone?T.success+'66':T.bord }}>
         <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
           <View style={{ flex:1 }}>
             <Text style={{ fontFamily:'BarlowCondensed_700Bold', fontSize:17, color:T.txt }}>{exercise.name}</Text>
@@ -432,13 +430,13 @@ function ExerciseCard({ T, exercise, logs, onComplete, onValueChange, onRest, pr
             )}
           </View>
         ))}
-      </UnifiedCard>
+      </Card>
     </>
   );
 }
 
 export default function WorkoutScreen() {
-  const { state, setState, T, session, setSession, startWorkout, finishWorkout, uiMode } = useApp();
+  const { state, setState, T, session, setSession, startWorkout, finishWorkout } = useApp();
   const { history } = state;
   const [showHist, setShowHist] = useState(false);
   const [histSearch, setHistSearch] = useState('');
@@ -458,7 +456,7 @@ export default function WorkoutScreen() {
   }, [session]);
 
   const fmtTime = (s: number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
-  const upd = (patch: any) => setSession(session ? { ...session, ...patch } : null);
+  const upd = (patch: any) => setSession((s: any) => s ? {...s,...patch} : s);
 
   const handleSaveExercise = (ex: any) => {
     const currentPlan = state.customPlan || PLAN;
@@ -489,7 +487,7 @@ export default function WorkoutScreen() {
           <EditWorkoutModal T={T} workout={editWorkout} onSave={handleSaveWorkout} onClose={() => setEditWorkout(null)} />
         )}
         {showAISuggest && (
-          <AISuggestionModal T={T} history={history} prs={prs} streak={0} onApply={(s) => { upd({ workoutNotes: ((session?.workoutNotes || '') ? session.workoutNotes + '\n' : '') + '💡 ' + s }); setShowAISuggest(false); }} onClose={() => setShowAISuggest(false)} />
+          <AISuggestionModal T={T} history={history} prs={prs} streak={0} onApply={(s) => console.log('Apply suggestion:', s)} onClose={() => setShowAISuggest(false)} />
         )}
         <ScrollView contentContainerStyle={{ padding:14, paddingBottom:20 }}>
           <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
@@ -508,7 +506,7 @@ export default function WorkoutScreen() {
           {!showHist && PLAN.map((plan,i)=>{
             const log=history[fmt(dates[i])]; const isToday=i===todayI;
             return (
-              <UnifiedCard key={i} T={T} style={{ marginBottom:8, borderWidth:isToday?1.5:1, borderColor:isToday?T.primary+'66':T.bord, opacity:plan.type==='rest'?0.6:1 }}>
+              <Card key={i} T={T} style={{ marginBottom:8, borderWidth:isToday?1.5:1, borderColor:isToday?T.primary+'66':T.bord, opacity:plan.type==='rest'?0.6:1 }}>
                 <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
                   <View style={{ flexDirection:'row', alignItems:'center', gap:10 }}>
                     <Text style={{ fontSize:24 }}>{plan.emoji}</Text>
@@ -527,7 +525,7 @@ export default function WorkoutScreen() {
                     </TouchableOpacity>
                   ) : <Badge color={T.muted} T={T}>~</Badge>}
                 </View>
-              </UnifiedCard>
+              </Card>
             );
           })}
           {showHist && (
@@ -537,7 +535,7 @@ export default function WorkoutScreen() {
                 const plan=PLAN.find(p=>p.id===(log as WorkoutLog).dayId)||{name:'Тренировка',emoji:'💪', exercises:[]};
                 const reps=Object.values((log as WorkoutLog).exercises||{}).flat().reduce((s:number,x)=>s+(parseInt((x as SetLog).value)||0),0);
                 return (
-                  <UnifiedCard key={date} T={T} style={{ marginBottom:8 }}>
+                  <Card key={date} T={T} style={{ marginBottom:8 }}>
                     <TouchableOpacity onPress={() => setEditWorkout({ date, ...log })}>
                       <View style={{ flexDirection:'row', alignItems:'center', gap:10 }}>
                         <Text style={{ fontSize:22 }}>{plan.emoji}</Text>
@@ -553,7 +551,7 @@ export default function WorkoutScreen() {
                         <Edit2 size={16} color={T.muted} />
                       </View>
                     </TouchableOpacity>
-                  </UnifiedCard>
+                  </Card>
                 );
               })}
             </>
@@ -571,7 +569,6 @@ export default function WorkoutScreen() {
 
   return (
     <SafeAreaView style={{ flex:1, backgroundColor:T.bg }}>
-      <ModeBackground T={T} mode={uiMode} />
       {session.showRest && <RestTimerModal T={T} onDone={()=>upd({showRest:false})}/>}
       <ScrollView contentContainerStyle={{ padding:14, paddingBottom:20 }}>
 
@@ -583,7 +580,7 @@ export default function WorkoutScreen() {
             </View>
           </View>
           <Text style={{ fontFamily:'BarlowCondensed_900Black', fontSize:26, color:T.txt, marginBottom:14 }}>🔥 Разминка — {plan.name}</Text>
-          <UnifiedCard T={T} style={{ marginBottom:12 }}>
+          <Card T={T} style={{ marginBottom:12 }}>
             {plan.warmup.map((item,i)=>(
               <TouchableOpacity key={i} onPress={()=>{ const s=new Set(session.warmupDone); s.has(i)?s.delete(i):s.add(i); upd({warmupDone:s}); }}
                 style={{ flexDirection:'row', alignItems:'center', gap:12, paddingVertical:10, borderBottomWidth:i<plan.warmup.length-1?1:0, borderBottomColor:T.bord }}>
@@ -593,7 +590,7 @@ export default function WorkoutScreen() {
                 <Text style={{ fontFamily:'Barlow_400Regular', fontSize:15, color:session.warmupDone.has(i)?T.muted:T.txt, textDecorationLine:session.warmupDone.has(i)?'line-through':'none', flex:1 }}>{item}</Text>
               </TouchableOpacity>
             ))}
-          </UnifiedCard>
+          </Card>
           <TouchableOpacity onPress={()=>upd({phase:'exercises'})} style={{ height:50, borderRadius:12, borderWidth:session.warmupDone.size>=plan.warmup.length?0:1.5, borderColor:T.primary, backgroundColor:session.warmupDone.size>=plan.warmup.length?T.primary:'transparent', alignItems:'center', justifyContent:'center' }}>
             <Text style={{ fontFamily:'BarlowCondensed_900Black', fontSize:16, color:session.warmupDone.size>=plan.warmup.length?'#000':T.primary }}>Начать упражнения →</Text>
           </TouchableOpacity>
@@ -632,7 +629,7 @@ export default function WorkoutScreen() {
               <Clock size={13} color={T.success}/><Text style={{ fontFamily:'BarlowCondensed_700Bold', fontSize:15, color:T.success }}>{fmtTime(elapsed)}</Text>
             </View>
           </View>
-          <UnifiedCard T={T} style={{ marginBottom:12 }}>
+          <Card T={T} style={{ marginBottom:12 }}>
             <Lbl T={T} style={{ marginBottom:12 }}>Сложность тренировки</Lbl>
             <View style={{ flexDirection:'row', gap:5, flexWrap:'wrap', marginBottom:8 }}>
               {Array.from({length:10},(_,i)=>i+1).map(n=>(
@@ -646,8 +643,8 @@ export default function WorkoutScreen() {
                 {session.difficulty<=3?'😴 Слишком легко':session.difficulty<=6?'💪 Хороший диапазон':session.difficulty<=8?'🔥 Тяжело, но продуктивно':'😤 Очень тяжело — следи за восстановлением'}
               </Text>
             </View>
-          </UnifiedCard>
-          <UnifiedCard T={T} style={{ marginBottom:16 }}>
+          </Card>
+          <Card T={T} style={{ marginBottom:16 }}>
             <Lbl T={T} style={{ marginBottom:8 }}>Заметки к тренировке</Lbl>
             <TextInput value={session.workoutNotes||''} onChangeText={v=>upd({workoutNotes:v})} placeholder="Что заметил, что улучшить…" placeholderTextColor={T.muted} multiline
               style={{ borderRadius:8, borderWidth:1.5, borderColor:T.bord, backgroundColor:T.lo, color:T.txt, fontFamily:'Barlow_400Regular', fontSize:14, padding:10, minHeight:70, textAlignVertical:'top', marginBottom:12 }}/>
@@ -657,7 +654,7 @@ export default function WorkoutScreen() {
             {painDanger&&<View style={{ marginTop:8, padding:10, backgroundColor:T.danger+'18', borderWidth:1, borderColor:T.danger+'55', borderRadius:8, flexDirection:'row', alignItems:'center', gap:7 }}>
               <AlertTriangle size={15} color={T.danger}/><Text style={{ fontFamily:'Barlow_400Regular', fontSize:13, color:T.danger }}>Боль в суставах — снизь нагрузку</Text>
             </View>}
-          </UnifiedCard>
+          </Card>
           <TouchableOpacity onPress={finishWorkout} style={{ height:54, borderRadius:12, backgroundColor:T.success, alignItems:'center', justifyContent:'center' }}>
             <Text style={{ fontFamily:'BarlowCondensed_900Black', fontSize:18, color:'#000' }}>✓ Сохранить тренировку</Text>
           </TouchableOpacity>

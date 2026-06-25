@@ -6,26 +6,20 @@ import { ChevronLeft, ChevronRight, Plus, X, Check, Target, Dumbbell, BookOpen, 
 import * as Notifications from 'expo-notifications';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Badge } from '../components';
-import { UnifiedCard } from '../components/UnifiedCard';
 import { uid, fmt, fmtSleep } from '../helpers';
 import { PLAN, MOODS } from '../data';
-import { ModeBackground } from '../modes';
-import { CalEventCategory } from '../types';
-import { ScreenHeader } from '../components/ScreenHeader';
 
-// Local CalEvent — UI variant with extra optional fields not in the storage type
-type CalEvent = {
+interface CalEvent {
   id: string;
   date: string;
   title: string;
-  category: CalEventCategory;
-  completed?: boolean;
-  done?: boolean;
+  category: 'workout' | 'goal' | 'note' | 'health' | 'study' | 'social' | 'other';
+  done: boolean;
   color?: string;
   time?: string;
   reminder?: 'day' | 'hour' | '30min' | null;
   notifId?: string;
-};
+}
 
 const REMIND_OPTIONS = [
   { id: 'day' as const, label: 'За день', icon: '📅' },
@@ -62,16 +56,16 @@ async function scheduleEventReminder(event: CalEvent): Promise<string | null> {
     
     const notifId = await Notifications.scheduleNotificationAsync({
       content: { title: `⏰ ${event.title}`, body: `Через ${event.reminder === 'day' ? 'день' : event.reminder === 'hour' ? 'час' : '30 минут'}!`, sound: true },
-      trigger: reminderDate as any,
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: reminderDate },
     });
     return notifId;
   } catch (e) { return null; }
 }
 
 export default function CalendarScreen() {
-  const { state, setState, T, uiMode } = useApp();
+  const { state, setState, T } = useApp();
   const { history, journal } = state;
-  const events: CalEvent[] = (state.calEvents || []) as CalEvent[];
+  const events: CalEvent[] = state.calEvents || [];
 
   const setEvents = (fn: (e: CalEvent[]) => CalEvent[]) => {
     setState((s: any) => ({ ...s, calEvents: fn(s.calEvents || []) }));
@@ -122,7 +116,7 @@ export default function CalendarScreen() {
   const addEvent = async () => {
     if (!newEvent.title.trim()) return;
     const timeStr = `${String(eventHour).padStart(2, '0')}:${String(eventMinute).padStart(2, '0')}`;
-    const event: CalEvent = { id: uid(), date: selectedDate, title: newEvent.title.trim(), completed: false, ...newEvent, time: timeStr };
+    const event: CalEvent = { id: uid(), date: selectedDate, title: newEvent.title.trim(), ...newEvent, time: timeStr };
     if (event.reminder) {
       event.notifId = await scheduleEventReminder(event) || undefined;
     }
@@ -149,8 +143,6 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
-      <ModeBackground T={T} mode={uiMode} />
-      <ScreenHeader T={T} title="Календарь" subtitle="События и история" />
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }} stickyHeaderIndices={[0]}>
 
         {/* Sticky Calendar Header */}
@@ -251,7 +243,7 @@ export default function CalendarScreen() {
 
           {/* Workout for this day */}
           {selectedPlanDay && (
-            <UnifiedCard T={T} style={{ marginBottom: 10, borderWidth: selectedWorkout?.completed ? 1.5 : 1, borderColor: selectedWorkout?.completed ? T.success + '66' : T.bord }}>
+            <Card T={T} style={{ marginBottom: 10, borderWidth: selectedWorkout?.completed ? 1.5 : 1, borderColor: selectedWorkout?.completed ? T.success + '66' : T.bord }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <Text style={{ fontSize: 22 }}>{selectedPlanDay.emoji}</Text>
                 <View style={{ flex: 1 }}>
@@ -262,12 +254,12 @@ export default function CalendarScreen() {
                 </View>
                 {selectedWorkout?.completed && <Badge color={T.success} T={T}>✓</Badge>}
               </View>
-            </UnifiedCard>
+            </Card>
           )}
 
           {/* Mood for this day */}
           {selectedJournal && (
-            <UnifiedCard T={T} style={{ marginBottom: 10 }}>
+            <Card T={T} style={{ marginBottom: 10 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <Text style={{ fontSize: 24 }}>{MOOD_EMOJI[selectedJournal.mood] || '😐'}</Text>
                 <View>
@@ -278,7 +270,7 @@ export default function CalendarScreen() {
                   {selectedJournal.text ? <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted, marginTop: 2 }} numberOfLines={2}>{selectedJournal.text}</Text> : null}
                 </View>
               </View>
-            </UnifiedCard>
+            </Card>
           )}
 
           {/* Calendar events */}
@@ -291,7 +283,7 @@ export default function CalendarScreen() {
           {selectedEvents.map(event => {
             const cat = CAT_INFO[event.category];
             return (
-              <UnifiedCard key={event.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 4, borderLeftColor: cat.color, opacity: event.done ? 0.6 : 1 }}>
+              <Card key={event.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 4, borderLeftColor: cat.color, opacity: event.done ? 0.6 : 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <TouchableOpacity onPress={() => toggleEvent(event.id)} style={{ width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: event.done ? T.success : cat.color, backgroundColor: event.done ? T.success : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
                     {event.done && <Check size={13} color="#000" strokeWidth={3} />}
@@ -308,7 +300,7 @@ export default function CalendarScreen() {
                     <X size={13} color={T.muted} />
                   </TouchableOpacity>
                 </View>
-              </UnifiedCard>
+              </Card>
             );
           })}
         </View>

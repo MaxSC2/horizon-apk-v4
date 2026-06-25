@@ -21,11 +21,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Plus, X, Bell, Trash2, Zap, RefreshCw, Clock } from 'lucide-react-native';
 import { useApp } from '../AppContext';
 import { Card, Lbl, ProgressBar, IconBtn, Btn, EmptyState } from '../components';
-import { UnifiedCard } from '../components/UnifiedCard';
 import { uid, TODAY, fmtSleep } from '../helpers';
-import { Haptic, modeAchievement } from '../haptics';
-import { ModeBackground } from '../modes';
-import { ScreenHeader } from '../components/ScreenHeader';
+import { Haptic } from '../haptics';
 import {
   CHANNEL_ID,
   scheduleAlarm,
@@ -376,7 +373,7 @@ function AlarmAddModal({
 
 // ── Main screen ─────────────────────────────────────────────────────────────
 export default function AlarmScreen() {
-  const { state, setState, T, resyncAlarms, purgeAlarms, uiMode } = useApp();
+  const { state, setState, T, resyncAlarms, purgeAlarms } = useApp();
   const alarms: Alarm[] = state.alarms || [];
   const [showAdd, setShowAdd] = useState(false);
   const [editAlarm, setEditAlarm] = useState<Alarm | null>(null);
@@ -429,7 +426,7 @@ export default function AlarmScreen() {
     }
     setShowAdd(false);
     setEditAlarm(null);
-    modeAchievement(uiMode as string);
+    Haptic.save();
   };
 
   const toggleAlarm = async (id: string) => {
@@ -537,26 +534,31 @@ export default function AlarmScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
-      <ModeBackground T={T} mode={uiMode} />
-      <ScreenHeader
-        T={T}
-        title="Будильники"
-        subtitle={`${alarms.filter(a => a.enabled).length} активных${preview ? ` · следующий ${preview.label}` : ''}`}
-        right={
-          <View style={{ flexDirection: 'row', gap: 6 }}>
-            <IconBtn onPress={handleResync} T={T} size={38} bg={T.lo} border={T.bord}>
-              <RefreshCw size={15} color={T.muted} />
-            </IconBtn>
-            <TouchableOpacity
-              onPress={() => setShowAdd(true)}
-              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-              style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center' }}
-            >
-              <Plus size={22} color="#000" />
-            </TouchableOpacity>
-          </View>
-        }
-      />
+      {/* Header */}
+      <View style={{
+        backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord,
+        paddingHorizontal: 16, paddingVertical: 12,
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+      }}>
+        <View>
+          <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt, letterSpacing: 1 }}>⏰ Будильники</Text>
+          <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted }}>
+            {alarms.filter(a => a.enabled).length} активных{preview ? ` · следующий ${preview.label}` : ''}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row', gap: 6 }}>
+          <IconBtn onPress={handleResync} T={T} size={38} bg={T.lo} border={T.bord}>
+            <RefreshCw size={15} color={T.muted} />
+          </IconBtn>
+          <TouchableOpacity
+            onPress={() => setShowAdd(true)}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Plus size={22} color="#000" />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       {/* Sub-tabs */}
       <View style={{ flexDirection: 'row', backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord }}>
@@ -644,7 +646,7 @@ export default function AlarmScreen() {
                   const cat = CATEGORY_INFO[alarm.category];
                   const sound = SOUND_OPTIONS.find(s => s.id === alarm.soundId) || SOUND_OPTIONS[0];
                   return (
-                    <UnifiedCard
+                    <Card
                       key={alarm.id}
                       T={T}
                       style={{
@@ -707,7 +709,7 @@ export default function AlarmScreen() {
                           </TouchableOpacity>
                         </View>
                       </View>
-                    </UnifiedCard>
+                    </Card>
                   );
                 })}
 
@@ -748,14 +750,14 @@ export default function AlarmScreen() {
             <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted, marginBottom: 14 }}>Данные из дневника</Text>
 
             {!sleepScore ? (
-              <UnifiedCard T={T} style={{ alignItems: 'center', padding: 24 }}>
+              <Card T={T} style={{ alignItems: 'center', padding: 24 }}>
                 <Text style={{ fontSize: 40, marginBottom: 12 }}>💤</Text>
                 <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 16, color: T.txt, marginBottom: 6 }}>Нужно минимум 3 записи</Text>
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted, textAlign: 'center' }}>Записывай сон в дневнике — и здесь появится анализ.</Text>
-              </UnifiedCard>
+              </Card>
             ) : (
               <>
-                <UnifiedCard T={T} style={{ marginBottom: 12, backgroundColor: sleepScore.score >= 80 ? T.success + '10' : sleepScore.score >= 60 ? T.warn + '10' : T.danger + '10', borderWidth: 1, borderColor: sleepScore.score >= 80 ? T.success + '44' : sleepScore.score >= 60 ? T.warn + '44' : T.danger + '44' }}>
+                <Card T={T} style={{ marginBottom: 12, backgroundColor: sleepScore.score >= 80 ? T.success + '10' : sleepScore.score >= 60 ? T.warn + '10' : T.danger + '10', borderWidth: 1, borderColor: sleepScore.score >= 80 ? T.success + '44' : sleepScore.score >= 60 ? T.warn + '44' : T.danger + '44' }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                     <View>
                       <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 48, color: sleepScore.score >= 80 ? T.success : sleepScore.score >= 60 ? T.warn : T.danger, lineHeight: 52 }}>{sleepScore.score}</Text>
@@ -770,9 +772,9 @@ export default function AlarmScreen() {
                     </View>
                   </View>
                   <ProgressBar pct={sleepScore.score} color={sleepScore.score >= 80 ? T.success : sleepScore.score >= 60 ? T.warn : T.danger} T={T} height={8} />
-                </UnifiedCard>
+                </Card>
 
-                <UnifiedCard T={T} style={{ marginBottom: 12 }}>
+                <Card T={T} style={{ marginBottom: 12 }}>
                   <Lbl T={T} style={{ marginBottom: 12 }}>Последние ночи</Lbl>
                   {last7Sleep.map((entry: any, i) => {
                     const h = entry.sleep || 0;
@@ -790,10 +792,10 @@ export default function AlarmScreen() {
                       </View>
                     );
                   })}
-                </UnifiedCard>
+                </Card>
 
                 {wakeAlarms.length > 0 && (
-                  <UnifiedCard T={T} style={{ marginBottom: 12 }}>
+                  <Card T={T} style={{ marginBottom: 12 }}>
                     <Lbl T={T} style={{ marginBottom: 10 }}>Анализ подъёма</Lbl>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt }}>Среднее время подъёма</Text>
@@ -801,10 +803,10 @@ export default function AlarmScreen() {
                         {avgWakeHour ? `${String(Math.floor(avgWakeHour)).padStart(2, '0')}:${String(Math.round((avgWakeHour % 1) * 60)).padStart(2, '0')}` : '—'}
                       </Text>
                     </View>
-                  </UnifiedCard>
+                  </Card>
                 )}
 
-                <UnifiedCard T={T} style={{ marginBottom: 12 }}>
+                <Card T={T} style={{ marginBottom: 12 }}>
                   <Lbl T={T} style={{ marginBottom: 10 }}>💡 Рекомендации</Lbl>
                   {[
                     { condition: parseFloat(sleepScore.avg) < 7, text: 'Старайся спать минимум 7 часов.', icon: '😴' },
@@ -816,7 +818,7 @@ export default function AlarmScreen() {
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.txt, lineHeight: 19, flex: 1 }}>{rec.text}</Text>
                     </View>
                   ))}
-                </UnifiedCard>
+                </Card>
               </>
             )}
           </>

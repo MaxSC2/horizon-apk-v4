@@ -5,18 +5,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Target, Plus, X } from 'lucide-react-native';
 import { useApp } from '../AppContext';
 import { Card, Lbl } from '../components';
-import { UnifiedCard } from '../components/UnifiedCard';
 import { loadNutrition, saveNutrition } from '../storage';
 import { uid, TODAY } from '../helpers';
 import { FOOD_PRESETS } from '../data';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
-import { ModeBackground } from '../modes';
-import { ScreenHeader } from '../components/ScreenHeader';
 
 const DEFAULT_GOALS = { calories: 2200, protein: 150, carbs: 220, fat: 70 };
 
 export default function NutritionScreen() {
-  const { T, uiMode } = useApp();
+  const { T } = useApp();
   const [data, setData] = useState<Record<string, any>>({});
   const [goals, setGoals] = useState(DEFAULT_GOALS);
   const [adding, setAdding] = useState(false);
@@ -46,15 +43,13 @@ export default function NutritionScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
-      <ModeBackground T={T} mode={uiMode} />
-      <ScreenHeader T={T} title="Питание" subtitle="Калории и макросы" />
       <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt }}>🥗 Питание</Text>
         </View>
 
         {/* Macro summary */}
-        <UnifiedCard T={T} style={{ marginBottom: 12 }}>
+        <Card T={T} style={{ marginBottom: 12 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
             <Lbl T={T}>Сегодня</Lbl>
             <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: totals.cal > goals.calories ? T.danger : T.primary }}>
@@ -86,7 +81,7 @@ export default function NutritionScreen() {
               );
             })}
           </View>
-        </UnifiedCard>
+        </Card>
 
         {/* Food list */}
         <TouchableOpacity onPress={() => setAdding(!adding)} style={{ height: 44, borderRadius: 10, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6, marginBottom: 12 }}>
@@ -95,7 +90,7 @@ export default function NutritionScreen() {
         </TouchableOpacity>
 
         {adding && (
-          <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
+          <Card T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
             <Lbl T={T} style={{ marginBottom: 10 }}>Быстрый выбор</Lbl>
             {FOOD_PRESETS.map((f, i) => (
               <TouchableOpacity key={i} onPress={() => { addEntry(f); setAdding(false); }}
@@ -125,7 +120,7 @@ export default function NutritionScreen() {
               style={{ height: 40, borderRadius: 9, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center', opacity: !custom.name.trim() || !custom.cal ? 0.5 : 1 }}>
               <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: '#000' }}>Добавить</Text>
             </TouchableOpacity>
-          </UnifiedCard>
+          </Card>
         )}
 
         {today.entries.length === 0 && !adding && (
