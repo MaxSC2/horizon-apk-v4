@@ -24,6 +24,7 @@ export const DEFAULTS: AppState = {
   user: { maxPushups: 15, note: '' },
   themeId: 'cosmos',
   uiStyleId: 'default',
+  uiMode: 'focus',
   alarms: [],
   calEvents: [],
   aiConfig: {

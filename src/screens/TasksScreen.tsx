@@ -7,6 +7,8 @@ import { useApp } from '../AppContext';
 import { Card, Lbl, Btn, Badge, ProgressBar } from '../components';
 import { uid, TODAY, goalForecast } from '../helpers';
 import { Task, Goal } from '../types';
+import { Haptic } from '../haptics';
+import { ModeBackground } from '../modes';
 
 const TASK_CATS = [
   { id: 'workout', label: 'Тренировка', emoji: '💪', color: '#00C4F0' },
@@ -31,7 +33,7 @@ function taskStreak(task: Task): number {
 }
 
 export default function TasksScreen() {
-  const { state, setState, T } = useApp();
+  const { state, setState, T, uiMode } = useApp();
   const { tasks, goals } = state;
   const [sub, setSub] = useState<'tasks' | 'goals'>('tasks');
   const [addingTask, setAddingTask] = useState(false);
@@ -56,6 +58,7 @@ export default function TasksScreen() {
         return { ...task, completedDates: done ? task.completedDates.filter(d => d !== TODAY) : [...(task.completedDates || []), TODAY] };
       }),
     }));
+    Haptic.toggle();
   };
 
   const addGoal = () => {
@@ -92,6 +95,7 @@ export default function TasksScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       {/* Sub-tab bar */}
       <View style={{ flexDirection: 'row', backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord }}>
         {[{ id: 'tasks' as const, l: '✓ Задачи' }, { id: 'goals' as const, l: '🎯 Цели' }].map(t => (

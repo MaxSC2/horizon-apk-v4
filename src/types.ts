@@ -211,6 +211,7 @@ export interface AppState {
   };
   themeId: string;
   uiStyleId: string;
+  uiMode?: string; // v4.2: 'focus' | 'aurora' | 'neon' | 'paper' | 'quest'
   alarms: Alarm[];
   calEvents: CalEvent[];
   aiConfig: AIConfig;

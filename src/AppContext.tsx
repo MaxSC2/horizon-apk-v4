@@ -12,6 +12,7 @@ import {
   purgeAllAlarms,
   ensureAlarmHandlersRegistered,
 } from './alarm';
+import { getUIMode, UIModeId } from './modes';
 
 let globalNavigate: ((tab: string) => void) | null = null;
 export const setGlobalNavigate = (fn: (tab: string) => void) => { globalNavigate = fn; };
@@ -20,6 +21,7 @@ interface AppContextValue {
   state: AppState;
   setState: (patch: Partial<AppState> | ((s: AppState) => AppState)) => void;
   T: Theme;
+  uiMode: UIModeId; // v4.2
   session: WorkoutSession | null;
   setSession: (s: WorkoutSession | null) => void;
   startWorkout: (dayIdx: number) => void;
@@ -29,7 +31,6 @@ interface AppContextValue {
   update1RM: (val: number) => void;
   loading: boolean;
   navigateTo: (tab: string) => void;
-  // v4.1 — alarm helpers exposed to UI
   resyncAlarms: () => Promise<void>;
   purgeAlarms: () => Promise<void>;
   exportData: () => Promise<string>;
@@ -85,6 +86,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const T = getTheme(state.themeId || 'cosmos');
+  const uiMode = getUIMode(state.uiMode).id;
 
   // ── Workout session helpers ──
   const startWorkout = useCallback((dayIdx: number) => {
@@ -168,7 +170,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      state, setState, T, session, setSession,
+      state, setState, T, uiMode, session, setSession,
       startWorkout, finishWorkout, cancelWorkout,
       editHistory, update1RM,
       loading, navigateTo,

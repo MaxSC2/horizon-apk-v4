@@ -9,6 +9,7 @@ import { Card, Lbl, Badge, ProgressBar } from '../components';
 import { uid, TODAY, fmt, getMonday, fmtSleep } from '../helpers';
 import { MOODS, ENERGY, PAIN_ZONES } from '../data';
 import { loadPhotos, savePhotos } from '../storage';
+import { ModeBackground } from '../modes';
 
 const SLEEP_LABELS = [
   { h: 0, label: 'Не записан' }, { h: 4, label: '4ч — мало' }, { h: 5, label: '5ч — мало' },
@@ -17,7 +18,7 @@ const SLEEP_LABELS = [
 const sleepLabel = (h: number) => SLEEP_LABELS.reduce((b, c) => h >= c.h ? c : b, SLEEP_LABELS[0]).label;
 
 export default function JournalScreen() {
-  const { state, setState, T } = useApp();
+  const { state, setState, T, uiMode } = useApp();
   const { journal, bodyLog, reflections, painLog } = state;
   const [sub, setSub] = useState<'journal' | 'body' | 'pain' | 'reflection'>('journal');
 
@@ -58,7 +59,32 @@ export default function JournalScreen() {
     setState(s => ({ ...s, journal: [{ id: uid(), date: TODAY, text: jText.trim(), mood: jMood, energy: jEnergy, sleep: jSleep, waterGlasses: 0, createdAt: new Date().toISOString() }, ...s.journal] }));
     setJText(''); setJMood(3); setJEnergy(3); setJSleep(7); setAdding(false);
   };
-  const filtered = useMemo(() => journal.filter(j => !search || j.text.toLowerCase().includes(search.toLowerCase())).sort((a, b) => b.date > a.date ? 1 : -1), [journal, search]);
+  const [filterMood, setFilterMood] = useState<number | null>(null);
+  const filtered = useMemo(() => {
+    let arr = journal.filter(j => !search || j.text.toLowerCase().includes(search.toLowerCase()));
+    if (filterMood !== null) arr = arr.filter(j => j.mood === filterMood);
+    return arr.sort((a, b) => b.date > a.date ? 1 : -1);
+  }, [journal, search, filterMood]);
+
+  // Group entries by date for timeline view
+  const grouped = useMemo(() => {
+    const groups: { date: string; entries: typeof filtered; label: string }[] = [];
+    filtered.forEach(e => {
+      let g = groups.find(g => g.date === e.date);
+      if (!g) {
+        const d = new Date(e.date + 'T12:00:00');
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const yest = new Date(today); yest.setDate(yest.getDate() - 1);
+        const label = d.toDateString() === today.toDateString() ? 'Сегодня'
+          : d.toDateString() === yest.toDateString() ? 'Вчера'
+          : d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
+        g = { date: e.date, entries: [], label };
+        groups.push(g);
+      }
+      g.entries.push(e);
+    });
+    return groups;
+  }, [filtered]);
 
   // ── Body
   const saveBody = () => {
@@ -120,6 +146,7 @@ export default function JournalScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       {/* Sub-tabs */}
       <View style={{ backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord }}>
         <View style={{ flexDirection: 'row' }}>
@@ -195,47 +222,107 @@ export default function JournalScreen() {
             )}
 
             {journal.length > 0 && (
-              <TextInput value={search} onChangeText={setSearch} placeholder="🔍 Поиск…" placeholderTextColor={T.muted}
-                style={{ height: 38, borderRadius: 8, borderWidth: 1.5, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 14, paddingHorizontal: 12, marginBottom: 12 }} />
+              <>
+                <TextInput value={search} onChangeText={setSearch} placeholder="🔍 Поиск по записям…" placeholderTextColor={T.muted}
+                  style={{ height: 42, borderRadius: 10, borderWidth: 1.5, borderColor: T.bord, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 14, paddingHorizontal: 12, marginBottom: 8 }} />
+                {/* Mood filter chips */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, paddingBottom: 12 }}>
+                  <TouchableOpacity
+                    onPress={() => setFilterMood(null)}
+                    style={{
+                      paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16,
+                      borderWidth: filterMood === null ? 1.5 : 1,
+                      borderColor: filterMood === null ? T.primary : T.bord,
+                      backgroundColor: filterMood === null ? T.primary + '22' : T.lo,
+                    }}
+                  >
+                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: filterMood === null ? T.primary : T.muted }}>Все</Text>
+                  </TouchableOpacity>
+                  {MOODS.map(m => (
+                    <TouchableOpacity
+                      key={m.v}
+                      onPress={() => setFilterMood(filterMood === m.v ? null : m.v)}
+                      style={{
+                        paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16,
+                        borderWidth: filterMood === m.v ? 1.5 : 1,
+                        borderColor: filterMood === m.v ? T.primary : T.bord,
+                        backgroundColor: filterMood === m.v ? T.primary + '22' : T.lo,
+                        flexDirection: 'row', alignItems: 'center', gap: 4,
+                      }}
+                    >
+                      <Text style={{ fontSize: 14 }}>{m.e}</Text>
+                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 11, color: filterMood === m.v ? T.primary : T.muted }}>{m.l}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </>
             )}
 
             {filtered.length === 0 && (
-              <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-                <Text style={{ fontSize: 36, marginBottom: 10 }}>📝</Text>
-                <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.muted }}>{search ? 'Ничего не найдено' : 'Начни вести дневник'}</Text>
+              <View style={{ alignItems: 'center', paddingVertical: 48 }}>
+                <Text style={{ fontSize: 44, marginBottom: 12 }}>📝</Text>
+                <Text style={{ fontFamily: 'Barlow_600SemiBold', fontSize: 15, color: T.txt, marginBottom: 4 }}>
+                  {search || filterMood ? 'Ничего не найдено' : 'Дневник пуст'}
+                </Text>
+                <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted, textAlign: 'center' }}>
+                  {search || filterMood ? 'Измени поиск или фильтр' : 'Записывай мысли, настроение и сон каждый день'}
+                </Text>
               </View>
             )}
 
-            {filtered.map(entry => {
-              const m = MOODS.find(x => x.v === entry.mood);
-              const en = ENERGY.find(x => x.v === entry.energy);
-              return (
-                <Card key={entry.id} T={T} style={{ marginBottom: 10, borderLeftWidth: 3, borderLeftColor: m?.v && m.v >= 4 ? T.success : m?.v && m.v <= 2 ? T.danger : T.muted }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                      <Text style={{ fontSize: 20 }}>{m?.e}</Text>
-                      {entry.energy && <Text style={{ fontSize: 16, opacity: 0.7 }}>{en?.e}</Text>}
-                      {entry.sleep && (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: T.lo, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
-                          <BedDouble size={10} color={T.muted} />
-                          <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: T.muted }}>{fmtSleep(entry.sleep)}</Text>
+            {/* Timeline view — grouped by date */}
+            {grouped.map(group => (
+              <View key={group.date} style={{ marginBottom: 14 }}>
+                {/* Date header */}
+                <View style={{
+                  flexDirection: 'row', alignItems: 'center', gap: 10,
+                  marginBottom: 8, marginTop: 4,
+                }}>
+                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: group.date === TODAY ? T.primary : T.muted }} />
+                  <Text style={{
+                    fontFamily: 'BarlowCondensed_900Black', fontSize: 14,
+                    color: group.date === TODAY ? T.primary : T.muted,
+                    letterSpacing: 1, textTransform: 'uppercase', flex: 1,
+                  }}>
+                    {group.label}
+                  </Text>
+                  <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted }}>{group.entries.length} зап.</Text>
+                </View>
+
+                {/* Entries for this date */}
+                {group.entries.map(entry => {
+                  const m = MOODS.find(x => x.v === entry.mood);
+                  const en = ENERGY.find(x => x.v === entry.energy);
+                  return (
+                    <Card key={entry.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 3, borderLeftColor: m?.v && m.v >= 4 ? T.success : m?.v && m.v <= 2 ? T.danger : T.muted, marginLeft: 6 }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap', flex: 1 }}>
+                          <Text style={{ fontSize: 20 }}>{m?.e}</Text>
+                          {entry.energy && <Text style={{ fontSize: 16, opacity: 0.7 }}>{en?.e}</Text>}
+                          {entry.sleep && (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: T.lo, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
+                              <BedDouble size={10} color={T.muted} />
+                              <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: T.muted }}>{fmtSleep(entry.sleep)}</Text>
+                            </View>
+                          )}
+                          <View style={{ flex: 1 }}>
+                            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted }}>{m?.l}{entry.energy ? ' · ' + en?.l : ''}</Text>
+                          </View>
                         </View>
-                      )}
-                      <View>
-                        <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: entry.date === TODAY ? T.primary : T.muted }}>
-                          {entry.date === TODAY ? 'Сегодня' : new Date(entry.date + 'T12:00:00').toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' })}
-                        </Text>
-                        <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted }}>{m?.l}{entry.energy ? ' · ' + en?.l : ''}</Text>
+                        <TouchableOpacity
+                          onPress={() => setState(s => ({ ...s, journal: s.journal.filter(x => x.id !== entry.id) }))}
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                          style={{ padding: 6, opacity: 0.5 }}
+                        >
+                          <X size={14} color={T.muted} />
+                        </TouchableOpacity>
                       </View>
-                    </View>
-                    <TouchableOpacity onPress={() => setState(s => ({ ...s, journal: s.journal.filter(x => x.id !== entry.id) }))} style={{ opacity: 0.5, padding: 4 }}>
-                      <X size={14} color={T.muted} />
-                    </TouchableOpacity>
-                  </View>
-                  {entry.text && <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt, lineHeight: 21 }}>{entry.text}</Text>}
-                </Card>
-              );
-            })}
+                      {entry.text && <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt, lineHeight: 21 }}>{entry.text}</Text>}
+                    </Card>
+                  );
+                })}
+              </View>
+            ))}
           </>
         )}
 

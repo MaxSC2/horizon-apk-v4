@@ -9,11 +9,12 @@ import { loadNutrition, saveNutrition } from '../storage';
 import { uid, TODAY } from '../helpers';
 import { FOOD_PRESETS } from '../data';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
+import { ModeBackground } from '../modes';
 
 const DEFAULT_GOALS = { calories: 2200, protein: 150, carbs: 220, fat: 70 };
 
 export default function NutritionScreen() {
-  const { T } = useApp();
+  const { T, uiMode } = useApp();
   const [data, setData] = useState<Record<string, any>>({});
   const [goals, setGoals] = useState(DEFAULT_GOALS);
   const [adding, setAdding] = useState(false);
@@ -43,6 +44,7 @@ export default function NutritionScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt }}>🥗 Питание</Text>

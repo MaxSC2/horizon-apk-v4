@@ -11,6 +11,7 @@ import { PLAN } from '../data';
 import { AI_PROVIDERS } from '../data';
 import { callAI } from './MentorScreen';
 import { SetLog, WorkoutLog } from '../types';
+import { ModeBackground } from '../modes';
 
 function NumpadModal({ T, value, onChange, onConfirm, unit, placeholder, color }: any) {
   const [display, setDisplay] = useState(value || '');
@@ -436,7 +437,7 @@ function ExerciseCard({ T, exercise, logs, onComplete, onValueChange, onRest, pr
 }
 
 export default function WorkoutScreen() {
-  const { state, setState, T, session, setSession, startWorkout, finishWorkout } = useApp();
+  const { state, setState, T, session, setSession, startWorkout, finishWorkout, uiMode } = useApp();
   const { history } = state;
   const [showHist, setShowHist] = useState(false);
   const [histSearch, setHistSearch] = useState('');
@@ -569,6 +570,7 @@ export default function WorkoutScreen() {
 
   return (
     <SafeAreaView style={{ flex:1, backgroundColor:T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       {session.showRest && <RestTimerModal T={T} onDone={()=>upd({showRest:false})}/>}
       <ScrollView contentContainerStyle={{ padding:14, paddingBottom:20 }}>
 

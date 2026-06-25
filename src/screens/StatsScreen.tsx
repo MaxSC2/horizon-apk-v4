@@ -16,6 +16,7 @@ import { DEFAULTS } from '../storage';
 import ThemePickerModal from '../components/ThemePickerModal';
 import StylePickerModal from '../components/StylePickerModal';
 import { UI_STYLES, getUIStyle } from '../styles';
+import { ModeBackground } from '../modes';
 
 // Simple bar chart using SVG (no custom dot renderers = no crashes)
 function BarChartSVG({ data, T, height = 100, accentLast = false, refVal }: { data: { label: string; value: number; highlight?: boolean }[]; T: any; height?: number; accentLast?: boolean; refVal?: number }) {
@@ -96,7 +97,7 @@ function RadarSVG({ data, T, size = 160 }: { data: { label: string; value: numbe
 }
 
 export default function StatsScreen() {
-  const { state, T, update1RM, exportData } = useApp();
+  const { state, T, update1RM, exportData, uiMode } = useApp();
   const { history, tasks, goals, journal, achievements } = state;
   const [sub, setSub] = useState<'stats' | 'achievements' | 'anatomy' | 'profile'>('stats');
   const [selEx, setSelEx] = useState('pushups');
@@ -167,6 +168,7 @@ export default function StatsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord, maxHeight: 44 }}>
         <View style={{ flexDirection: 'row' }}>
           {[{ id: 'stats' as const, l: '📊 Статы' }, { id: 'achievements' as const, l: '🏆 Достиж.' }, { id: 'anatomy' as const, l: '🫀 Анатомия' }, { id: 'profile' as const, l: '⚙️ Профиль' }].map(t => (

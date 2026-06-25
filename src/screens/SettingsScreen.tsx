@@ -28,6 +28,7 @@ import { AI_PROVIDERS } from '../data';
 import { AIConfig } from '../types';
 import { callAI } from './MentorScreen';
 import { scheduleTestAlarm, canScheduleExactAlarms, openAlarmPermissionSettings } from '../alarm';
+import { UI_MODES, UIModeId, ModeBackground, ModeCard, getUIMode } from '../modes';
 
 const PERSONA_PRESETS = [
   { id: 'coach',   emoji: '💪', label: 'Тренер',     text: 'Ты строгий, но поддерживающий тренер. Короткие чёткие указания, без воды.' },
@@ -38,7 +39,7 @@ const PERSONA_PRESETS = [
 ];
 
 export default function SettingsScreen() {
-  const { state, setState, T, exportData, resyncAlarms, purgeAlarms } = useApp();
+  const { state, setState, T, exportData, resyncAlarms, purgeAlarms, uiMode } = useApp();
   const insets = useSafeAreaInsets();
   const [expandedSection, setExpandedSection] = useState<string | null>('appearance');
 
@@ -196,9 +197,10 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       {/* Header */}
       <View style={{
-        backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord,
+        backgroundColor: uiMode === 'aurora' ? 'transparent' : T.surf, borderBottomWidth: uiMode === 'aurora' ? 0 : 1, borderBottomColor: T.bord,
         paddingHorizontal: 16, paddingVertical: 12,
       }}>
         <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt, letterSpacing: 1 }}>⚙️ Настройки</Text>
@@ -212,10 +214,64 @@ export default function SettingsScreen() {
           id="appearance"
           icon={<Palette size={18} color={T.primary} />}
           title="Внешний вид"
-          subtitle={`${THEMES.find(t => t.id === state.themeId)?.name || 'Космос'} · ${UI_STYLES.find(s => s.id === state.uiStyleId)?.name || 'Стандарт'}`}
+          subtitle={`${getUIMode(state.uiMode).name} · ${THEMES.find(t => t.id === state.themeId)?.name || 'Космос'}`}
         >
+          {/* v4.2 — Interface mode picker with live preview */}
           <View style={{ marginTop: 12 }}>
-            <Lbl T={T} style={{ marginBottom: 8 }}>Тема оформления</Lbl>
+            <Lbl T={T} style={{ marginBottom: 8 }}>🎭 Режим интерфейса</Lbl>
+            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginBottom: 10, lineHeight: 16 }}>
+              Кардинально разные визуальные стили — от минимализма до геймификации. Каждый режим меняет фон, карточки, кнопки и анимации.
+            </Text>
+
+            {/* Live preview block */}
+            <View style={{
+              height: 100, borderRadius: 14, overflow: 'hidden',
+              marginBottom: 12, borderWidth: 1, borderColor: T.bord,
+            }}>
+              <ModeBackground T={T} mode={getUIMode(state.uiMode).id} />
+              <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, padding: 12, justifyContent: 'center' }}>
+                <ModeCard T={T} mode={getUIMode(state.uiMode).id} style={{ padding: 10 }}>
+                  <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 14, color: T.txt }}>
+                    {getUIMode(state.uiMode).emoji} {getUIMode(state.uiMode).name}
+                  </Text>
+                  <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted, marginTop: 2 }}>
+                    Превью карточки в этом режиме
+                  </Text>
+                </ModeCard>
+              </View>
+            </View>
+
+            {/* Mode grid 2×3 */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {UI_MODES.map(m => {
+                const cur = (state.uiMode || 'focus') === m.id;
+                return (
+                  <TouchableOpacity
+                    key={m.id}
+                    onPress={() => setState(s => ({ ...s, uiMode: m.id }))}
+                    style={{
+                      width: '48%', padding: 12, borderRadius: 12,
+                      borderWidth: cur ? 2 : 1,
+                      borderColor: cur ? T.primary : T.bord,
+                      backgroundColor: cur ? T.primary + '15' : T.lo,
+                    }}
+                    hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <Text style={{ fontSize: 20 }}>{m.emoji}</Text>
+                      <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 14, color: cur ? T.primary : T.txt }}>{m.name}</Text>
+                    </View>
+                    <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted, lineHeight: 14 }}>
+                      {m.desc}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          <View style={{ marginTop: 16 }}>
+            <Lbl T={T} style={{ marginBottom: 8 }}>Тема оформления (цвета)</Lbl>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {THEMES.map(theme => {
                 const cur = (state.themeId || 'cosmos') === theme.id;
@@ -242,7 +298,7 @@ export default function SettingsScreen() {
           </View>
 
           <View style={{ marginTop: 16 }}>
-            <Lbl T={T} style={{ marginBottom: 8 }}>Стиль интерфейса</Lbl>
+            <Lbl T={T} style={{ marginBottom: 8 }}>Стиль интерфейса (тонкая настройка)</Lbl>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {UI_STYLES.map(s => {
                 const cur = (state.uiStyleId || 'default') === s.id;
@@ -565,11 +621,11 @@ export default function SettingsScreen() {
           id="about"
           icon={<Info size={18} color={T.muted} />}
           title="О приложении"
-          subtitle="ГОРИЗОНТ v4.1.0"
+          subtitle="ГОРИЗОНТ v4.2.0"
         >
           <View style={{ marginTop: 12, alignItems: 'center', paddingVertical: 12 }}>
             <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 28, letterSpacing: 3, color: T.txt }}>ГОРИЗОНТ</Text>
-            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted, marginTop: 4 }}>Life Tracker · v4.1.0 · Expo React Native</Text>
+            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted, marginTop: 4 }}>Life Tracker · v4.2.0 · Expo React Native</Text>
             <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 2 }}>Тело · Разум · Дисциплина · Горизонт</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
               <Text style={{ fontSize: 10, color: T.muted }}>⏰ Notifee alarms</Text>

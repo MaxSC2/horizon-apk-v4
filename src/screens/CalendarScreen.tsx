@@ -8,6 +8,7 @@ import { useApp } from '../AppContext';
 import { Card, Lbl, Badge } from '../components';
 import { uid, fmt, fmtSleep } from '../helpers';
 import { PLAN, MOODS } from '../data';
+import { ModeBackground } from '../modes';
 
 interface CalEvent {
   id: string;
@@ -63,7 +64,7 @@ async function scheduleEventReminder(event: CalEvent): Promise<string | null> {
 }
 
 export default function CalendarScreen() {
-  const { state, setState, T } = useApp();
+  const { state, setState, T, uiMode } = useApp();
   const { history, journal } = state;
   const events: CalEvent[] = state.calEvents || [];
 
@@ -143,6 +144,7 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }} stickyHeaderIndices={[0]}>
 
         {/* Sticky Calendar Header */}

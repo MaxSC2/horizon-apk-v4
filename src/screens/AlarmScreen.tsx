@@ -22,6 +22,8 @@ import { Plus, X, Bell, Trash2, Zap, RefreshCw, Clock } from 'lucide-react-nativ
 import { useApp } from '../AppContext';
 import { Card, Lbl, ProgressBar, IconBtn, Btn, EmptyState } from '../components';
 import { uid, TODAY, fmtSleep } from '../helpers';
+import { Haptic } from '../haptics';
+import { ModeBackground } from '../modes';
 import {
   CHANNEL_ID,
   scheduleAlarm,
@@ -372,7 +374,7 @@ function AlarmAddModal({
 
 // ── Main screen ─────────────────────────────────────────────────────────────
 export default function AlarmScreen() {
-  const { state, setState, T, resyncAlarms, purgeAlarms } = useApp();
+  const { state, setState, T, resyncAlarms, purgeAlarms, uiMode } = useApp();
   const alarms: Alarm[] = state.alarms || [];
   const [showAdd, setShowAdd] = useState(false);
   const [editAlarm, setEditAlarm] = useState<Alarm | null>(null);
@@ -425,6 +427,7 @@ export default function AlarmScreen() {
     }
     setShowAdd(false);
     setEditAlarm(null);
+    Haptic.save();
   };
 
   const toggleAlarm = async (id: string) => {
@@ -437,12 +440,14 @@ export default function AlarmScreen() {
       await cancelAlarmById(id);
     }
     setAlarms(prev => prev.map(a => a.id === id ? next : a));
+    Haptic.toggle();
   };
 
   // v4.1 — AWAIT cancellation so the alarm can't ring after deletion.
   const deleteAlarm = async (id: string) => {
     await cancelAlarmById(id);
     setAlarms(prev => prev.filter(a => a.id !== id));
+    Haptic.delete();
   };
 
   // v4.1 — "Проверить сигнал" — fires a test alarm in 10 seconds.
@@ -530,9 +535,10 @@ export default function AlarmScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       {/* Header */}
       <View style={{
-        backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord,
+        backgroundColor: uiMode === 'aurora' ? 'transparent' : T.surf, borderBottomWidth: uiMode === 'aurora' ? 0 : 1, borderBottomColor: T.bord,
         paddingHorizontal: 16, paddingVertical: 12,
         flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
       }}>

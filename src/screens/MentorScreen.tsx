@@ -15,11 +15,13 @@ import { Card, Btn, Lbl } from '../components';
 import { buildAIContext, calcStreak, getPRs } from '../helpers';
 import { AI_PROVIDERS, QUICK_PROMPTS } from '../data';
 import { ChatMessage, AIConfig, AIProvider } from '../types';
+import { Share } from 'react-native';
+import { ModeBackground } from '../modes';
 
 const PLAN_PROMPT = `Составь персональный план тренировок на следующую неделю. Формат: день — тренировка — упражнения — комментарий.`;
 
 export async function callAI(messages: ChatMessage[], systemPrompt: string, aiConfig: AIConfig): Promise<string> {
-  const cfg = aiConfig || {};
+  const cfg: AIConfig = aiConfig || { provider: 'claude', apiKey: '', model: '', endpoint: '' };
   const prov = AI_PROVIDERS.find(p => p.id === cfg.provider) || AI_PROVIDERS[0];
   const model = cfg.model || prov.defaultModel;
   const fullSys = systemPrompt + (cfg.persona ? `\n\nПерсонаж: ${cfg.persona}` : '') + (cfg.systemExtra ? `\n\n${cfg.systemExtra}` : '');
@@ -66,8 +68,8 @@ export async function callAI(messages: ChatMessage[], systemPrompt: string, aiCo
 }
 
 export default function MentorScreen() {
-  const { state, setState, T } = useApp();
-  const aiConfig = state.aiConfig || {};
+  const { state, setState, T, navigateTo, uiMode } = useApp();
+  const aiConfig: AIConfig = state.aiConfig || { provider: 'claude', apiKey: '', model: '', endpoint: '', persona: '', systemExtra: '' };
   const prov = AI_PROVIDERS.find(p => p.id === (aiConfig.provider || 'claude')) || AI_PROVIDERS[0];
   const provColor = prov.color;
   const modelLabel = aiConfig.model || prov.defaultModel;
@@ -79,6 +81,7 @@ export default function MentorScreen() {
   const [showSettings, setShowSettings] = useState(false);
   const [showContext, setShowContext] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [menuFor, setMenuFor] = useState<number | null>(null); // index of message with open long-press menu
   const scrollRef = useRef<ScrollView>(null);
   const isWelcome = messages.length === 0;
 
@@ -146,6 +149,32 @@ export default function MentorScreen() {
     ]);
   };
 
+  const copyMessage = async (text: string, idx: number) => {
+    try {
+      await Share.share({ message: text });
+      setCopiedId(idx);
+      setTimeout(() => setCopiedId(null), 1500);
+    } catch (e) {
+      // user dismissed share sheet — no-op
+    }
+  };
+
+  const deleteMessage = (idx: number) => {
+    const next = messages.filter((_, i) => i !== idx);
+    setMessages(next);
+    saveHistory(next);
+    setMenuFor(null);
+  };
+
+  const fmtDate = (ts: number) => {
+    const d = new Date(ts);
+    const today = new Date();
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    if (d.toDateString() === today.toDateString()) return 'Сегодня';
+    if (d.toDateString() === yest.toDateString()) return 'Вчера';
+    return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  };
+
   const fmtTime = (ts: number) => new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 
   // Simple markdown-like rendering
@@ -175,6 +204,7 @@ export default function MentorScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
+      <ModeBackground T={T} mode={uiMode} />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={62}>
 
         {/* Header */}
@@ -214,8 +244,12 @@ export default function MentorScreen() {
               <TouchableOpacity onPress={clearChat} style={{ width: 30, height: 30, borderRadius: 8, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
                 <Trash2 size={12} color={T.muted} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowSettings(true)} style={{ width: 30, height: 30, borderRadius: 8, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
-                <Settings size={13} color={T.muted} />
+              <TouchableOpacity
+                onPress={() => navigateTo('SettingsScreen')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={{ width: 34, height: 34, borderRadius: 10, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Settings size={14} color={T.muted} />
               </TouchableOpacity>
             </View>
           </View>
@@ -276,39 +310,100 @@ export default function MentorScreen() {
           {messages.map((m, i) => {
             const isUser = m.role === 'user';
             const mProv = AI_PROVIDERS.find(p => p.id === m.provider) || prov;
+            const showDateSep = i === 0 || fmtDate(messages[i - 1].ts) !== fmtDate(m.ts);
             return (
-              <View key={i} style={{ alignItems: isUser ? 'flex-end' : 'flex-start', gap: 4 }}>
-                {!isUser && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginLeft: 4 }}>
-                    <View style={{ width: 16, height: 16, borderRadius: 5, backgroundColor: mProv.color + '22', borderWidth: 1, borderColor: mProv.color + '55', alignItems: 'center', justifyContent: 'center' }}>
-                      <Sparkles size={9} color={mProv.color} />
+              <View key={i}>
+                {/* Date separator */}
+                {showDateSep && (
+                  <View style={{ alignItems: 'center', marginVertical: 8 }}>
+                    <View style={{ paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10, backgroundColor: T.lo, borderWidth: 1, borderColor: T.bord }}>
+                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: T.muted, letterSpacing: 0.5 }}>{fmtDate(m.ts)}</Text>
                     </View>
-                    <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 9, color: T.muted, letterSpacing: 0.5, textTransform: 'uppercase' }}>{mProv.short}</Text>
                   </View>
                 )}
-                <View style={{
-                  maxWidth: '88%',
-                  padding: 12,
-                  borderRadius: isUser ? 18 : 18,
-                  borderBottomRightRadius: isUser ? 5 : 18,
-                  borderBottomLeftRadius: isUser ? 18 : 5,
-                  backgroundColor: isUser ? provColor : T.card,
-                  borderWidth: isUser ? 0 : 1,
-                  borderColor: T.bord,
-                }}>
-                  {isUser
-                    ? <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: '#000', lineHeight: 20 }}>{m.content}</Text>
-                    : <View>{renderContent(m.content)}</View>
-                  }
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: isUser ? 0 : 4, marginRight: isUser ? 4 : 0 }}>
-                  {m.ts && <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 9, color: T.muted }}>{fmtTime(m.ts)}</Text>}
+                <View style={{ alignItems: isUser ? 'flex-end' : 'flex-start', gap: 4 }}>
                   {!isUser && (
-                    <TouchableOpacity onPress={() => { setCopiedId(i); setTimeout(() => setCopiedId(null), 1500); }} style={{ flexDirection: 'row', alignItems: 'center', gap: 3, opacity: 0.7 }}>
-                      {copiedId === i ? <Check size={10} color={T.success} strokeWidth={3} /> : <MessageSquare size={10} color={T.muted} />}
-                      <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 9, color: copiedId === i ? T.success : T.muted }}>{copiedId === i ? 'Скоп.' : 'Копировать'}</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginLeft: 4 }}>
+                      <View style={{ width: 16, height: 16, borderRadius: 5, backgroundColor: mProv.color + '22', borderWidth: 1, borderColor: mProv.color + '55', alignItems: 'center', justifyContent: 'center' }}>
+                        <Sparkles size={9} color={mProv.color} />
+                      </View>
+                      <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 9, color: T.muted, letterSpacing: 0.5, textTransform: 'uppercase' }}>{mProv.short}</Text>
+                    </View>
                   )}
+                  <TouchableOpacity
+                    onLongPress={() => setMenuFor(i)}
+                    activeOpacity={0.85}
+                    style={{
+                      maxWidth: '88%',
+                      padding: 12,
+                      borderRadius: 18,
+                      borderBottomRightRadius: isUser ? 5 : 18,
+                      borderBottomLeftRadius: isUser ? 18 : 5,
+                      backgroundColor: isUser ? provColor : T.card,
+                      borderWidth: isUser ? 0 : 1,
+                      borderColor: T.bord,
+                    }}
+                  >
+                    {isUser
+                      ? <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: '#000', lineHeight: 20 }}>{m.content}</Text>
+                      : <View>{renderContent(m.content)}</View>
+                    }
+                  </TouchableOpacity>
+
+                  {/* Long-press action menu */}
+                  {menuFor === i && (
+                    <View style={{
+                      flexDirection: 'row', gap: 6, marginTop: 4,
+                      padding: 6, borderRadius: 10,
+                      backgroundColor: T.surf, borderWidth: 1, borderColor: T.bord,
+                      elevation: 3, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 4, shadowOffset: { width: 0, height: 1 },
+                    }}>
+                      <TouchableOpacity
+                        onPress={() => copyMessage(m.content, i)}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: T.lo, flexDirection: 'row', alignItems: 'center', gap: 4 }}
+                      >
+                        {copiedId === i ? <Check size={11} color={T.success} strokeWidth={3} /> : <MessageSquare size={11} color={T.muted} />}
+                        <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: copiedId === i ? T.success : T.muted }}>{copiedId === i ? '✓' : 'Копи.'}</Text>
+                      </TouchableOpacity>
+                      {!isUser && i === messages.length - 1 && (
+                        <TouchableOpacity
+                          onPress={() => { regenerate(); setMenuFor(null); }}
+                          disabled={loading}
+                          style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: T.lo, flexDirection: 'row', alignItems: 'center', gap: 4, opacity: loading ? 0.4 : 1 }}
+                        >
+                          <RotateCcw size={11} color={T.muted} />
+                          <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: T.muted }}>Заново</Text>
+                        </TouchableOpacity>
+                      )}
+                      <TouchableOpacity
+                        onPress={() => deleteMessage(i)}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: T.danger + '15', flexDirection: 'row', alignItems: 'center', gap: 4 }}
+                      >
+                        <Trash2 size={11} color={T.danger} />
+                        <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 10, color: T.danger }}>Удал.</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => setMenuFor(null)}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <X size={11} color={T.muted} />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: isUser ? 0 : 4, marginRight: isUser ? 4 : 0 }}>
+                    {m.ts && <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 9, color: T.muted }}>{fmtTime(m.ts)}</Text>}
+                    {menuFor !== i && !isUser && (
+                      <TouchableOpacity
+                        onPress={() => copyMessage(m.content, i)}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        style={{ flexDirection: 'row', alignItems: 'center', gap: 3, opacity: 0.7 }}
+                      >
+                        {copiedId === i ? <Check size={10} color={T.success} strokeWidth={3} /> : <MessageSquare size={10} color={T.muted} />}
+                        <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 9, color: copiedId === i ? T.success : T.muted }}>{copiedId === i ? 'Скоп.' : 'Копир.'}</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </View>
               </View>
             );
@@ -337,7 +432,7 @@ export default function MentorScreen() {
                   <Text key={i} style={{ fontFamily: i === 0 ? 'BarlowCondensed_700Bold' : 'Barlow_400Regular', fontSize: i === 0 ? 14 : 12, color: i === 0 ? T.danger : T.txt, lineHeight: 18 }}>{line}</Text>
                 ))}
                 {error.includes('ключ') && (
-                  <TouchableOpacity onPress={() => setShowSettings(true)}>
+                  <TouchableOpacity onPress={() => navigateTo('SettingsScreen')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                     <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 12, color: T.primary, marginTop: 4 }}>Открыть настройки →</Text>
                   </TouchableOpacity>
                 )}
