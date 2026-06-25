@@ -44,6 +44,7 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 import { ensureAlarmHandlersRegistered } from './src/alarm';
 import { ModeBackground, UI_MODES, getUIMode } from './src/modes';
 import { Haptic } from './src/haptics';
+import { SplashView } from './src/components/SplashView';
 
 // Register background event handler ASAP — before any screen mounts — so
 // snooze/stop actions on notifications work even if the app was cold-started
@@ -251,10 +252,16 @@ export default function App() {
     Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold,
   });
 
+  // v4.5 — красивая анимированная загрузка вместо чёрного экрана + ActivityIndicator
   if (!fontsLoaded) {
-    return <View style={{ flex: 1, backgroundColor: '#07090D', alignItems: 'center', justifyContent: 'center' }}>
-      <ActivityIndicator color="#00C4F0" size="large" />
-    </View>;
+    // Космос тема по умолчанию для splash (стандартная для приложения)
+    const splashTheme = {
+      bg: '#07090D', surf: '#0D1520', card: '#111D2C', bord: '#1A2E42',
+      txt: '#DDE6EE', muted: '#3D5A72', lo: '#0F1C2C',
+      primary: '#00C4F0', success: '#00E676', warn: '#FFD600', danger: '#FF4455',
+      dark: true, id: 'cosmos', name: 'Космос', icon: '🌌',
+    } as any;
+    return <SplashView T={splashTheme} mode="focus" label="Загрузка" duration={0} showWordmark />;
   }
 
   return (

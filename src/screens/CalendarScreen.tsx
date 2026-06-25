@@ -10,6 +10,7 @@ import { uid, fmt, fmtSleep } from '../helpers';
 import { PLAN, MOODS } from '../data';
 import { ModeBackground } from '../modes';
 import { CalEventCategory } from '../types';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 // Local CalEvent — UI variant with extra optional fields not in the storage type
 type CalEvent = {
@@ -148,6 +149,7 @@ export default function CalendarScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
       <ModeBackground T={T} mode={uiMode} />
+      <ScreenHeader T={T} title="Календарь" subtitle="События и история" />
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }} stickyHeaderIndices={[0]}>
 
         {/* Sticky Calendar Header */}

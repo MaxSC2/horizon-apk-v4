@@ -24,6 +24,7 @@ import { Card, Lbl, ProgressBar, IconBtn, Btn, EmptyState } from '../components'
 import { uid, TODAY, fmtSleep } from '../helpers';
 import { Haptic, modeAchievement } from '../haptics';
 import { ModeBackground } from '../modes';
+import { ScreenHeader } from '../components/ScreenHeader';
 import {
   CHANNEL_ID,
   scheduleAlarm,
@@ -536,31 +537,25 @@ export default function AlarmScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
       <ModeBackground T={T} mode={uiMode} />
-      {/* Header */}
-      <View style={{
-        backgroundColor: uiMode === 'aurora' ? 'transparent' : T.surf, borderBottomWidth: uiMode === 'aurora' ? 0 : 1, borderBottomColor: T.bord,
-        paddingHorizontal: 16, paddingVertical: 12,
-        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-      }}>
-        <View>
-          <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt, letterSpacing: 1 }}>⏰ Будильники</Text>
-          <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted }}>
-            {alarms.filter(a => a.enabled).length} активных{preview ? ` · следующий ${preview.label}` : ''}
-          </Text>
-        </View>
-        <View style={{ flexDirection: 'row', gap: 6 }}>
-          <IconBtn onPress={handleResync} T={T} size={38} bg={T.lo} border={T.bord}>
-            <RefreshCw size={15} color={T.muted} />
-          </IconBtn>
-          <TouchableOpacity
-            onPress={() => setShowAdd(true)}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-            style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Plus size={22} color="#000" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <ScreenHeader
+        T={T}
+        title="Будильники"
+        subtitle={`${alarms.filter(a => a.enabled).length} активных${preview ? ` · следующий ${preview.label}` : ''}`}
+        right={
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            <IconBtn onPress={handleResync} T={T} size={38} bg={T.lo} border={T.bord}>
+              <RefreshCw size={15} color={T.muted} />
+            </IconBtn>
+            <TouchableOpacity
+              onPress={() => setShowAdd(true)}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+              style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Plus size={22} color="#000" />
+            </TouchableOpacity>
+          </View>
+        }
+      />
 
       {/* Sub-tabs */}
       <View style={{ flexDirection: 'row', backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord }}>

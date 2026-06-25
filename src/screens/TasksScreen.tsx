@@ -9,6 +9,7 @@ import { uid, TODAY, goalForecast } from '../helpers';
 import { Task, Goal } from '../types';
 import { Haptic, modeAchievement } from '../haptics';
 import { ModeBackground } from '../modes';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 const TASK_CATS = [
   { id: 'workout', label: 'Тренировка', emoji: '💪', color: '#00C4F0' },
@@ -101,6 +102,7 @@ export default function TasksScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
       <ModeBackground T={T} mode={uiMode} />
+      <ScreenHeader T={T} title="Задачи и цели" subtitle="Привычки, цели, прогресс" />
       {/* Sub-tab bar */}
       <View style={{ flexDirection: 'row', backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord }}>
         {[{ id: 'tasks' as const, l: '✓ Задачи' }, { id: 'goals' as const, l: '🎯 Цели' }].map(t => (

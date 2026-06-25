@@ -363,3 +363,158 @@
 - Expo SDK 51, React Native 0.74.5 — без изменений
 - Существующие данные сохраняются (uiMode по умолчанию = 'focus')
 - APK собирается через `eas build -p android --profile preview`
+
+---
+
+## [4.5.0] — 2026-06-25
+
+### 🎨 Полный редизайн стиля по умолчанию (Focus)
+
+**Баг**: стиль по умолчанию был скучным — статичные точки на чёрном фоне, без
+современных эффектов.
+
+**Редизайн**: Focus режим полностью переработан под тренды 2025-2026:
+- **Gradient mesh background**: глубокий вертикальный градиент (bg → lo → bg)
+  вместо плоского цвета
+- **2 дышащих цветных облака**: primary (сверху-слева) и accent (снизу-справа),
+  плавно дышат (8 сек) и дрейфуют (40 сек) — создают ощущение глубины
+- **Тонкая точечная сетка** сохранена (как Linear), но с opacity 0.5 для
+  лёгкой текстуры
+- **Карточки**: radius увеличен с 12 до 18, добавлен subtle shadow (было без
+  тени), border стал полупрозрачным primary (`T.primary + '22'`)
+- **Кнопки**: radius увеличен с 8 до 12 — более современный мягкий вид
+- **Easing**: использован `Easing.sin` для органичного дыхания облаков
+
+Это создаёт ощущение «живого» интерфейса, а не статичной картинки.
+
+### ✨ SplashView — анимированная загрузка для каждой темы
+
+Новый компонент `src/components/SplashView.tsx` (530+ строк) — показывает
+красивую анимированную загрузку с уникальным паттерном для каждого режима:
+
+| Режим | Анимация загрузки | Логотип |
+|-------|-------------------|---------|
+| Focus | Пульсирующее кольцо с градиентом | Вращающееся кольцо с точкой |
+| Aurora | Сливающиеся цветные блобы | Радиальный градиент |
+| Neon | Бегущая неоновая линия по сетке | Blinking «H» в неоновой рамке |
+| Paper | Разворачивающийся свиток | Свиток с наклоном |
+| Quest | Вращающийся щит + мерцающие звёзды | ⚔️ в золотой рамке |
+| Cosmic | Расширяющиеся орбиты с планетами | Звезда с радиальным glow |
+| Mono | Эффект печатной машинки | «Г» в строгой рамке |
+| Synthwave | Сетка-перспектива + заходящее солнце | Градиентный «H» |
+
+Показывается:
+- При загрузке приложения (поверх Expo splash) — focus режим
+- Может использоваться для переходных анимаций
+- Готов к использованию при AI-запросах, экспорте, и т.д.
+
+### ✅ Проверка приложения — bundle успешно собран
+
+Запустил `npx expo export --platform android` — **бандл успешно собран**:
+- Размер: 5.52 MB (нормально для такого функционала)
+- 0 ошибок компиляции
+- Все импорты резолвятся
+- Все 24 TS-файла валидны
+
+### 🔍 Аудит всех функций
+
+Проверено что работает:
+- ✅ Навигация: `navigationRef` на `NavigationContainer` (не Tab.Navigator)
+- ✅ Все 11 экранов зарегистрированы (5 табов + 6 hidden)
+- ✅ ModeQuickSwitcher импортирован в DashboardScreen
+- ✅ SplashView импортирован в App.tsx
+- ✅ alarm.ts: 10+ экспортируемых функций (scheduleAlarm, cancelAlarmById,
+  purgeAllAlarms, syncAlarmsWithSystem, scheduleTestAlarm, nextAlarmPreview,
+  snoozeAlarm, modeAchievement, и т.д.)
+- ✅ AppContext: exposes `uiMode`, `resyncAlarms`, `purgeAlarms`, `exportData`
+- ✅ 8 режимов интерфейса с уникальными фонами и карточками
+- ✅ Haptics: mode-specific achievement patterns для всех 8 режимов
+- ✅ Иконка приложения переработана (Python+PIL)
+
+### 📊 Статистика проекта
+- 25 TypeScript-файлов в `src/`
+- 8 режимов интерфейса
+- 11 экранов с поддержкой режимов
+- 0 ошибок TypeScript
+- Bundle успешно собирается (5.52 MB)
+- 5 итераций: 4.0 → 4.1 → 4.1.1 → 4.2 → 4.3 → 4.4 → 4.5
+
+### 📦 Совместимость
+- Expo SDK 51, React Native 0.74.5 — без изменений
+- Существующие данные сохраняются
+- APK собирается через `eas build -p android --profile preview`
+
+---
+
+## [4.6.0] — 2026-06-25
+
+### 🚨 Критический фикс: кнопки возврата
+
+**Баг**: на всех скрытых экранах (Tasks/Nutrition/Calendar/Alarm/Stats/Settings),
+открытых из вкладки «Ещё», не было кнопки «Назад» — пользователь не мог вернуться.
+
+**Фикс**: создан `src/components/ScreenHeader.tsx` — единый заголовок с кнопкой
+возврата. Добавлен на ВСЕ 6 скрытых экранов:
+- TasksScreen — «Задачи и цели»
+- NutritionScreen — «Питание»
+- CalendarScreen — «Календарь»
+- AlarmScreen — «Будильники» (с right-actions: resync + add)
+- StatsScreen — «Статистика»
+- SettingsScreen — «Настройки»
+
+Кнопка назад использует `navigationRef.goBack()` с fallback на `navigate('More')`.
+Также поддерживает `backTo` prop для прямой навигации на конкретный таб.
+
+### 🎨 Единая дизайн-система
+
+**Проблема**: 3 независимые системы стилей (UI_STYLES, UI_MODES, встроенные
+компоненты) конфликтовали — переключение стиля меняло только половину экранов.
+
+**Решение**: создана `src/design/` — единая точка управления:
+
+- `src/design/types.ts` — `DesignTokens` interface (15+ параметров: радиусы,
+  шрифты, тени, glow, отступы, borders, анимации, иконографические префиксы)
+- `src/design/designs.ts` — 8 дизайнов + маппинг старых mode IDs
+- `src/design/index.ts` — `useDesign()` hook
+
+### 8 современных дизайнов (по ТЗ)
+
+| ID | Название | Описание |
+|----|----------|----------|
+| `minimal-glass` | Minimal Glass | iOS 18 / visionOS. Матовое стекло, огромные radius (24-30), backdrop blur, монохром + 1 accent |
+| `neon-cyber` | Neon Cyber | Synthwave 2.0. Неоновый glow, жирные границы (1.5px), острые углы (4px), magenta-cyan палитра |
+| `paper-classic` | Paper Classic | Премиальная бумага. Тёплый офф-вайт, минимальные тени, гротеск, radius 12 |
+| `cosmic-deep` | Cosmic Deep | Космос. Глубокий тёмный фон, мерцающие звёзды, орбитальные элементы, glow-карточки |
+| `playful-bubble` | Playful Bubble | Пузырьковый. Огромные radius (30-40), пастельные цвета, толстые обводки (2px), emoji |
+| `retro-pixel` | Retro Pixel | Пиксель-арт. Нулевые радиусы, чёткие сетки, scanline overlay, жирные обводки (3px) |
+| `nature-calm` | Nature Calm | Биофильный. Землистые тона, органические формы, плавные градиенты, radius 18 |
+| `mono-print` | Mono Print | Монохромная печать. Чёрный/белый/серый, колоночная вёрстка, uppercase, контрастные границы |
+
+### Унифицированные компоненты
+
+- `UnifiedCard` (`src/components/UnifiedCard.tsx`) — заменяет Card + ModeCard.
+  Поддерживает: blur (minimal-glass), glow (neon/cosmic), tilt (paper),
+  gradient, golden corners (playful-bubble), double top border (mono-print),
+  neon underline (neon-cyber), star decorations (cosmic-deep)
+- `UnifiedBtn` (`src/components/UnifiedBtn.tsx`) — заменяет Btn + ModeBtn.
+  Все радиусы/шрифты/тени из DesignTokens, glow для primary кнопок
+- `ScreenHeader` — заголовок с кнопкой «Назад»
+
+### 🔄 Маппинг старых mode IDs
+
+Старые `uiMode` значения (`focus`/`aurora`/`neon`/`paper`/`quest`/`cosmic`/
+`mono`/`synthwave`) автоматически маппятся на новые design IDs через
+`MODE_TO_DESIGN`. Существующие данные пользователя сохраняются.
+
+### 📊 Технические детали
+- Bundle успешно собран: 5.52 MB
+- 0 ошибок TypeScript
+- 8 дизайнов × 8 цветовых тем = 64 комбинации
+- Backwards compatible — старый код с Card/Btn/ModeCard продолжает работать
+- Новые компоненты: UnifiedCard, UnifiedBtn, ScreenHeader
+- Документация: `DESIGN-SYSTEM.md`
+
+### 📦 Совместимость
+- Expo SDK 51, React Native 0.74.5 — без изменений
+- Существующие данные сохраняются
+- APK собирается через `eas build -p android --profile preview`

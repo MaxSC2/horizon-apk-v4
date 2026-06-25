@@ -49,15 +49,15 @@ export const UI_MODES: UIMode[] = [
     id: 'focus',
     name: 'Фокус',
     emoji: '◇',
-    desc: 'Минимализм. Чистые линии, монохром с одним акцентом. Как Linear / Notion.',
+    desc: 'Современный минимализм. Gradient mesh, glass cards, micro-animations. Тренд 2025-2026.',
     cardBg: (T) => T.card,
-    cardBorder: (T) => T.bord,
+    cardBorder: (T) => T.primary + '22',
     cardBorderWidth: 1,
-    cardRadius: 12,
-    cardBlur: false,
-    cardShadow: false,
+    cardRadius: 18,
+    cardBlur: false,    // v4.5: focus теперь использует полупрозрачный card + subtle shadow вместо blur
+    cardShadow: true,   // v4.5: добавлен elevation shadow для глубины
     cardGlow: false,
-    btnRadius: 8,
+    btnRadius: 12,
     fontTitle: 'BarlowCondensed_900Black',
     fontBody: 'Barlow_400Regular',
     fontMono: 'Barlow_500Medium',
@@ -197,31 +197,89 @@ export function getUIMode(id: string | undefined): UIMode {
 
 // ── Backgrounds ─────────────────────────────────────────────────────────────
 
-// 1. FOCUS — subtle dot grid
+// 1. FOCUS — v4.5 modern gradient mesh + subtle animated glow
+// Современный тренд 2025-2026: медленно дышащие цветные «облака» поверх
+// монохромного градиента. Создаёт ощущение глубины без перегрузки.
 function FocusBackground({ T }: { T: Theme }) {
-  const spacing = 24;
-  const cols = Math.ceil(W / spacing) + 1;
-  const rows = Math.ceil(H / spacing) + 1;
-  const dots: React.ReactNode[] = [];
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      dots.push(
-        <View
-          key={`${r}-${c}`}
-          style={{
-            position: 'absolute',
-            left: c * spacing,
-            top: r * spacing,
-            width: 1, height: 1,
-            borderRadius: 0.5,
-            backgroundColor: T.muted,
-            opacity: 0.18,
-          }}
-        />
-      );
-    }
-  }
-  return <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>{dots}</View>;
+  const breathe = useRef(new Animated.Value(0)).current;
+  const drift = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const breatheLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(breathe, { toValue: 1, duration: 8000, easing: Easing.inOut(Easing.sin), useNativeDriver: false }),
+        Animated.timing(breathe, { toValue: 0, duration: 8000, easing: Easing.inOut(Easing.sin), useNativeDriver: false }),
+      ])
+    );
+    const driftLoop = Animated.loop(
+      Animated.timing(drift, { toValue: 1, duration: 40000, easing: Easing.inOut(Easing.ease), useNativeDriver: false })
+    );
+    breatheLoop.start(); driftLoop.start();
+    return () => { breatheLoop.stop(); driftLoop.stop(); };
+  }, []);
+
+  const breatheOpacity = breathe.interpolate({ inputRange: [0, 1], outputRange: [0.10, 0.20] });
+  const driftX = drift.interpolate({ inputRange: [0, 0.5, 1], outputRange: [-50, 50, -50] });
+  const driftY = drift.interpolate({ inputRange: [0, 0.5, 1], outputRange: [30, -30, 30] });
+
+  return (
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: T.bg, overflow: 'hidden' }}>
+      {/* Базовый вертикальный градиент — глубокий фон */}
+      <LinearGradient
+        colors={[T.bg, T.lo, T.bg]}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      />
+
+      {/* Дышащее цветное облако сверху-слева (primary) */}
+      <Animated.View style={{
+        position: 'absolute', top: -120, left: -100,
+        width: 360, height: 360, borderRadius: 180,
+        backgroundColor: T.primary,
+        opacity: breatheOpacity,
+        transform: [{ translateX: driftX }, { translateY: driftY }],
+      }} />
+
+      {/* Второе облако снизу-справа (accent) — медленнее, в противофазе */}
+      <Animated.View style={{
+        position: 'absolute', bottom: -150, right: -120,
+        width: 400, height: 400, borderRadius: 200,
+        backgroundColor: (T as any).success || '#00E676',
+        opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.08, 0.16] }),
+        transform: [{ translateX: drift.interpolate({ inputRange: [0, 0.5, 1], outputRange: [40, -40, 40] }) }],
+      }} />
+
+      {/* Тонкая точечная сетка для текстуры (как Linear) */}
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.5 }}>
+        {(() => {
+          const spacing = 32;
+          const cols = Math.ceil(W / spacing) + 1;
+          const rows = Math.ceil(H / spacing) + 1;
+          const dots: React.ReactNode[] = [];
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              dots.push(
+                <View
+                  key={`${r}-${c}`}
+                  style={{
+                    position: 'absolute',
+                    left: c * spacing,
+                    top: r * spacing,
+                    width: 1, height: 1,
+                    borderRadius: 0.5,
+                    backgroundColor: T.muted,
+                    opacity: 0.12,
+                  }}
+                />
+              );
+            }
+          }
+          return dots;
+        })()}
+      </View>
+    </View>
+  );
 }
 
 // 2. AURORA — animated gradient blobs

@@ -17,6 +17,7 @@ import ThemePickerModal from '../components/ThemePickerModal';
 import StylePickerModal from '../components/StylePickerModal';
 import { UI_STYLES, getUIStyle } from '../styles';
 import { ModeBackground } from '../modes';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 // Simple bar chart using SVG (no custom dot renderers = no crashes)
 function BarChartSVG({ data, T, height = 100, accentLast = false, refVal }: { data: { label: string; value: number; highlight?: boolean }[]; T: any; height?: number; accentLast?: boolean; refVal?: number }) {
@@ -169,6 +170,7 @@ export default function StatsScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
       <ModeBackground T={T} mode={uiMode} />
+      <ScreenHeader T={T} title="Статистика" subtitle="Графики, рекорды, анатомия" />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ backgroundColor: T.surf, borderBottomWidth: 1, borderBottomColor: T.bord, maxHeight: 44 }}>
         <View style={{ flexDirection: 'row' }}>
           {[{ id: 'stats' as const, l: '📊 Статы' }, { id: 'achievements' as const, l: '🏆 Достиж.' }, { id: 'anatomy' as const, l: '🫀 Анатомия' }, { id: 'profile' as const, l: '⚙️ Профиль' }].map(t => (

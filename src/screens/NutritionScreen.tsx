@@ -10,6 +10,7 @@ import { uid, TODAY } from '../helpers';
 import { FOOD_PRESETS } from '../data';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import { ModeBackground } from '../modes';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 const DEFAULT_GOALS = { calories: 2200, protein: 150, carbs: 220, fat: 70 };
 
@@ -45,6 +46,7 @@ export default function NutritionScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }}>
       <ModeBackground T={T} mode={uiMode} />
+      <ScreenHeader T={T} title="Питание" subtitle="Калории и макросы" />
       <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, color: T.txt }}>🥗 Питание</Text>
