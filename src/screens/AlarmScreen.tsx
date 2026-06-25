@@ -22,7 +22,7 @@ import { Plus, X, Bell, Trash2, Zap, RefreshCw, Clock } from 'lucide-react-nativ
 import { useApp } from '../AppContext';
 import { Card, Lbl, ProgressBar, IconBtn, Btn, EmptyState } from '../components';
 import { uid, TODAY, fmtSleep } from '../helpers';
-import { Haptic } from '../haptics';
+import { Haptic, modeAchievement } from '../haptics';
 import { ModeBackground } from '../modes';
 import {
   CHANNEL_ID,
@@ -427,7 +427,7 @@ export default function AlarmScreen() {
     }
     setShowAdd(false);
     setEditAlarm(null);
-    Haptic.save();
+    modeAchievement(uiMode as string);
   };
 
   const toggleAlarm = async (id: string) => {

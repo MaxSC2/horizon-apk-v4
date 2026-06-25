@@ -621,11 +621,11 @@ export default function SettingsScreen() {
           id="about"
           icon={<Info size={18} color={T.muted} />}
           title="О приложении"
-          subtitle="ГОРИЗОНТ v4.3.0"
+          subtitle="ГОРИЗОНТ v4.4.0"
         >
           <View style={{ marginTop: 12, alignItems: 'center', paddingVertical: 12 }}>
             <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 28, letterSpacing: 3, color: T.txt }}>ГОРИЗОНТ</Text>
-            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted, marginTop: 4 }}>Life Tracker · v4.3.0 · Expo React Native</Text>
+            <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted, marginTop: 4 }}>Life Tracker · v4.4.0 · Expo React Native</Text>
             <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 2 }}>Тело · Разум · Дисциплина · Горизонт</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
               <Text style={{ fontSize: 10, color: T.muted }}>⏰ Notifee alarms</Text>

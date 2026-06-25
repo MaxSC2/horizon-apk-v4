@@ -14,6 +14,7 @@ import { MOODS, ENERGY, QUOTES, PLAN } from '../data';
 import ThemePickerModal from '../components/ThemePickerModal';
 import { nextAlarmPreview } from '../alarm';
 import { ModeBackground, ModeCard, ModeHeader, XPBar, getUIMode } from '../modes';
+import { ModeQuickSwitcher } from '../components/ModeQuickSwitcher';
 
 // ── HeatMap
 function HeatMap({ T, history }: any) {
@@ -190,6 +191,8 @@ export default function DashboardScreen() {
           <TouchableOpacity onPress={() => setShowThemePicker(true)} style={{ width: 34, height: 34, borderRadius: 9, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
             <Palette size={16} color={T.muted} />
           </TouchableOpacity>
+          {/* v4.4 — quick mode switcher button (always visible in dashboard header) */}
+          <ModeQuickSwitcher T={T} variant="header" />
         </View>
       </View>
 

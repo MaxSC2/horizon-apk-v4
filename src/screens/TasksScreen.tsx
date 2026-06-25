@@ -7,7 +7,7 @@ import { useApp } from '../AppContext';
 import { Card, Lbl, Btn, Badge, ProgressBar } from '../components';
 import { uid, TODAY, goalForecast } from '../helpers';
 import { Task, Goal } from '../types';
-import { Haptic } from '../haptics';
+import { Haptic, modeAchievement } from '../haptics';
 import { ModeBackground } from '../modes';
 
 const TASK_CATS = [
@@ -35,6 +35,7 @@ function taskStreak(task: Task): number {
 export default function TasksScreen() {
   const { state, setState, T, uiMode } = useApp();
   const { tasks, goals } = state;
+  const modeId = uiMode as string;
   const [sub, setSub] = useState<'tasks' | 'goals'>('tasks');
   const [addingTask, setAddingTask] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
@@ -50,6 +51,8 @@ export default function TasksScreen() {
   };
 
   const toggleTask = (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    const willComplete = !task?.completedDates?.includes(TODAY);
     setState(s => ({
       ...s,
       tasks: s.tasks.map(task => {
@@ -58,7 +61,9 @@ export default function TasksScreen() {
         return { ...task, completedDates: done ? task.completedDates.filter(d => d !== TODAY) : [...(task.completedDates || []), TODAY] };
       }),
     }));
-    Haptic.toggle();
+    // v4.4 — mode-specific achievement haptic when completing a task
+    if (willComplete) modeAchievement(modeId);
+    else Haptic.toggle();
   };
 
   const addGoal = () => {

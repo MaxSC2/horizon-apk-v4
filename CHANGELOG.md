@@ -285,3 +285,81 @@
 - Expo SDK 51, React Native 0.74.5 — без изменений
 - Существующие данные пользователя сохраняются (uiMode по умолчанию = 'focus')
 - APK собирается локально через `eas build -p android --profile preview`
+
+---
+
+## [4.4.0] — 2026-06-25
+
+### 🚨 Критический фикс навигации
+
+**Баг**: вкладка «Ещё» в таб-баре не открывала экраны — кнопки в ней «для красоты».
+
+**Причина**: `navigationRef` был привязан к `<Tab.Navigator>`, но для cross-tab
+навигации (открытие Settings/Tasks/etc из MoreScreen) нужен ref на
+`<NavigationContainer>`. Использование `useRef` + `setGlobalNavigate` в
+`useEffect([])` тоже не работало — ref мог быть `null` в момент установки.
+
+**Фикс**:
+- Используем `createNavigationContainerRef()` из `@react-navigation/native` —
+  type-safe и гарантированно работает
+- Ref привязан к `<NavigationContainer ref={navigationRef}>` (а не к Tab.Navigator)
+- `setGlobalNavigate` использует `navigationRef.isReady()` + `navigationRef.navigate()`
+- В MoreScreen добавлен `handleNavigate(target)` который дёргает ref напрямую
+
+### 🎭 ModeQuickSwitcher — быстрый переключатель режимов
+
+**Баг**: пользователь не мог найти где переключить интерфейс — кнопка была
+спрятана глубоко в Настройках.
+
+**Фикс**: новый компонент `src/components/ModeQuickSwitcher.tsx`:
+- Кнопка **всегда видна в шапке дашборда** (иконка.palette рядом с темой)
+- Открывает модалку с live preview текущего режима + сеткой всех 8 режимов
+- Тап на режим сразу применяет его + даёт haptic feedback
+- Доступен как `variant="header"` (38×38) или `variant="fab"` (52×52 floating)
+
+### 📳 Тематические сигналы выполнения для каждого режима
+
+В `src/haptics.ts` добавлены `modeAchievement(mode)` и `modeTap(mode)`:
+- **focus** → Selection (спокойный тик)
+- **aurora** → Success notification (плавный всплеск)
+- **neon** → Impact Heavy (резкий бздынь)
+- **paper** → Selection (как роспись пером)
+- **quest** → Impact Medium + Success (двойной удар — «achievement unlocked»)
+- **cosmic** → Success (вспышка сверхновой)
+- **mono** → Impact Light (строгий короткий — как печатная машинка)
+- **synthwave** → Impact Rigid (электрический синтезатор 80-х)
+
+Подключено в:
+- `TasksScreen.toggleTask` — выполнение задачи даёт mode-specific achievement
+- `AlarmScreen.addAlarm` — создание будильника даёт mode-specific achievement
+
+### 🎨 Новая иконка приложения
+
+Полностью переработанная иконка через Python + PIL (`scripts/generate_icon.py`):
+- **icon.png** (1024×1024) — градиентный небесный фон, стилизованный солнечный
+  диск с тёплым свечением, 40 мерцающих звёзд, жирная неоновая линия горизонта
+  с glow-эффектом, жёлтый progress-arc над солнцем с endpoint-маркерами
+- **adaptive-icon.png** (1024×1024, transparent bg) — только символ для
+  Android adaptive icons
+- **splash.png** (1242×2436) — крупный логотип по центру + wordmark «ГОРИЗОНТ»
+  + subtitle «LIFE TRACKER»
+
+Символизм: солнце = новая цель/день, горизонт = путь, progress-arc = трекинг.
+
+### 🛠 Технические улучшения
+- Новый файл `src/components/ModeQuickSwitcher.tsx` (160 строк)
+- Расширен `src/haptics.ts`: `impactRigid`, `impactSoft`, `modeAchievement`,
+  `modeTap`
+- Скрипт `scripts/generate_icon.py` для регенерации иконок
+- Все 3 ассета (`icon.png`, `adaptive-icon.png`, `splash.png`) перерисованы
+
+### 📊 Статистика
+- 0 ошибок TypeScript
+- 8 режимов интерфейса
+- 11 экранов с поддержкой режимов
+- Все критические баги навигации исправлены
+
+### 📦 Совместимость
+- Expo SDK 51, React Native 0.74.5 — без изменений
+- Существующие данные сохраняются (uiMode по умолчанию = 'focus')
+- APK собирается через `eas build -p android --profile preview`
