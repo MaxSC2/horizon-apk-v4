@@ -8,6 +8,9 @@ import { DesignTokens, DesignId } from './types';
 import { useApp } from '../AppContext';
 import { Theme } from '../types';
 
+// Re-export for external consumers
+export { MODE_TO_DESIGN, DESIGN_TO_BG };
+
 export interface DesignContext {
   tokens: DesignTokens;
   T: Theme;

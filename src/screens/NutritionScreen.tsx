@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Target, Plus, X } from 'lucide-react-native';
 import { useApp } from '../AppContext';
 import { Card, Lbl } from '../components';
+import { UnifiedCard } from '../components/UnifiedCard';
 import { loadNutrition, saveNutrition } from '../storage';
 import { uid, TODAY } from '../helpers';
 import { FOOD_PRESETS } from '../data';
@@ -53,7 +54,7 @@ export default function NutritionScreen() {
         </View>
 
         {/* Macro summary */}
-        <Card T={T} style={{ marginBottom: 12 }}>
+        <UnifiedCard T={T} style={{ marginBottom: 12 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
             <Lbl T={T}>Сегодня</Lbl>
             <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: totals.cal > goals.calories ? T.danger : T.primary }}>
@@ -85,7 +86,7 @@ export default function NutritionScreen() {
               );
             })}
           </View>
-        </Card>
+        </UnifiedCard>
 
         {/* Food list */}
         <TouchableOpacity onPress={() => setAdding(!adding)} style={{ height: 44, borderRadius: 10, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6, marginBottom: 12 }}>
@@ -94,7 +95,7 @@ export default function NutritionScreen() {
         </TouchableOpacity>
 
         {adding && (
-          <Card T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
+          <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
             <Lbl T={T} style={{ marginBottom: 10 }}>Быстрый выбор</Lbl>
             {FOOD_PRESETS.map((f, i) => (
               <TouchableOpacity key={i} onPress={() => { addEntry(f); setAdding(false); }}
@@ -124,7 +125,7 @@ export default function NutritionScreen() {
               style={{ height: 40, borderRadius: 9, backgroundColor: T.primary, alignItems: 'center', justifyContent: 'center', opacity: !custom.name.trim() || !custom.cal ? 0.5 : 1 }}>
               <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: '#000' }}>Добавить</Text>
             </TouchableOpacity>
-          </Card>
+          </UnifiedCard>
         )}
 
         {today.entries.length === 0 && !adding && (

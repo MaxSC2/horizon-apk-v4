@@ -9,11 +9,12 @@ import { useNavigation } from '@react-navigation/native';
 import { Flame, Droplets, Trophy, Target, Zap, BedDouble, Palette, Bell } from 'lucide-react-native';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Ring, Badge, ProgressBar } from '../components';
+import { UnifiedCard } from '../components/UnifiedCard';
 import { calcLifeScore, calcStreak, generateInsights, TODAY, fmt, weekDates, todayIdx, uid, getHeatMapData, fmtSleep } from '../helpers';
 import { MOODS, ENERGY, QUOTES, PLAN } from '../data';
 import ThemePickerModal from '../components/ThemePickerModal';
 import { nextAlarmPreview } from '../alarm';
-import { ModeBackground, ModeCard, ModeHeader, XPBar, getUIMode } from '../modes';
+import { ModeBackground, XPBar } from '../modes';
 import { ModeQuickSwitcher } from '../components/ModeQuickSwitcher';
 
 // ── HeatMap
@@ -39,7 +40,7 @@ function HeatMap({ T, history }: any) {
   };
 
   return (
-    <Card T={T} style={{ marginBottom: 12 }}>
+    <UnifiedCard T={T} style={{ marginBottom: 12 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <Lbl T={T}>Активность · 3 месяца</Lbl>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -68,7 +69,7 @@ function HeatMap({ T, history }: any) {
         ))}
         <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 9, color: T.muted }}>Больше</Text>
       </View>
-    </Card>
+    </UnifiedCard>
   );
 }
 
@@ -236,7 +237,7 @@ export default function DashboardScreen() {
         })()}
 
         {/* Focus */}
-        <Card T={T} style={{ marginBottom: 12, borderWidth: state.focus?.date === TODAY && state.focus.text ? 1.5 : 1, borderColor: state.focus?.date === TODAY && state.focus.text ? T.warn + '66' : T.bord }}>
+        <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: state.focus?.date === TODAY && state.focus.text ? 1.5 : 1, borderColor: state.focus?.date === TODAY && state.focus.text ? T.warn + '66' : T.bord }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <Lbl T={T}>🎯 Главный фокус дня</Lbl>
             {!editFocus && (
@@ -266,7 +267,7 @@ export default function DashboardScreen() {
               </Text>
             </TouchableOpacity>
           )}
-        </Card>
+        </UnifiedCard>
 
         {/* Quick Actions — v4.1 — primary actions one tap away */}
         <View style={{ marginBottom: 12 }}>
@@ -325,7 +326,7 @@ export default function DashboardScreen() {
 
         {/* Today's plan card — v4.1 — shows what workout is scheduled today */}
         {todayPlan && todayPlan.type !== 'rest' && (
-          <Card T={T} style={{ marginBottom: 12, borderLeftWidth: 4, borderLeftColor: T.primary }}>
+          <UnifiedCard T={T} style={{ marginBottom: 12, borderLeftWidth: 4, borderLeftColor: T.primary }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ flex: 1 }}>
                 <Lbl T={T} style={{ marginBottom: 4 }}>Сегодня · {todayPlan.day}</Lbl>
@@ -355,11 +356,11 @@ export default function DashboardScreen() {
                 </TouchableOpacity>
               )}
             </View>
-          </Card>
+          </UnifiedCard>
         )}
 
         {/* Life Score */}
-        <Card T={T} style={{ marginBottom: 12, backgroundColor: T.card }}>
+        <UnifiedCard T={T} style={{ marginBottom: 12, backgroundColor: T.card }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <View>
               <Lbl T={T} style={{ marginBottom: 4 }}>Score недели</Lbl>
@@ -388,11 +389,11 @@ export default function DashboardScreen() {
               </View>
             )}
           </View>
-        </Card>
+        </UnifiedCard>
 
         {/* Smart Insights */}
         {insights.length > 0 && (
-          <Card T={T} style={{ marginBottom: 12 }}>
+          <UnifiedCard T={T} style={{ marginBottom: 12 }}>
             <Lbl T={T} style={{ marginBottom: 10 }}>💡 Инсайты</Lbl>
             {insights.map((ins, i) => (
               <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: i < insights.length - 1 ? 8 : 0, paddingBottom: i < insights.length - 1 ? 8 : 0, borderBottomWidth: i < insights.length - 1 ? 1 : 0, borderBottomColor: T.bord }}>
@@ -402,14 +403,14 @@ export default function DashboardScreen() {
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.txt, lineHeight: 19, flex: 1, paddingTop: 4 }}>{ins.text}</Text>
               </View>
             ))}
-          </Card>
+          </UnifiedCard>
         )}
 
         {/* Heat Map */}
         {Object.keys(history).length >= 3 && <HeatMap T={T} history={history} />}
 
         {/* Today card */}
-        <Card T={T} style={{ marginBottom: 12 }}>
+        <UnifiedCard T={T} style={{ marginBottom: 12 }}>
           <Lbl T={T} style={{ marginBottom: 10 }}>Сегодня — {new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}</Lbl>
 
           {/* Workout */}
@@ -457,11 +458,11 @@ export default function DashboardScreen() {
               <ProgressBar pct={todayTasks.length ? (todayTasksDone / todayTasks.length) * 100 : 0} color={T.success} T={T} />
             </View>
           )}
-        </Card>
+        </UnifiedCard>
 
         {/* Quick check-in — stays visible until BOTH selected */}
         {!checkinDone && (
-          <Card T={T} style={{ marginBottom: 12, borderWidth: 1.5, borderColor: T.primary + '55', backgroundColor: T.card }}>
+          <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1.5, borderColor: T.primary + '55', backgroundColor: T.card }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 4 }}>
               <Zap size={14} color={T.primary} />
               <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, letterSpacing: 1.5, color: T.primary, textTransform: 'uppercase' }}>Быстрый чек-ин</Text>
@@ -504,11 +505,11 @@ export default function DashboardScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </Card>
+          </UnifiedCard>
         )}
 
         {/* Water tracker */}
-        <Card T={T} style={{ marginBottom: 12 }}>
+        <UnifiedCard T={T} style={{ marginBottom: 12 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
               <Droplets size={16} color={T.primary} />
@@ -527,11 +528,11 @@ export default function DashboardScreen() {
           {waterToday >= 8 && (
             <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.success, marginTop: 6 }}>✓ Норма выполнена!</Text>
           )}
-        </Card>
+        </UnifiedCard>
 
         {/* Active goals */}
         {activeGoals.length > 0 && (
-          <Card T={T} style={{ marginBottom: 12 }}>
+          <UnifiedCard T={T} style={{ marginBottom: 12 }}>
             <Lbl T={T} style={{ marginBottom: 10 }}>🎯 Активные цели</Lbl>
             {activeGoals.map(g => {
               const pct = Math.round((g.currentValue / Math.max(g.targetValue, 1)) * 100);
@@ -545,7 +546,7 @@ export default function DashboardScreen() {
                 </View>
               );
             })}
-          </Card>
+          </UnifiedCard>
         )}
       </ScrollView>
 

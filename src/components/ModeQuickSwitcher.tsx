@@ -1,35 +1,39 @@
-// src/components/ModeQuickSwitcher.tsx — v4.4
+// src/components/ModeQuickSwitcher.tsx — v4.7
 //
-// Быстрый переключатель режимов интерфейса — доступен прямо из шапки дашборда
-// или как FAB на других экранах. Открывает модалку с сеткой всех 8 режимов,
-// тап на режим сразу его применяет + даёт haptic feedback.
+// Быстрый переключатель дизайнов интерфейса. Кнопка в шапке дашборда
+// открывает модалку с live preview + сеткой всех 8 дизайнов.
 //
-// Это решает проблему «не могу найти где переключить интерфейс» — кнопка
-// всегда видна в шапке дашборда (иконка.palette).
+// v4.7: теперь показывает 8 новых дизайнов из design/designs.ts
+// (minimal-glass, neon-cyber, paper-classic, cosmic-deep, playful-bubble,
+//  retro-pixel, nature-calm, mono-print) вместо старых modes.
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Palette, X, Check } from 'lucide-react-native';
 import { useApp } from '../AppContext';
-import { UI_MODES, getUIMode, ModeBackground, ModeCard } from '../modes';
+import { DESIGNS, getDesign, MODE_TO_DESIGN, useDesign } from '../design';
+import { ModeBackground } from '../modes';
+import { UnifiedCard } from './UnifiedCard';
 import { Haptic } from '../haptics';
 import { Theme } from '../types';
 
 interface Props {
   T: Theme;
-  // Position variant — 'header' для кнопки в шапке, 'fab' для плавающей кнопки
   variant?: 'header' | 'fab';
 }
 
 export function ModeQuickSwitcher({ T, variant = 'header' }: Props) {
-  const { state, setState, uiMode } = useApp();
+  const { state, setState } = useApp();
+  const { tokens: currentDesign } = useDesign();
   const [open, setOpen] = useState(false);
 
-  const currentMode = getUIMode(state.uiMode);
+  // Resolve current design ID (handles old mode IDs via MODE_TO_DESIGN)
+  const rawMode = state.uiMode || 'focus';
+  const currentDesignId = MODE_TO_DESIGN[rawMode] || rawMode;
 
-  const selectMode = (modeId: string) => {
-    setState(s => ({ ...s, uiMode: modeId }));
+  const selectDesign = (designId: string) => {
+    // Сохраняем новый design ID напрямую в state.uiMode
+    setState(s => ({ ...s, uiMode: designId }));
     Haptic.tap();
-    // Close modal after a short delay so user sees the selection
     setTimeout(() => setOpen(false), 200);
   };
 
@@ -84,10 +88,10 @@ export function ModeQuickSwitcher({ T, variant = 'header' }: Props) {
 
           {/* Header */}
           <View style={{ paddingHorizontal: 18, paddingVertical: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <View>
-              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>🎭 Режим интерфейса</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.txt }}>🎨 Дизайн интерфейса</Text>
               <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 2 }}>
-                Сейчас: {currentMode.emoji} {currentMode.name} · тапни чтобы сменить
+                Сейчас: {currentDesign.emoji} {currentDesign.name}
               </Text>
             </View>
             <TouchableOpacity onPress={() => setOpen(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
@@ -95,33 +99,33 @@ export function ModeQuickSwitcher({ T, variant = 'header' }: Props) {
             </TouchableOpacity>
           </View>
 
-          {/* Live preview of current mode */}
+          {/* Live preview of current design */}
           <View style={{
-            marginHorizontal: 16, marginBottom: 14, height: 80, borderRadius: 14,
+            marginHorizontal: 16, marginBottom: 14, height: 90, borderRadius: 14,
             overflow: 'hidden', borderWidth: 1, borderColor: T.bord,
           }}>
-            <ModeBackground T={T} mode={uiMode} />
-            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, padding: 10, justifyContent: 'center' }}>
-              <ModeCard T={T} mode={uiMode} style={{ padding: 8 }}>
+            <ModeBackground T={T} mode={currentDesign.backgroundId} />
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, padding: 12, justifyContent: 'center' }}>
+              <UnifiedCard T={T} style={{ padding: 10 }}>
                 <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 14, color: T.txt }}>
-                  {currentMode.emoji} {currentMode.name}
+                  {currentDesign.emoji} {currentDesign.name}
                 </Text>
-                <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted, marginTop: 1 }}>
-                  {currentMode.desc.length > 50 ? currentMode.desc.slice(0, 50) + '…' : currentMode.desc}
+                <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted, marginTop: 1 }} numberOfLines={1}>
+                  {currentDesign.desc}
                 </Text>
-              </ModeCard>
+              </UnifiedCard>
             </View>
           </View>
 
-          {/* Grid of all modes */}
+          {/* Grid of all designs */}
           <View style={{ paddingHorizontal: 12 }}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {UI_MODES.map(m => {
-                const cur = (state.uiMode || 'focus') === m.id;
+              {DESIGNS.map(d => {
+                const cur = currentDesignId === d.id;
                 return (
                   <TouchableOpacity
-                    key={m.id}
-                    onPress={() => selectMode(m.id)}
+                    key={d.id}
+                    onPress={() => selectDesign(d.id)}
                     activeOpacity={0.75}
                     style={{
                       width: '48%', padding: 12, borderRadius: 14,
@@ -131,14 +135,14 @@ export function ModeQuickSwitcher({ T, variant = 'header' }: Props) {
                     }}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                      <Text style={{ fontSize: 22 }}>{m.emoji}</Text>
-                      <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 15, color: cur ? T.primary : T.txt, flex: 1 }}>
-                        {m.name}
+                      <Text style={{ fontSize: 22 }}>{d.emoji}</Text>
+                      <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 13, color: cur ? T.primary : T.txt, flex: 1 }} numberOfLines={1}>
+                        {d.name}
                       </Text>
                       {cur && <Check size={14} color={T.primary} strokeWidth={3} />}
                     </View>
-                    <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted, lineHeight: 14 }}>
-                      {m.desc.length > 60 ? m.desc.slice(0, 60) + '…' : m.desc}
+                    <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted, lineHeight: 14 }} numberOfLines={2}>
+                      {d.desc}
                     </Text>
                   </TouchableOpacity>
                 );

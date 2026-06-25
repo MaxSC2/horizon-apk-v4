@@ -6,6 +6,7 @@ import { BedDouble, Plus, Minus, Camera, X, TrendingUp, TrendingDown } from 'luc
 import * as ImagePicker from 'expo-image-picker';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Badge, ProgressBar } from '../components';
+import { UnifiedCard } from '../components/UnifiedCard';
 import { uid, TODAY, fmt, getMonday, fmtSleep } from '../helpers';
 import { MOODS, ENERGY, PAIN_ZONES } from '../data';
 import { loadPhotos, savePhotos } from '../storage';
@@ -173,7 +174,7 @@ export default function JournalScreen() {
             </View>
 
             {adding && (
-              <Card T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
+              <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
                 {/* Mood */}
                 <Lbl T={T} style={{ marginBottom: 6 }}>Настроение</Lbl>
                 <View style={{ flexDirection: 'row', gap: 5, marginBottom: 12 }}>
@@ -218,7 +219,7 @@ export default function JournalScreen() {
                     <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: '#000' }}>Сохранить</Text>
                   </TouchableOpacity>
                 </View>
-              </Card>
+              </UnifiedCard>
             )}
 
             {journal.length > 0 && (
@@ -294,7 +295,7 @@ export default function JournalScreen() {
                   const m = MOODS.find(x => x.v === entry.mood);
                   const en = ENERGY.find(x => x.v === entry.energy);
                   return (
-                    <Card key={entry.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 3, borderLeftColor: m?.v && m.v >= 4 ? T.success : m?.v && m.v <= 2 ? T.danger : T.muted, marginLeft: 6 }}>
+                    <UnifiedCard key={entry.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 3, borderLeftColor: m?.v && m.v >= 4 ? T.success : m?.v && m.v <= 2 ? T.danger : T.muted, marginLeft: 6 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap', flex: 1 }}>
                           <Text style={{ fontSize: 20 }}>{m?.e}</Text>
@@ -318,7 +319,7 @@ export default function JournalScreen() {
                         </TouchableOpacity>
                       </View>
                       {entry.text && <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt, lineHeight: 21 }}>{entry.text}</Text>}
-                    </Card>
+                    </UnifiedCard>
                   );
                 })}
               </View>
@@ -338,17 +339,17 @@ export default function JournalScreen() {
 
             {/* Weight trend summary */}
             {weightChange !== null && (
-              <Card T={T} style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <UnifiedCard T={T} style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                 {parseFloat(weightChange) < 0 ? <TrendingDown size={22} color={T.success} /> : <TrendingUp size={22} color={T.warn} />}
                 <View>
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: parseFloat(weightChange) < 0 ? T.success : T.warn }}>{parseFloat(weightChange) > 0 ? '+' : ''}{weightChange} кг</Text>
                   <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted }}>за последние {bodyChartEntries.length} замеров</Text>
                 </View>
-              </Card>
+              </UnifiedCard>
             )}
 
             {addBody && (
-              <Card T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
+              <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
                 <Lbl T={T} style={{ marginBottom: 10 }}>Новые замеры</Lbl>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
                   {([['weight', '⚖️ Вес (кг)', '70'], ['height', '📐 Рост (см)', '175'], ['chest', '📏 Грудь (см)', '90'], ['waist', '📏 Талия (см)', '80'], ['arms', '💪 Бицепс (см)', '30'], ['hips', '📏 Бёдра (см)', '95']] as [string, string, string][]).map(([k, l, ph]) => (
@@ -377,7 +378,7 @@ export default function JournalScreen() {
                     <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: '#000' }}>Сохранить</Text>
                   </TouchableOpacity>
                 </View>
-              </Card>
+              </UnifiedCard>
             )}
 
             {(bodyLog || []).length === 0 && !addBody && (
@@ -388,7 +389,7 @@ export default function JournalScreen() {
             )}
 
             {(bodyLog || []).slice(0, 10).map((entry: any) => (
-              <Card key={entry.id} T={T} style={{ marginBottom: 8 }}>
+              <UnifiedCard key={entry.id} T={T} style={{ marginBottom: 8 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: T.muted }}>
                     {new Date(entry.date + 'T12:00:00').toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' })}
@@ -403,7 +404,7 @@ export default function JournalScreen() {
                   {entry.waist && <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 15, color: T.warn }}>📏 {entry.waist} талия</Text>}
                   {entry.arms && <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 15, color: T.muted }}>💪 {entry.arms} бицепс</Text>}
                 </View>
-              </Card>
+              </UnifiedCard>
             ))}
 
             {/* Photo progress */}
@@ -459,7 +460,7 @@ export default function JournalScreen() {
             </View>
 
             {addPain && (
-              <Card T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.danger + '55' }}>
+              <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.danger + '55' }}>
                 <Lbl T={T} style={{ marginBottom: 10 }}>Где болит?</Lbl>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
                   {PAIN_ZONES.map(z => (
@@ -496,12 +497,12 @@ export default function JournalScreen() {
                 <TouchableOpacity onPress={savePain} style={{ height: 40, borderRadius: 9, backgroundColor: T.danger, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: '#fff' }}>Сохранить запись</Text>
                 </TouchableOpacity>
-              </Card>
+              </UnifiedCard>
             )}
 
             {/* Frequency chart */}
             {painFrequency.length > 0 && (
-              <Card T={T} style={{ marginBottom: 12 }}>
+              <UnifiedCard T={T} style={{ marginBottom: 12 }}>
                 <Lbl T={T} style={{ marginBottom: 10 }}>Частота за 30 дней</Lbl>
                 {painFrequency.map(z => (
                   <View key={z.id} style={{ marginBottom: 8 }}>
@@ -512,7 +513,7 @@ export default function JournalScreen() {
                     <ProgressBar pct={(z.count / Math.max(...painFrequency.map(x => x.count))) * 100} color={z.color} T={T} height={5} />
                   </View>
                 ))}
-              </Card>
+              </UnifiedCard>
             )}
 
             {/* History */}
@@ -526,7 +527,7 @@ export default function JournalScreen() {
             {(painLog || []).slice(0, 10).map((entry: any) => {
               const zone = PAIN_ZONES.find(z => z.id === entry.zone) || PAIN_ZONES[0];
               return (
-                <Card key={entry.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 3, borderLeftColor: zone.color }}>
+                <UnifiedCard key={entry.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 3, borderLeftColor: zone.color }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <View style={{ flex: 1 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -544,7 +545,7 @@ export default function JournalScreen() {
                       <X size={14} color={T.muted} />
                     </TouchableOpacity>
                   </View>
-                </Card>
+                </UnifiedCard>
               );
             })}
           </>
@@ -562,7 +563,7 @@ export default function JournalScreen() {
               </View>
             )}
 
-            <Card T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '44' }}>
+            <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '44' }}>
               <Lbl T={T} style={{ marginBottom: 14 }}>📝 Чек-ин</Lbl>
               {([
                 { key: 'went', emoji: '✅', label: 'Что получилось на этой неделе?' },
@@ -579,21 +580,21 @@ export default function JournalScreen() {
                 style={{ height: 44, borderRadius: 10, backgroundColor: T.success, alignItems: 'center', justifyContent: 'center', opacity: (!refForm.went.trim() && !refForm.didnt.trim() && !refForm.focus.trim()) ? 0.5 : 1 }}>
                 <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 15, color: '#000' }}>Сохранить рефлексию</Text>
               </TouchableOpacity>
-            </Card>
+            </UnifiedCard>
 
             {/* Past reflections */}
             {(reflections || []).length > 0 && (
               <>
                 <Lbl T={T} style={{ marginBottom: 10 }}>История рефлексий</Lbl>
                 {(reflections || []).slice(0, 5).map((r: any) => (
-                  <Card key={r.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 3, borderLeftColor: T.success }}>
+                  <UnifiedCard key={r.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 3, borderLeftColor: T.success }}>
                     <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: T.muted, marginBottom: 8 }}>
                       {new Date(r.date + 'T12:00:00').toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}
                     </Text>
                     {r.went && <View style={{ marginBottom: 6 }}><Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.success, marginBottom: 2 }}>✅ Получилось</Text><Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.txt }}>{r.went}</Text></View>}
                     {r.didnt && <View style={{ marginBottom: 6 }}><Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.warn, marginBottom: 2 }}>🔧 Улучшить</Text><Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.txt }}>{r.didnt}</Text></View>}
                     {r.focus && <View><Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.primary, marginBottom: 2 }}>🎯 Фокус</Text><Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.txt }}>{r.focus}</Text></View>}
-                  </Card>
+                  </UnifiedCard>
                 ))}
               </>
             )}

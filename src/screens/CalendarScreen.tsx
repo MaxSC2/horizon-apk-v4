@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Plus, X, Check, Target, Dumbbell, BookOpen, 
 import * as Notifications from 'expo-notifications';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Badge } from '../components';
+import { UnifiedCard } from '../components/UnifiedCard';
 import { uid, fmt, fmtSleep } from '../helpers';
 import { PLAN, MOODS } from '../data';
 import { ModeBackground } from '../modes';
@@ -250,7 +251,7 @@ export default function CalendarScreen() {
 
           {/* Workout for this day */}
           {selectedPlanDay && (
-            <Card T={T} style={{ marginBottom: 10, borderWidth: selectedWorkout?.completed ? 1.5 : 1, borderColor: selectedWorkout?.completed ? T.success + '66' : T.bord }}>
+            <UnifiedCard T={T} style={{ marginBottom: 10, borderWidth: selectedWorkout?.completed ? 1.5 : 1, borderColor: selectedWorkout?.completed ? T.success + '66' : T.bord }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <Text style={{ fontSize: 22 }}>{selectedPlanDay.emoji}</Text>
                 <View style={{ flex: 1 }}>
@@ -261,12 +262,12 @@ export default function CalendarScreen() {
                 </View>
                 {selectedWorkout?.completed && <Badge color={T.success} T={T}>✓</Badge>}
               </View>
-            </Card>
+            </UnifiedCard>
           )}
 
           {/* Mood for this day */}
           {selectedJournal && (
-            <Card T={T} style={{ marginBottom: 10 }}>
+            <UnifiedCard T={T} style={{ marginBottom: 10 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <Text style={{ fontSize: 24 }}>{MOOD_EMOJI[selectedJournal.mood] || '😐'}</Text>
                 <View>
@@ -277,7 +278,7 @@ export default function CalendarScreen() {
                   {selectedJournal.text ? <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted, marginTop: 2 }} numberOfLines={2}>{selectedJournal.text}</Text> : null}
                 </View>
               </View>
-            </Card>
+            </UnifiedCard>
           )}
 
           {/* Calendar events */}
@@ -290,7 +291,7 @@ export default function CalendarScreen() {
           {selectedEvents.map(event => {
             const cat = CAT_INFO[event.category];
             return (
-              <Card key={event.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 4, borderLeftColor: cat.color, opacity: event.done ? 0.6 : 1 }}>
+              <UnifiedCard key={event.id} T={T} style={{ marginBottom: 8, borderLeftWidth: 4, borderLeftColor: cat.color, opacity: event.done ? 0.6 : 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <TouchableOpacity onPress={() => toggleEvent(event.id)} style={{ width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: event.done ? T.success : cat.color, backgroundColor: event.done ? T.success : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
                     {event.done && <Check size={13} color="#000" strokeWidth={3} />}
@@ -307,7 +308,7 @@ export default function CalendarScreen() {
                     <X size={13} color={T.muted} />
                   </TouchableOpacity>
                 </View>
-              </Card>
+              </UnifiedCard>
             );
           })}
         </View>

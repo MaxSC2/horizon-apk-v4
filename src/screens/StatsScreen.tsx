@@ -6,6 +6,7 @@ import { TrendingUp, BedDouble, ChevronLeft, ChevronRight, Trash2, Palette } fro
 import Svg, { Circle, Text as SvgText, Rect, Line, G, Polygon, Polyline } from 'react-native-svg';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Badge, ProgressBar, Ring } from '../components';
+import { UnifiedCard } from '../components/UnifiedCard';
 import {
   calcStreak, getPRs, weeklyTonnage, computeAuto1RM, calcLifeScore,
   getAllProgressionSuggestions, moodWorkoutCorrelation, weeklyWorkoutStats,
@@ -193,10 +194,10 @@ export default function StatsScreen() {
                 { l: '🔥 Серия', v: streak, c: T.success },
                 { l: '💤 Сон avg', v: avgSleepLabel, c: T.primary },
               ].map((s, i) => (
-                <Card key={i} T={T} style={{ flex: 1, padding: 10, alignItems: 'center' }}>
+                <UnifiedCard key={i} T={T} style={{ flex: 1, padding: 10, alignItems: 'center' }}>
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: s.c, lineHeight: 24 }}>{s.v}</Text>
                   <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 8, letterSpacing: 1, color: T.muted, textTransform: 'uppercase', marginTop: 3, textAlign: 'center' }}>{s.l}</Text>
-                </Card>
+                </UnifiedCard>
               ))}
             </View>
 
@@ -215,26 +216,26 @@ export default function StatsScreen() {
             )}
 
             {/* Radar */}
-            <Card T={T} style={{ marginBottom: 14, alignItems: 'center' }}>
+            <UnifiedCard T={T} style={{ marginBottom: 14, alignItems: 'center' }}>
               <Lbl T={T} style={{ marginBottom: 8, alignSelf: 'flex-start' }}>Баланс жизни</Lbl>
               <RadarSVG data={radarData} T={T} size={200} />
-            </Card>
+            </UnifiedCard>
 
             {/* Frequency + Tonnage */}
             <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
-              <Card T={T} style={{ flex: 1 }}>
+              <UnifiedCard T={T} style={{ flex: 1 }}>
                 <Lbl T={T} style={{ marginBottom: 8 }}>Дней / нед.</Lbl>
                 <BarChartSVG data={wFreq} T={T} height={110} accentLast />
-              </Card>
-              <Card T={T} style={{ flex: 1 }}>
+              </UnifiedCard>
+              <UnifiedCard T={T} style={{ flex: 1 }}>
                 <Lbl T={T} style={{ marginBottom: 8 }}>Объём / нед.</Lbl>
                 <AreaChartSVG data={tonnage.map(t => t.tonnage)} T={T} height={110} color={T.success} />
-              </Card>
+              </UnifiedCard>
             </View>
 
             {/* Mood correlation */}
             {moodBars.filter(b => b.value > 0).length >= 5 && (
-              <Card T={T} style={{ marginBottom: 14 }}>
+              <UnifiedCard T={T} style={{ marginBottom: 14 }}>
                 <Lbl T={T} style={{ marginBottom: 4 }}>Настроение и тренировки</Lbl>
                 {avgMoodW && avgMoodR && (
                   <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10 }}>
@@ -266,12 +267,12 @@ export default function StatsScreen() {
                     <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted }}>Обычный день</Text>
                   </View>
                 </View>
-              </Card>
+              </UnifiedCard>
             )}
 
             {/* Sleep */}
             {sleepEntries.length >= 3 && (
-              <Card T={T} style={{ marginBottom: 14 }}>
+              <UnifiedCard T={T} style={{ marginBottom: 14 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <Lbl T={T}>Сон / 30 дней</Lbl>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
@@ -281,11 +282,11 @@ export default function StatsScreen() {
                 </View>
                 <AreaChartSVG data={sleepLine} T={T} height={80} color={T.primary} />
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 10, color: T.muted, marginTop: 3 }}>Норма: 7+ часов</Text>
-              </Card>
+              </UnifiedCard>
             )}
 
             {/* Exercise trend */}
-            <Card T={T} style={{ marginBottom: 14 }}>
+            <UnifiedCard T={T} style={{ marginBottom: 14 }}>
               <Lbl T={T} style={{ marginBottom: 8 }}>Динамика упражнения</Lbl>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
                 <View style={{ flexDirection: 'row', gap: 6 }}>
@@ -305,11 +306,11 @@ export default function StatsScreen() {
                 ? <BarChartSVG data={exTrend.map((v, i) => ({ label: String(i + 1), value: v }))} T={T} height={110} accentLast />
                 : <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.muted, textAlign: 'center', paddingVertical: 20 }}>Нужно минимум 2 записи</Text>
               }
-            </Card>
+            </UnifiedCard>
 
             {/* PRs */}
             {Object.keys(prs).length > 0 && (
-              <Card T={T} style={{ marginBottom: 14 }}>
+              <UnifiedCard T={T} style={{ marginBottom: 14 }}>
                 <Lbl T={T} style={{ marginBottom: 10 }}>🏆 Личные рекорды</Lbl>
                 {Object.entries(prs).slice(0, 8).map(([id, val]) => {
                   const ex = trackedEx.find((e: any) => e.id === id);
@@ -321,15 +322,15 @@ export default function StatsScreen() {
                     </View>
                   );
                 })}
-              </Card>
+              </UnifiedCard>
             )}
 
             {/* Progression alerts */}
             {alerts.length > 0 && (
-              <Card T={T} style={{ marginBottom: 14, backgroundColor: T.warn + '0C', borderWidth: 1, borderColor: T.warn + '44' }}>
+              <UnifiedCard T={T} style={{ marginBottom: 14, backgroundColor: T.warn + '0C', borderWidth: 1, borderColor: T.warn + '44' }}>
                 <Lbl T={T} style={{ marginBottom: 10 }}>💡 Прогрессия</Lbl>
                 {alerts.map((a, i) => <Text key={i} style={{ fontFamily: 'Barlow_400Regular', fontSize: 14, color: T.txt, paddingVertical: 5, borderBottomWidth: i < alerts.length - 1 ? 1 : 0, borderBottomColor: T.bord }}>{a.message}</Text>)}
-              </Card>
+              </UnifiedCard>
             )}
           </>
         )}
@@ -351,7 +352,7 @@ export default function StatsScreen() {
               const rows: any[] = [];
               for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7));
               return (
-                <Card T={T} style={{ marginBottom: 14 }}>
+                <UnifiedCard T={T} style={{ marginBottom: 14 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <Lbl T={T}>Месяц</Lbl>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -402,7 +403,7 @@ export default function StatsScreen() {
                       })}
                     </View>
                   ))}
-                </Card>
+                </UnifiedCard>
               );
             })()}
 
@@ -411,11 +412,11 @@ export default function StatsScreen() {
                 <Lbl T={T} style={{ marginBottom: 10 }}>Получено</Lbl>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
                   {ACHIEVEMENT_DEFS.filter(a => earned.includes(a.id)).map(a => (
-                    <Card key={a.id} T={T} style={{ width: '47%', padding: 12, backgroundColor: T.success + '0C', borderWidth: 1, borderColor: T.success + '55' }}>
+                    <UnifiedCard key={a.id} T={T} style={{ width: '47%', padding: 12, backgroundColor: T.success + '0C', borderWidth: 1, borderColor: T.success + '55' }}>
                       <Text style={{ fontSize: 28, marginBottom: 6 }}>{a.emoji}</Text>
                       <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.success, marginBottom: 2 }}>{a.title}</Text>
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted }}>{a.desc}</Text>
-                    </Card>
+                    </UnifiedCard>
                   ))}
                 </View>
               </>
@@ -426,11 +427,11 @@ export default function StatsScreen() {
                 <Lbl T={T} style={{ marginBottom: 10 }}>Впереди</Lbl>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                   {notEarned.map(a => (
-                    <Card key={a.id} T={T} style={{ width: '47%', padding: 12, opacity: 0.4 }}>
+                    <UnifiedCard key={a.id} T={T} style={{ width: '47%', padding: 12, opacity: 0.4 }}>
                       <Text style={{ fontSize: 28, marginBottom: 6 }}>{a.emoji}</Text>
                       <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.muted, marginBottom: 2 }}>{a.title}</Text>
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted }}>{a.desc}</Text>
-                    </Card>
+                    </UnifiedCard>
                   ))}
                 </View>
               </>
@@ -485,7 +486,7 @@ export default function StatsScreen() {
               const musclePRs = muscle.exercises.map(id => prs[id] || 0).filter(v => v > 0);
               const bestPR = musclePRs.length ? Math.max(...musclePRs) : 0;
               return (
-                <Card key={muscle.name} T={T} style={{ marginBottom: 12, borderTopWidth: 3, borderTopColor: muscle.color }}>
+                <UnifiedCard key={muscle.name} T={T} style={{ marginBottom: 12, borderTopWidth: 3, borderTopColor: muscle.color }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                       <Text style={{ fontSize: 28 }}>{muscle.emoji}</Text>
@@ -520,7 +521,7 @@ export default function StatsScreen() {
                       <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 13, color: T.txt, flex: 1 }}>{m}</Text>
                     </View>
                   ))}
-                </Card>
+                </UnifiedCard>
               );
             })}
           </>
@@ -530,7 +531,7 @@ export default function StatsScreen() {
         {sub === 'profile' && (
           <>
             {/* Stats summary */}
-            <Card T={T} style={{ marginBottom: 12, backgroundColor: T.primary + '12', borderWidth: 1, borderColor: T.primary + '44' }}>
+            <UnifiedCard T={T} style={{ marginBottom: 12, backgroundColor: T.primary + '12', borderWidth: 1, borderColor: T.primary + '44' }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                 {[
                   { l: 'Тренировок', v: Object.values(history).filter(l => l.completed).length, c: T.primary },
@@ -546,10 +547,10 @@ export default function StatsScreen() {
                   </React.Fragment>
                 ))}
               </View>
-            </Card>
+            </UnifiedCard>
 
             {/* Max pushups editor */}
-            <Card T={T} style={{ marginBottom: 12 }}>
+            <UnifiedCard T={T} style={{ marginBottom: 12 }}>
               <Lbl T={T} style={{ marginBottom: 8 }}>Максимум отжиманий</Lbl>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                 <TouchableOpacity onPress={() => setState((s: any) => ({ ...s, user: { ...s.user, maxPushups: Math.max(1, (s.user.maxPushups || 27) - 1) } }))} style={{ width: 36, height: 36, borderRadius: 9, borderWidth: 1, borderColor: T.bord, backgroundColor: T.lo, alignItems: 'center', justifyContent: 'center' }}>
@@ -560,10 +561,10 @@ export default function StatsScreen() {
                   <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 20, color: T.muted }}>+</Text>
                 </TouchableOpacity>
               </View>
-            </Card>
+            </UnifiedCard>
 
             {/* Style section */}
-            <Card T={T} style={{ marginBottom: 12 }}>
+            <UnifiedCard T={T} style={{ marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <Text style={{ fontSize: 14 }}>🎨</Text>
                 <Lbl T={T} style={{ color: T.success }}>Стиль интерфейса</Lbl>
@@ -583,10 +584,10 @@ export default function StatsScreen() {
               <TouchableOpacity onPress={() => setShowStylePicker(true)} style={{ height: 36, borderRadius: 9, borderWidth: 1, borderColor: T.success + '55', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: T.success }}>Выбрать стиль →</Text>
               </TouchableOpacity>
-            </Card>
+            </UnifiedCard>
 
             {/* Theme swatches */}
-            <Card T={T} style={{ marginBottom: 12 }}>
+            <UnifiedCard T={T} style={{ marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <Palette size={14} color={T.primary} />
                 <Lbl T={T} style={{ color: T.primary }}>Тема оформления</Lbl>
@@ -607,7 +608,7 @@ export default function StatsScreen() {
               <TouchableOpacity onPress={() => setShowThemePicker(true)} style={{ marginTop: 10, height: 36, borderRadius: 9, borderWidth: 1, borderColor: T.primary + '55', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: T.primary }}>Все темы →</Text>
               </TouchableOpacity>
-            </Card>
+            </UnifiedCard>
 
             {/* Reset */}
             <TouchableOpacity onPress={() => Alert.alert('Сбросить всё?', 'Тренировки, задачи, цели, дневник — всё удалится.', [{ text: 'Отмена', style: 'cancel' }, { text: 'Удалить всё', style: 'destructive', onPress: () => setState({ ...DEFAULTS, themeId: state.themeId }) }])}
@@ -641,13 +642,13 @@ export default function StatsScreen() {
               <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 14, color: T.primary }}>Экспорт в JSON</Text>
             </TouchableOpacity>
 
-            <Card T={T} style={{ marginBottom: 0 }}>
+            <UnifiedCard T={T} style={{ marginBottom: 0 }}>
               <View style={{ alignItems: 'center', paddingVertical: 8 }}>
                 <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 22, letterSpacing: 2, color: T.txt }}>ГОРИЗОНТ</Text>
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 12, color: T.muted, marginTop: 4 }}>Life Tracker · v4.1 · Expo React Native</Text>
                 <Text style={{ fontFamily: 'Barlow_400Regular', fontSize: 11, color: T.muted, marginTop: 2 }}>Тело · Разум · Дисциплина · Горизонт</Text>
               </View>
-            </Card>
+            </UnifiedCard>
           </>
         )}
       </ScrollView>

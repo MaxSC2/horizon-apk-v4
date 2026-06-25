@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus, X, Check } from 'lucide-react-native';
 import { useApp } from '../AppContext';
 import { Card, Lbl, Btn, Badge, ProgressBar } from '../components';
+import { UnifiedCard } from '../components/UnifiedCard';
 import { uid, TODAY, goalForecast } from '../helpers';
 import { Task, Goal } from '../types';
 import { Haptic, modeAchievement } from '../haptics';
@@ -124,7 +125,7 @@ export default function TasksScreen() {
             </View>
 
             {addingTask && (
-              <Card T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
+              <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
                 <Lbl T={T} style={{ marginBottom: 10 }}>Новая задача</Lbl>
                 <TextInput value={taskTitle} onChangeText={setTaskTitle} placeholder="Название задачи…" placeholderTextColor={T.muted} onSubmitEditing={addTask}
                   style={{ height: 42, borderRadius: 8, borderWidth: 1.5, borderColor: T.primary, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 15, paddingHorizontal: 12, marginBottom: 10 }} />
@@ -149,7 +150,7 @@ export default function TasksScreen() {
                     <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: '#000' }}>Добавить</Text>
                   </TouchableOpacity>
                 </View>
-              </Card>
+              </UnifiedCard>
             )}
 
             {tasks.length === 0 && !addingTask && (
@@ -164,7 +165,7 @@ export default function TasksScreen() {
               const done = task.completedDates?.includes(TODAY);
               const streak = taskStreak(task);
               return (
-                <Card key={task.id} T={T} style={{ marginBottom: 10, borderWidth: done ? 1.5 : 1, borderColor: done ? T.success + '55' : T.bord }}>
+                <UnifiedCard key={task.id} T={T} style={{ marginBottom: 10, borderWidth: done ? 1.5 : 1, borderColor: done ? T.success + '55' : T.bord }}>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
                     <TouchableOpacity onPress={() => toggleTask(task.id)} style={{ width: 26, height: 26, borderRadius: 8, borderWidth: 2, borderColor: done ? T.success : c.color, backgroundColor: done ? T.success : 'transparent', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
                       {done && <Text style={{ color: '#000', fontSize: 14, fontWeight: '900' }}>✓</Text>}
@@ -193,7 +194,7 @@ export default function TasksScreen() {
                       <X size={14} color={T.muted} />
                     </TouchableOpacity>
                   </View>
-                </Card>
+                </UnifiedCard>
               );
             })}
           </>
@@ -209,7 +210,7 @@ export default function TasksScreen() {
             </View>
 
             {addingGoal && (
-              <Card T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
+              <UnifiedCard T={T} style={{ marginBottom: 12, borderWidth: 1, borderColor: T.primary + '55' }}>
                 <TextInput value={goalForm.title} onChangeText={v => setGoalForm(f => ({ ...f, title: v }))} placeholder="Название цели…" placeholderTextColor={T.muted}
                   style={{ height: 42, borderRadius: 8, borderWidth: 1.5, borderColor: T.primary, backgroundColor: T.lo, color: T.txt, fontFamily: 'Barlow_400Regular', fontSize: 15, paddingHorizontal: 12, marginBottom: 10 }} />
                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10 }}>
@@ -237,14 +238,14 @@ export default function TasksScreen() {
                     <Text style={{ fontFamily: 'BarlowCondensed_700Bold', fontSize: 13, color: '#000' }}>Добавить</Text>
                   </TouchableOpacity>
                 </View>
-              </Card>
+              </UnifiedCard>
             )}
 
             {goals.filter(g => !g.completed).map(g => {
               const pct = Math.round((g.currentValue / Math.max(g.targetValue, 1)) * 100);
               const fc = goalForecast(g);
               return (
-                <Card key={g.id} T={T} style={{ marginBottom: 12 }}>
+                <UnifiedCard key={g.id} T={T} style={{ marginBottom: 12 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontFamily: 'BarlowCondensed_900Black', fontSize: 18, color: T.txt }}>{g.emoji} {g.title}</Text>
@@ -279,7 +280,7 @@ export default function TasksScreen() {
                       </Text>
                     </View>
                   )}
-                </Card>
+                </UnifiedCard>
               );
             })}
 

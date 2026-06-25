@@ -518,3 +518,48 @@
 - Expo SDK 51, React Native 0.74.5 — без изменений
 - Существующие данные сохраняются
 - APK собирается через `eas build -p android --profile preview`
+
+---
+
+## [4.7.0] — 2026-06-25
+
+### 🎨 Полная миграция на UnifiedCard
+
+Все 9 экранов приложения переведены на единую дизайн-систему:
+
+| Экран | Карточек мигрировано |
+|-------|---------------------|
+| DashboardScreen | 9 |
+| StatsScreen | 14 |
+| JournalScreen | 6 |
+| WorkoutScreen | 4 |
+| AlarmScreen | 5 |
+| TasksScreen | 2 |
+| NutritionScreen | 2 |
+| CalendarScreen | 2 |
+| SettingsScreen | 1 |
+| **Итого** | **45 карточек** |
+
+Теперь переключение дизайна меняет **все** карточки на всех экранах — больше
+никаких расхождений между Card и ModeCard.
+
+### 🎨 ModeQuickSwitcher обновлён
+
+Кнопка быстрого переключения в шапке дашборда теперь показывает **8 новых
+дизайнов** (minimal-glass, neon-cyber, paper-classic, cosmic-deep,
+playful-bubble, retro-pixel, nature-calm, mono-print) вместо старых 8 modes.
+
+Live preview в модалке использует `UnifiedCard` — пользователь видит реальный
+вид карточки в выбранном дизайне до применения.
+
+### 📊 Технические детали
+- 0 ошибок TypeScript
+- Bundle успешно собран: 5.53 MB
+- 45 карточек мигрировано на UnifiedCard
+- Старый `Card` компонент удалён из всех экранов (остался в components/index.tsx для совместимости)
+- Backwards compatible — старый код с `Card` продолжает работать если где-то остался
+
+### 📦 Совместимость
+- Expo SDK 51, React Native 0.74.5 — без изменений
+- Существующие данные сохраняются
+- APK собирается через `eas build -p android --profile preview`
