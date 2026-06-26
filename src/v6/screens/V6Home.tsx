@@ -229,8 +229,7 @@ function ProgressRing({ label, value, max, color }: { label: string; value: numb
 
 function SvgRing({ size, stroke, r, circ, pct, color, value }: any) {
   // Импортируем внутри чтобы не плодить зависимостей в начале файла
-  const Svg = require('react-native-svg').default;
-  const Circle = Svg.Circle;
+  const { Svg, Circle } = require('react-native-svg');
   const offset = circ - (circ * pct / 100);
   return (
     <Svg width={size} height={size}>
