@@ -2,7 +2,7 @@
   "expo": {
     "name": "Горизонт",
     "slug": "horizon-life-tracker",
-    "version": "6.0.0",
+    "version": "6.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -17,7 +17,7 @@
         "backgroundColor": "#07090D"
       },
       "package": "com.horizon.lifetracker",
-      "versionCode": 12,
+      "versionCode": 13,
       "permissions": [
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.VIBRATE",

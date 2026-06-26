@@ -4,10 +4,12 @@
 // Navigation — Apple Health style tab bar (не floating dock).
 // Все v4 экраны доступны (через wrapV4 — V6 фон + v4 контент).
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { V6Background } from './components/V6Background';
+import { V6Card } from './components/V6Card';
 import { V6TabBar } from './components/V6TabBar';
 import { V6Home } from './screens/V6Home';
+import { v6Colors, v6Typography, v6Geometry } from './theme';
 import WorkoutScreen from '../screens/WorkoutScreen';
 import JournalScreen from '../screens/JournalScreen';
 import MentorScreen from '../screens/MentorScreen';
@@ -85,8 +87,6 @@ function V6More({ onSelect }: { onSelect: (target: string) => void }) {
     { id: 'stats', label: 'Статы', desc: 'Графики и рекорды', emoji: '📊' },
     { id: 'settings', label: 'Настройки', desc: 'Темы, AI, данные', emoji: '⚙️' },
   ];
-  const { v6Colors, v6Typography, v6Geometry } = require('../theme');
-  const { V6Card } = require('./components/V6Card');
 
   return (
     <View style={styles.container}>
@@ -115,8 +115,6 @@ function V6More({ onSelect }: { onSelect: (target: string) => void }) {
     </View>
   );
 }
-
-import { Text } from 'react-native';
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000000' },

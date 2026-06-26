@@ -11,6 +11,7 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { ChevronRight, Plus, Activity, TrendingUp, Flame } from 'lucide-react-native';
+import Svg, { Circle as SvgCircle } from 'react-native-svg';
 import { V6Background } from '../components/V6Background';
 import { V6Card } from '../components/V6Card';
 import { v6Colors, v6Typography, v6Geometry } from '../theme';
@@ -216,31 +217,25 @@ function ProgressRing({ label, value, max, color }: { label: string; value: numb
   const stroke = 4;
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
-  // Используем SVG inline
+  const offset = circ - (circ * pct / 100);
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
-      <SvgRing size={size} stroke={stroke} r={r} circ={circ} pct={pct} color={color} value={value} />
-      <Text style={[v6Typography.micro, { color: v6Colors.textTertiary, marginTop: 6, textAlign: 'center' }]}>
+      <Svg width={size} height={size}>
+        <SvgCircle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={v6Colors.divider} strokeWidth={stroke} />
+        <SvgCircle
+          cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke}
+          strokeDasharray={`${circ} ${circ}`} strokeDashoffset={offset}
+          strokeLinecap="round"
+          rotation="-90" origin={`${size / 2}, ${size / 2}`}
+        />
+      </Svg>
+      <Text style={[v6Typography.micro, { color: v6Colors.textPrimary, marginTop: 6, textAlign: 'center', fontWeight: '600' }]}>
+        {value}/{max}
+      </Text>
+      <Text style={[v6Typography.micro, { color: v6Colors.textTertiary, marginTop: 2, textAlign: 'center' }]}>
         {label}
       </Text>
     </View>
-  );
-}
-
-function SvgRing({ size, stroke, r, circ, pct, color, value }: any) {
-  // Импортируем внутри чтобы не плодить зависимостей в начале файла
-  const { Svg, Circle } = require('react-native-svg');
-  const offset = circ - (circ * pct / 100);
-  return (
-    <Svg width={size} height={size}>
-      <Circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={v6Colors.divider} strokeWidth={stroke} />
-      <Circle
-        cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke}
-        strokeDasharray={`${circ} ${circ}`} strokeDashoffset={offset}
-        strokeLinecap="round"
-        rotation="-90" origin={`${size / 2}, ${size / 2}`}
-      />
-    </Svg>
   );
 }
 
