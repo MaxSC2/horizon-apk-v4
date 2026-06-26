@@ -19,7 +19,9 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: |
+          npm install --legacy-peer-deps
+          npx expo install --fix
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -32,7 +34,30 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build Release APK
+      - name: Configure signing
+        run: |
+          KEYSTORE_PATH="${{ github.workspace }}/android/horizon-release.keystore"
+          # Create signing config (Gradle allows re-opening the android block)
+          cat >> android/app/build.gradle << EOF
+
+android {
+    signingConfigs {
+        release {
+            storeFile file("${KEYSTORE_PATH}")
+            storePassword "horizon123"
+            keyAlias "horizon"
+            keyPassword "horizon123"
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+EOF
+
+      - name: Build Signed Release APK
         run: |
           cd android
           ./gradlew assembleRelease
