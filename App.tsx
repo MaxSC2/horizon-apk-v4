@@ -38,13 +38,12 @@ import CalendarScreen   from './src/screens/CalendarScreen';
 import SettingsScreen   from './src/screens/SettingsScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { ensureAlarmHandlersRegistered } from './src/alarm';
-import { V5App } from './src/v5/V5App';
+import { V6App } from './src/v6/V6App';
 
-// HORIZON V5.0 — полный rebuild UI. Включено по умолчанию.
-// V5 = 4 радикально новых темы (Solo Leveling, Dev Command, Glass Future, Cyberpunk Nexus),
-// кастомные загрузчики, floating dock, typewriter AI.
-// V4 код остаётся в src/screens/, src/modes/, src/design/ — доступен через V5_ENABLED = false.
-const V5_ENABLED = true;
+// HORIZON V6.0 — один проработанный дизайн.
+// Минимализм в стиле Apple Health / Linear / Whoop.
+// Без рамок, без хаоса, чистая иерархия, мягкие акценты.
+const V6_ENABLED = true;
 
 // Register background event handler ASAP — before any screen mounts — so
 // snooze/stop actions on notifications work even if the app was cold-started
@@ -237,12 +236,12 @@ export default function App() {
     </View>;
   }
 
-  // V5 — полный rebuild UI, активирован по умолчанию
-  if (V5_ENABLED) {
+  // V6 — один проработанный дизайн (минимализм Apple Health style)
+  if (V6_ENABLED) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
-          <V5App />
+          <V6App />
         </SafeAreaProvider>
       </GestureHandlerRootView>
     );
