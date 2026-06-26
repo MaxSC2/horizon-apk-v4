@@ -36,26 +36,23 @@ jobs:
 
       - name: Configure signing
         run: |
-          KEYSTORE_PATH="${{ github.workspace }}/android/horizon-release.keystore"
-          # Create signing config (Gradle allows re-opening the android block)
-          cat >> android/app/build.gradle << EOF
-
-android {
-    signingConfigs {
-        release {
-            storeFile file("${KEYSTORE_PATH}")
-            storePassword "horizon123"
-            keyAlias "horizon"
-            keyPassword "horizon123"
-        }
-    }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
-}
-EOF
+          KEYSTORE="${{ github.workspace }}/android/horizon-release.keystore"
+          echo "" >> android/app/build.gradle
+          echo "android {" >> android/app/build.gradle
+          echo "    signingConfigs {" >> android/app/build.gradle
+          echo "        release {" >> android/app/build.gradle
+          echo "            storeFile file(\"${KEYSTORE}\")" >> android/app/build.gradle
+          echo "            storePassword \"horizon123\"" >> android/app/build.gradle
+          echo "            keyAlias \"horizon\"" >> android/app/build.gradle
+          echo "            keyPassword \"horizon123\"" >> android/app/build.gradle
+          echo "        }" >> android/app/build.gradle
+          echo "    }" >> android/app/build.gradle
+          echo "    buildTypes {" >> android/app/build.gradle
+          echo "        release {" >> android/app/build.gradle
+          echo "            signingConfig signingConfigs.release" >> android/app/build.gradle
+          echo "        }" >> android/app/build.gradle
+          echo "    }" >> android/app/build.gradle
+          echo "}" >> android/app/build.gradle
 
       - name: Build Signed Release APK
         run: |
