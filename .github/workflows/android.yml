@@ -16,12 +16,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npx expo install --fix
+        run: npm install --legacy-peer-deps
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -33,18 +31,6 @@ jobs:
         run: npx expo prebuild --platform android --clean
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Sign release with debug key
-        run: |
-          # Gradle allows re-opening android block
-          echo "" >> android/app/build.gradle
-          echo "android {" >> android/app/build.gradle
-          echo "    buildTypes {" >> android/app/build.gradle
-          echo "        release {" >> android/app/build.gradle
-          echo "            signingConfig signingConfigs.debug" >> android/app/build.gradle
-          echo "        }" >> android/app/build.gradle
-          echo "    }" >> android/app/build.gradle
-          echo "}" >> android/app/build.gradle
 
       - name: Build Release APK
         run: |
