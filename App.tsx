@@ -38,12 +38,11 @@ import CalendarScreen   from './src/screens/CalendarScreen';
 import SettingsScreen   from './src/screens/SettingsScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { ensureAlarmHandlersRegistered } from './src/alarm';
-import { V6App } from './src/v6/V6App';
+import { V7App } from './src/v7/V7App';
 
-// HORIZON V6.0 — один проработанный дизайн.
-// Минимализм в стиле Apple Health / Linear / Whoop.
-// Без рамок, без хаоса, чистая иерархия, мягкие акценты.
-const V6_ENABLED = true;
+// HORIZON V7.0 — Life OS.
+// Не трекер. Не органайзер. Операционная система жизни.
+const V7_ENABLED = true;
 
 // Register background event handler ASAP — before any screen mounts — so
 // snooze/stop actions on notifications work even if the app was cold-started
@@ -236,12 +235,12 @@ export default function App() {
     </View>;
   }
 
-  // V6 — один проработанный дизайн (минимализм Apple Health style)
-  if (V6_ENABLED) {
+  // V7 — Life OS
+  if (V7_ENABLED) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
-          <V6App />
+          <V7App />
         </SafeAreaProvider>
       </GestureHandlerRootView>
     );

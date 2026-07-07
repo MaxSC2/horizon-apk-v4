@@ -9,6 +9,9 @@ import { V6Background } from './components/V6Background';
 import { V6Card } from './components/V6Card';
 import { V6TabBar } from './components/V6TabBar';
 import { V6Home } from './screens/V6Home';
+import { V6Mentor } from './screens/V6Mentor';
+import { V6Journal } from './screens/V6Journal';
+import { V6Tasks } from './screens/V6Tasks';
 import { v6Colors, v6Typography, v6Geometry } from './theme';
 import WorkoutScreen from '../screens/WorkoutScreen';
 import JournalScreen from '../screens/JournalScreen';
@@ -42,6 +45,11 @@ function V6AppContent() {
     }
   };
 
+  const goHome = () => {
+    setActive('home');
+    setMoreTarget(null);
+  };
+
   // Обёртка для v4 экранов — V6 фон + v4 контент
   const wrapV4 = (Screen: React.ComponentType) => (
     <View style={styles.container}>
@@ -56,9 +64,11 @@ function V6AppContent() {
     <View style={styles.container}>
       {active === 'home' && <V6Home onNavigate={handleNavigate} />}
       {active === 'train' && wrapV4(WorkoutScreen)}
-      {active === 'journal' && wrapV4(JournalScreen)}
-      {active === 'ai' && wrapV4(MentorScreen)}
-      {active === 'more' && moreTarget && wrapV4(getMoreScreen(moreTarget))}
+      {active === 'journal' && <V6Journal onBack={goHome} />}
+      {active === 'ai' && <V6Mentor onBack={goHome} />}
+      {active === 'tasks' && <V6Tasks onBack={goHome} />}
+      {active === 'more' && moreTarget === 'tasks' && <V6Tasks onBack={goHome} />}
+      {active === 'more' && moreTarget && moreTarget !== 'tasks' && wrapV4(getMoreScreen(moreTarget))}
       {active === 'more' && !moreTarget && <V6More onSelect={setMoreTarget} />}
       <V6TabBar active={active} onSelect={(id) => { setActive(id); if (id !== 'more') setMoreTarget(null); }} />
     </View>
